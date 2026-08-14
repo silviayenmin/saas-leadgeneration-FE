@@ -1,29 +1,56 @@
 import React, { useState } from 'react';
-import { Sparkles, ArrowRight, Lock, Mail } from 'lucide-react';
+import { Sparkles, ArrowRight, Eye, EyeOff, Lock, Mail, AlertCircle } from 'lucide-react';
 import api from '../services/api';
 import './Auth.scss';
 
-const Login = ({ onNavigate, onLoginSuccess }) => {
-  const [email, setEmail] = useState('demo@mapflow.ai');
-  const [password, setPassword] = useState('password123');
+const Login = ({ onNavigate, onLoginSuccess, onRequireOtp }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [forgotMsg, setForgotMsg] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setForgotMsg('');
+
     try {
       const res = await api.post('/auth/login', { email, password });
       if (res.data.success) {
-        localStorage.setItem('mapflow_token', res.data.token);
-        localStorage.setItem('mapflow_user', JSON.stringify(res.data.user));
+        if (rememberMe) {
+          localStorage.setItem('mapflow_token', res.data.token);
+          localStorage.setItem('mapflow_user', JSON.stringify(res.data.user));
+        } else {
+          sessionStorage.setItem('mapflow_token', res.data.token);
+          sessionStorage.setItem('mapflow_user', JSON.stringify(res.data.user));
+        }
         onLoginSuccess(res.data.user);
+      } else if (res.data.requiresOtp) {
+        onRequireOtp(res.data.email);
       }
+
     } catch (err) {
       setError(err.response?.data?.detail || 'Invalid email or password');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!email) {
+      setError('Please enter your business email first.');
+      return;
+    }
+    setError('');
+    try {
+      const res = await api.post('/auth/forgot-password', { email });
+      setForgotMsg(`Reset code sent to ${email} (Code: ${res.data.resetCode})`);
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Failed to request password reset.');
     }
   };
 
@@ -32,23 +59,73 @@ const Login = ({ onNavigate, onLoginSuccess }) => {
       <div className="auth-card animate-slide-in">
         <div className="auth-brand">
           <div className="brand-icon">
-            <Sparkles size={24} />
+            <Sparkles size={26} />
           </div>
-          <h2>Sign In to MapFlow AI</h2>
+          <h2>MapFlow AI</h2>
           <p>Discover Local Businesses. Find Better Leads. Close More Deals.</p>
         </div>
 
-        {error && <div className="error-banner" style={{ background: 'rgba(239,68,68,0.15)', color: '#EF4444', padding: '10px', borderRadius: '8px', fontSize: '0.85rem' }}>{error}</div>}
+        {error && (
+          <div className="banner-alert error">
+            <AlertCircle size={16} />
+            <span>{error}</span>
+          </div>
+        )}
+
+        {forgotMsg && (
+          <div className="banner-alert info">
+            <span>{forgotMsg}</span>
+          </div>
+        )}
 
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="form-group">
             <label>Business Email</label>
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+            <div className="input-wrapper">
+              <input
+                type="email"
+                placeholder="name@company.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
           </div>
 
           <div className="form-group">
-            <label>Password</label>
-            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+            <label>
+              <span>Password</span>
+              <span className="forgot-link" onClick={handleForgotPassword}>
+                Forgot Password?
+              </span>
+            </label>
+            <div className="input-wrapper">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <button
+                type="button"
+                className="toggle-icon"
+                onClick={() => setShowPassword(!showPassword)}
+                title={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
+          </div>
+
+          <div className="form-checkbox">
+            <input
+              type="checkbox"
+              id="remember"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+            />
+            <label htmlFor="remember">Remember Me</label>
           </div>
 
           <button type="submit" className="btn-submit" disabled={loading}>

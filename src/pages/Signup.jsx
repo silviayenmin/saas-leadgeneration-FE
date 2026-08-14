@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sparkles, ArrowRight } from 'lucide-react';
+import { Sparkles, ArrowRight, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import api from '../services/api';
 import './Auth.scss';
 
@@ -7,20 +7,34 @@ const Signup = ({ onNavigate, onSignupSuccess }) => {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError('');
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters long.');
+      return;
+    }
+
+    setLoading(true);
     try {
       const res = await api.post('/auth/signup', { fullName, email, password });
       if (res.data.success) {
-        onSignupSuccess(email, res.data.otpCode);
+        onSignupSuccess(email);
       }
+
     } catch (err) {
-      setError(err.response?.data?.detail || 'Registration failed');
+      setError(err.response?.data?.detail || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -31,32 +45,81 @@ const Signup = ({ onNavigate, onSignupSuccess }) => {
       <div className="auth-card animate-slide-in">
         <div className="auth-brand">
           <div className="brand-icon">
-            <Sparkles size={24} />
+            <Sparkles size={26} />
           </div>
           <h2>Create Account</h2>
-          <p>Start discovering high-intent Google Maps leads today.</p>
+          <p>Join MapFlow AI to discover local businesses & find better leads.</p>
         </div>
 
-        {error && <div className="error-banner" style={{ background: 'rgba(239,68,68,0.15)', color: '#EF4444', padding: '10px', borderRadius: '8px', fontSize: '0.85rem' }}>{error}</div>}
+        {error && (
+          <div className="banner-alert error">
+            <AlertCircle size={16} />
+            <span>{error}</span>
+          </div>
+        )}
 
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="form-group">
             <label>Full Name</label>
-            <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} required />
+            <div className="input-wrapper">
+              <input
+                type="text"
+                placeholder="John Doe"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                required
+              />
+            </div>
           </div>
 
           <div className="form-group">
             <label>Work Email</label>
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+            <div className="input-wrapper">
+              <input
+                type="email"
+                placeholder="john@agency.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
           </div>
 
           <div className="form-group">
             <label>Password</label>
-            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+            <div className="input-wrapper">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <button
+                type="button"
+                className="toggle-icon"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label>Confirm Password</label>
+            <div className="input-wrapper">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                placeholder="••••••••"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+              />
+            </div>
           </div>
 
           <button type="submit" className="btn-submit" disabled={loading}>
-            {loading ? 'Creating...' : 'Create Account & Send Code'} <ArrowRight size={16} />
+            {loading ? 'Sending Code...' : 'Create Account & Send Code'} <ArrowRight size={16} />
           </button>
         </form>
 

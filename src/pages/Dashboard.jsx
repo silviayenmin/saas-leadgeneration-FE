@@ -6,6 +6,7 @@ import './Pages.scss';
 const Dashboard = ({ onUpgradeClick }) => {
   const [dashData, setDashData] = useState(null);
   const [loading, setLoading] = useState(true);
+  console.log("Testing...")
 
   useEffect(() => {
     const fetchDashboard = async () => {
