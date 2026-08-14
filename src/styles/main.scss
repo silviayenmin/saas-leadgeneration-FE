@@ -1,0 +1,45 @@
+@import './variables';
+@import './mixins';
+@import './typography';
+@import './animations';
+@import './responsive';
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+  background-color: $bg-main;
+}
+
+/* Global Scrollbar */
+body {
+  @include custom-scrollbar;
+}
+
+/* Dark Map Styling Override for Leaflet */
+.leaflet-container {
+  background-color: #0A0F1C !important;
+  font-family: $font-family !important;
+}
+
+.leaflet-tile {
+  filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
+}
+
+.leaflet-popup-content-wrapper {
+  background: rgba(24, 34, 51, 0.92) !important;
+  border: 1px solid rgba(148, 163, 184, 0.20) !important;
+  color: #F8FAFC !important;
+  backdrop-filter: blur(8px);
+  border-radius: 10px !important;
+}
+
+.leaflet-popup-tip {
+  background: rgba(24, 34, 51, 0.92) !important;
+}

@@ -1,0 +1,109 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.app-header {
+  height: 70px;
+  padding: 0 $spacing-lg;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.10);
+  background: rgba(17, 24, 39, 0.5);
+  backdrop-filter: blur(8px);
+
+  .header-title h1 {
+    font-size: 1.35rem;
+    font-weight: 700;
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+
+    .header-search {
+      position: relative;
+      display: flex;
+      align-items: center;
+
+      .search-icon {
+        position: absolute;
+        left: 12px;
+        color: $text-muted;
+      }
+
+      input {
+        background: rgba(24, 34, 51, 0.8);
+        border: 1px solid rgba(148, 163, 184, 0.15);
+        border-radius: $radius-md;
+        padding: 8px 12px 8px 36px;
+        color: $text-primary;
+        font-size: 0.85rem;
+        width: 220px;
+        outline: none;
+        transition: all $transition-fast;
+
+        &:focus {
+          border-color: $primary-end;
+          width: 260px;
+        }
+      }
+    }
+
+    .credit-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      background: rgba(3, 113, 114, 0.15);
+      border: 1px solid rgba(14, 165, 164, 0.3);
+      border-radius: $radius-full;
+      cursor: pointer;
+      transition: all $transition-fast;
+
+      &:hover {
+        background: rgba(3, 113, 114, 0.25);
+      }
+
+      .coins-icon {
+        color: $primary-end;
+      }
+
+      .credit-text {
+        font-size: 0.825rem;
+        color: $text-primary;
+      }
+
+      .upgrade-pill {
+        background: linear-gradient(135deg, $primary 0%, $primary-end 100%);
+        border: none;
+        color: #fff;
+        font-size: 0.725rem;
+        font-weight: 700;
+        padding: 3px 8px;
+        border-radius: $radius-full;
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        cursor: pointer;
+      }
+    }
+
+    .icon-btn {
+      background: rgba(24, 34, 51, 0.8);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      color: $text-muted;
+      width: 36px;
+      height: 36px;
+      border-radius: $radius-md;
+      @include flex-center;
+      cursor: pointer;
+      transition: all $transition-fast;
+
+      &:hover {
+        color: $text-primary;
+        background: $card-hover;
+      }
+    }
+  }
+}

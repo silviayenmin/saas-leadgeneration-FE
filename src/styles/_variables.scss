@@ -1,0 +1,54 @@
+// ==========================================
+// MAPFLOW AI — SCSS VARIABLES & DESIGN TOKENS
+// ==========================================
+
+// Color Palette
+$bg-main: #0A0F1C;
+$surface: #111827;
+$card: #182233;
+$card-hover: #1E2A3E;
+
+$primary: #037172;
+$primary-end: #0EA5A4;
+$secondary: #22C55E;
+$highlight: #4DA3FF;
+
+// Intent Colors
+$high-intent: #22C55E;
+$medium-intent: #F59E0B;
+$low-intent: #EF4444;
+
+// Typography Colors
+$text-primary: #F8FAFC;
+$text-muted: #94A3B8;
+$border-color: rgba(148, 163, 184, 0.10);
+
+// Font Family
+$font-family: 'Inter', system-ui, -apple-system, sans-serif;
+
+// Spacing
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 16px;
+$spacing-lg: 24px;
+$spacing-xl: 32px;
+
+// Border Radius
+$radius-sm: 6px;
+$radius-md: 10px;
+$radius-lg: 14px;
+$radius-full: 9999px;
+
+// Glassmorphism Token
+$glass-bg: rgba(24, 34, 51, 0.75);
+$glass-border: 1px solid rgba(148, 163, 184, 0.10);
+$glass-blur: blur(12px);
+
+// Shadows
+$shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.2);
+$shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+$shadow-glow: 0 0 20px rgba(3, 113, 114, 0.35);
+
+// Transitions
+$transition-fast: 0.15s ease-in-out;
+$transition-base: 0.25s ease-in-out;
