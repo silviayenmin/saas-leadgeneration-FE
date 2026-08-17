@@ -3,7 +3,7 @@
 @import './typography';
 @import './animations';
 @import './responsive';
-
+@import '../components/Modals/LeadDetailModal';
 * {
   box-sizing: border-box;
   margin: 0;
@@ -59,5 +59,43 @@ textarea {
   line-height: 1.5;
 }
 
-@import '../components/Modals/LeadDetailModal';
+
+/* Global: react-phone-input-2 full-width & modern scrollbar override */
+.react-tel-input {
+  width: 100% !important;
+
+  .form-control {
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .country-list {
+    scrollbar-width: thin !important;
+    scrollbar-color: rgba(14, 165, 164, 0.6) transparent !important;
+
+    &::-webkit-scrollbar {
+      width: 6px !important;
+      height: 6px !important;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.15) !important;
+      border-radius: 10px !important;
+      margin: 4px 0 !important;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, #0ea5a4 0%, #037172 100%) !important;
+      border-radius: 10px !important;
+      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+      box-shadow: 0 0 8px rgba(14, 165, 164, 0.4) !important;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(180deg, #14b8a6 0%, #0d9488 100%) !important;
+      box-shadow: 0 0 12px rgba(20, 184, 166, 0.7) !important;
+    }
+  }
+}
+
 

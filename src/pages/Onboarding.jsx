@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Rocket, ArrowRight, CheckCircle2 } from 'lucide-react';
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
 import api from '../services/api';
 import './Auth.scss';
 
@@ -31,8 +33,8 @@ const Onboarding = ({ user, onComplete }) => {
     setError('');
 
     if (step === 1) {
-      if (!fullName.trim() || !phone.trim() || !jobTitle.trim()) {
-        setError('Please fill in all personal details.');
+      if (!fullName.trim() || !phone || phone.length < 7 || !jobTitle.trim()) {
+        setError('Please fill in all personal details including a valid phone number.');
         return;
       }
       setStep(2);
@@ -51,7 +53,7 @@ const Onboarding = ({ user, onComplete }) => {
       setLoading(true);
       try {
         await api.post('/users/onboarding', {
-          step1: { fullName, phone, jobTitle, location, bio },
+          step1: { fullName, phone: phone ? `+${phone}` : '', jobTitle, location, bio },
           step2: { companyName, companyWebsite, targetIndustry, servicesOffered, technologiesUsed },
           step3: {
             targetCities: targetCities.split(',').map((c) => c.trim()),
@@ -120,13 +122,23 @@ const Onboarding = ({ user, onComplete }) => {
 
               <div className="form-group">
                 <label>Phone Number</label>
-                <div className="input-wrapper">
-                  <input
-                    type="text"
+                <div className="onboarding-phone-wrapper">
+                  <PhoneInput
+                    country={'us'}
                     value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="+1 (555) 019-2834"
-                    required
+                    onChange={(value) => setPhone(value)}
+                    enableSearch
+                    searchPlaceholder="Search country..."
+                    inputProps={{
+                      name: 'phone',
+                      placeholder: 'Enter phone number',
+                      required: true,
+                    }}
+                    containerClass="rpi-ob-container"
+                    buttonClass="rpi-ob-button"
+                    inputClass="rpi-ob-input"
+                    dropdownClass="rpi-ob-dropdown"
+                    searchClass="rpi-ob-search"
                   />
                 </div>
               </div>

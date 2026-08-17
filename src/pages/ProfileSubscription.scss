@@ -372,6 +372,164 @@
         cursor: not-allowed;
         background: rgba(0, 0, 0, 0.12);
       }
+
+      // react-phone-input-2 Package Theming
+      .phone-input-package-wrapper {
+        width: 100%;
+
+        .rpi-container {
+          width: 100% !important;
+          display: block !important;
+        }
+
+        .react-tel-input {
+          width: 100% !important;
+          display: block !important;
+
+          .rpi-input,
+          .form-control {
+            width: 100% !important;
+            box-sizing: border-box !important;
+            height: 42px !important;
+            background: $card !important;
+            border: 1px solid $border-color !important;
+            border-radius: $radius-md !important;
+            color: $text-primary !important;
+            font-size: 0.9rem !important;
+            font-family: inherit !important;
+            padding-left: 54px !important;
+            transition: all $transition-fast !important;
+
+            &:focus {
+              border-color: $secondary !important;
+              box-shadow: 0 0 0 2px rgba(14, 165, 164, 0.2) !important;
+              outline: none !important;
+            }
+
+            &::placeholder {
+              color: $text-muted !important;
+            }
+          }
+
+          .rpi-button,
+          .flag-dropdown {
+            background: $card-hover !important;
+            border: 1px solid $border-color !important;
+            border-right: none !important;
+            border-radius: $radius-md 0 0 $radius-md !important;
+
+            &:hover,
+            &.open {
+              background: $card-hover !important;
+            }
+
+            .selected-flag {
+              background: transparent !important;
+              border-radius: $radius-md 0 0 $radius-md !important;
+              padding: 0 8px 0 10px !important;
+              width: 48px !important;
+
+              &:hover,
+              &:focus {
+                background: rgba(14, 165, 164, 0.1) !important;
+              }
+
+              .arrow {
+                border-top-color: $text-muted !important;
+                border-bottom-color: $text-muted !important;
+              }
+            }
+          }
+
+          .rpi-dropdown,
+          .country-list {
+            background: var(--bg-card) !important;
+            border: 1px solid $border-color !important;
+            border-radius: $radius-md !important;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25) !important;
+            max-height: 220px !important;
+            overflow-y: auto !important;
+            scrollbar-width: thin !important;
+            scrollbar-color: rgba(14, 165, 164, 0.6) transparent !important;
+
+            &::-webkit-scrollbar {
+              width: 6px !important;
+              height: 6px !important;
+            }
+
+            &::-webkit-scrollbar-track {
+              background: rgba(15, 23, 42, 0.15) !important;
+              border-radius: 10px !important;
+              margin: 4px 0 !important;
+            }
+
+            &::-webkit-scrollbar-thumb {
+              background: linear-gradient(180deg, #0ea5a4 0%, #037172 100%) !important;
+              border-radius: 10px !important;
+              border: 1px solid rgba(255, 255, 255, 0.1) !important;
+              box-shadow: 0 0 8px rgba(14, 165, 164, 0.4) !important;
+            }
+
+            &::-webkit-scrollbar-thumb:hover {
+              background: linear-gradient(180deg, #14b8a6 0%, #0d9488 100%) !important;
+              box-shadow: 0 0 12px rgba(20, 184, 166, 0.7) !important;
+            }
+
+            .country {
+              color: $text-primary !important;
+              padding: 8px 12px !important;
+              font-size: 0.875rem !important;
+
+              &:hover,
+              &.highlight {
+                background: rgba(14, 165, 164, 0.12) !important;
+                color: $secondary !important;
+              }
+
+              .dial-code {
+                color: $text-muted !important;
+                font-size: 0.8rem !important;
+              }
+            }
+
+            .divider {
+              border-bottom-color: $border-color !important;
+              padding: 0 !important;
+            }
+          }
+
+          .rpi-search,
+          .search {
+            background: var(--bg-card) !important;
+            padding: 6px 8px !important;
+            border-bottom: 1px solid $border-color !important;
+
+            .search-emoji {
+              display: none !important;
+            }
+
+            input {
+              background: $card-hover !important;
+              border: 1px solid $border-color !important;
+              border-radius: $radius-sm !important;
+              color: $text-primary !important;
+              font-size: 0.85rem !important;
+              padding: 6px 10px !important;
+              width: 100% !important;
+              outline: none !important;
+              font-family: inherit !important;
+
+              &::placeholder {
+                color: $text-muted !important;
+              }
+
+              &:focus {
+                border-color: $secondary !important;
+              }
+            }
+          }
+        }
+      }
     }
 
     // Custom Select Dropdown
