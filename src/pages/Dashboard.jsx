@@ -3,15 +3,14 @@ import { Building2, Mail, Phone, Sparkles, TrendingUp } from 'lucide-react';
 import api from '../services/api';
 import './Pages.scss';
 
-const Dashboard = ({ onUpgradeClick }) => {
+const Dashboard = ({ onUpgradeClick, onViewDetails }) => {
   const [dashData, setDashData] = useState(null);
   const [loading, setLoading] = useState(true);
-  console.log("Testing...")
 
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
-        const res = await api.get('/dashboard');
+        const res = await api.get('/dashboard/');
         if (res.data.success) {
           setDashData(res.data.data);
         }
@@ -67,7 +66,10 @@ const Dashboard = ({ onUpgradeClick }) => {
       </div>
 
       <div className="data-card">
-        <h3>Recent Local Business Discoveries</h3>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h3>Recent Local Business Discoveries</h3>
+          <span style={{ fontSize: '0.75rem', color: '#94A3B8' }}>Click any business to open Lead Details</span>
+        </div>
         <table className="custom-table" style={{ marginTop: '16px' }}>
           <thead>
             <tr>
@@ -82,7 +84,12 @@ const Dashboard = ({ onUpgradeClick }) => {
           <tbody>
             {dashData?.recentLeads?.length > 0 ? (
               dashData.recentLeads.map((b) => (
-                <tr key={b.id}>
+                <tr 
+                  key={b.id}
+                  onClick={() => onViewDetails && onViewDetails(b)}
+                  className="clickable-row"
+                  style={{ cursor: 'pointer' }}
+                >
                   <td><strong>{b.name}</strong></td>
                   <td>{b.category}</td>
                   <td>{b.address}</td>
