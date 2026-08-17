@@ -1,27 +1,32 @@
 import React from 'react';
-import { Search, Bell, Coins, ArrowUpRight, Sun, Moon } from 'lucide-react';
+import { Bell, Coins, ArrowUpRight, Sun, Moon, Menu } from 'lucide-react';
 import './Header.scss';
 
-const Header = ({ title, credits, onUpgradeClick, theme, onToggleTheme }) => {
+const Header = ({ title, credits, onUpgradeClick, theme, onToggleTheme, isMobileNavOpen, onToggleMobileNav }) => {
   return (
     <header className="app-header">
-      <div className="header-title">
-        <h1>{title}</h1>
+      <div className="header-left">
+        <button
+          className={`mobile-menu-btn ${isMobileNavOpen ? 'active' : ''}`}
+          onClick={onToggleMobileNav}
+          title="Toggle Navigation Menu"
+          aria-label="Toggle Navigation Menu"
+        >
+          <Menu size={20} className="menu-icon" />
+        </button>
+        <div className="header-title">
+          <h1>{title}</h1>
+        </div>
       </div>
 
       <div className="header-actions">
-        <div className="header-search">
-          <Search size={16} className="search-icon" />
-          <input type="text" placeholder="Search leads, businesses..." />
-        </div>
-
-        <div className="credit-badge" onClick={onUpgradeClick}>
-          <Coins size={16} className="coins-icon" />
+        <div className="credit-badge" onClick={onUpgradeClick} title="View subscription & credits">
+          <Coins size={15} className="coins-icon" />
           <span className="credit-text">
-            <strong>{credits?.creditsRemaining ?? 0}</strong> / {credits?.creditLimit ?? 25} Credits
+            <strong>{credits?.creditsRemaining ?? 0}</strong>/{credits?.creditLimit ?? 25} <span className="credit-label-full">Credits</span>
           </span>
           <button className="upgrade-pill">
-            Upgrade <ArrowUpRight size={12} />
+            <span className="upgrade-text">Upgrade</span> <ArrowUpRight size={11} />
           </button>
         </div>
 

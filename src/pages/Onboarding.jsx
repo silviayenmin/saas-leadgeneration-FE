@@ -12,11 +12,15 @@ const Onboarding = ({ user, onComplete }) => {
   const [fullName, setFullName] = useState(user?.fullName || '');
   const [phone, setPhone] = useState('');
   const [jobTitle, setJobTitle] = useState('Agency Founder');
+  const [location, setLocation] = useState('');
+  const [bio, setBio] = useState('');
 
   // STEP 2: Company Information
   const [companyName, setCompanyName] = useState('');
   const [companyWebsite, setCompanyWebsite] = useState('');
-  const [targetIndustry, setTargetIndustry] = useState('Web Development');
+  const [targetIndustry, setTargetIndustry] = useState('Local Services');
+  const [servicesOffered, setServicesOffered] = useState('');
+  const [technologiesUsed, setTechnologiesUsed] = useState('');
 
   // STEP 3: Target Audience
   const [targetCities, setTargetCities] = useState('Chennai, Bangalore, Mumbai');
@@ -47,8 +51,8 @@ const Onboarding = ({ user, onComplete }) => {
       setLoading(true);
       try {
         await api.post('/users/onboarding', {
-          step1: { fullName, phone, jobTitle },
-          step2: { companyName, companyWebsite, targetIndustry },
+          step1: { fullName, phone, jobTitle, location, bio },
+          step2: { companyName, companyWebsite, targetIndustry, servicesOffered, technologiesUsed },
           step3: {
             targetCities: targetCities.split(',').map((c) => c.trim()),
             targetBusinessTypes: targetBusinessTypes.split(',').map((b) => b.trim()),
@@ -139,6 +143,30 @@ const Onboarding = ({ user, onComplete }) => {
                   />
                 </div>
               </div>
+
+              <div className="form-group">
+                <label>City / Base Location</label>
+                <div className="input-wrapper">
+                  <input
+                    type="text"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    placeholder="e.g. San Francisco, CA or Chennai, India"
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label>Founder Bio / Pitch Tagline</label>
+                <div className="input-wrapper">
+                  <textarea
+                    rows="2"
+                    value={bio}
+                    onChange={(e) => setBio(e.target.value)}
+                    placeholder="e.g. Helping local businesses acquire high-intent leads using MapFlow AI."
+                  />
+                </div>
+              </div>
             </>
           )}
 
@@ -176,13 +204,48 @@ const Onboarding = ({ user, onComplete }) => {
                     value={targetIndustry}
                     onChange={(e) => setTargetIndustry(e.target.value)}
                   >
-                    <option value="Web Development">Web Development</option>
-                    <option value="SEO Agency">SEO Agency</option>
-                    <option value="Digital Marketing">Digital Marketing</option>
-                    <option value="Solar Services">Solar Services</option>
-                    <option value="IT Services">IT Services</option>
-                    <option value="Consulting">Consulting</option>
+                    <option value="Local Services">Local Services (Plumbers, Electricians, HVAC, Roofing)</option>
+                    <option value="Health & Medical">Health & Medical (Dental, Clinics, Hospitals, Chiro)</option>
+                    <option value="Real Estate">Real Estate & Property Management (Agents, Brokers)</option>
+                    <option value="Restaurants & Hospitality">Restaurants, Cafes & Hospitality (Hotels, Catering)</option>
+                    <option value="Professional Services">Legal, Accounting, Tax & Financial Services</option>
+                    <option value="Digital Marketing & Web">Digital Marketing, SEO & Web Design Agencies</option>
+                    <option value="IT Services & Software">IT Services, SaaS & Software Development</option>
+                    <option value="Automotive & Transport">Automotive Repair, Dealerships & Towing</option>
+                    <option value="Beauty & Wellness">Beauty Salons, Spas, Gyms & Fitness</option>
+                    <option value="Construction & Architecture">Construction, Architecture & Interior Design</option>
+                    <option value="E-Commerce & Retail">E-Commerce & Retail Stores</option>
+                    <option value="Education & Training">Education, Tutoring, Schools & Coaching</option>
+                    <option value="Solar & Clean Energy">Solar Services, Energy & Sustainability</option>
+                    <option value="Logistics & Supply Chain">Logistics, Freight, Moving & Warehousing</option>
+                    <option value="Events & Entertainment">Event Planning, Photography & Venues</option>
+                    <option value="Manufacturing & Industrial">Manufacturing, Wholesalers & Equipment</option>
+                    <option value="Consulting & Recruitment">Management Consulting, HR & Staffing Agencies</option>
                   </select>
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label>Services Offered</label>
+                <div className="input-wrapper">
+                  <input
+                    type="text"
+                    value={servicesOffered}
+                    onChange={(e) => setServicesOffered(e.target.value)}
+                    placeholder="e.g. Web Design, Local SEO, Lead Gen, PPC"
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label>Technologies & Tools Used</label>
+                <div className="input-wrapper">
+                  <input
+                    type="text"
+                    value={technologiesUsed}
+                    onChange={(e) => setTechnologiesUsed(e.target.value)}
+                    placeholder="e.g. React, WordPress, Node.js, HubSpot, Python"
+                  />
                 </div>
               </div>
             </>

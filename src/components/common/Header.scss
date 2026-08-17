@@ -7,22 +7,80 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
   border-bottom: 1px solid $border-color;
   background: $surface;
   color: $text-primary;
   backdrop-filter: blur(8px);
   transition: background $transition-base, border-color $transition-base, color $transition-base;
 
-  .header-title h1 {
-    font-size: 1.35rem;
-    font-weight: 700;
-    color: $text-primary;
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    flex: 1;
+
+    .mobile-menu-btn {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      padding: 0;
+      border-radius: $radius-md;
+      background: $primary-light;
+      border: 1px solid rgba(14, 165, 164, 0.3);
+      color: $secondary;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all $transition-fast;
+
+      .menu-icon {
+        transition: transform $transition-fast;
+      }
+
+      &:hover {
+        background: linear-gradient(135deg, rgba(3, 113, 114, 0.25) 0%, rgba(14, 165, 164, 0.35) 100%);
+        color: #FFFFFF;
+        border-color: $secondary;
+        box-shadow: 0 0 12px rgba(14, 165, 164, 0.35);
+        transform: translateY(-1px);
+
+        .menu-icon {
+          transform: scale(1.08);
+        }
+      }
+
+      &:active, &.active {
+        background: linear-gradient(135deg, $primary 0%, $primary-end 100%);
+        color: #FFFFFF;
+        border-color: transparent;
+        box-shadow: 0 2px 8px rgba(3, 113, 114, 0.4);
+      }
+    }
+
+    .header-title {
+      min-width: 0;
+      overflow: hidden;
+
+      h1 {
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: $text-primary;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin: 0;
+      }
+    }
   }
 
   .header-actions {
     display: flex;
     align-items: center;
     gap: $spacing-md;
+    flex-shrink: 0;
 
     .header-search {
       position: relative;
@@ -60,12 +118,14 @@
     .credit-badge {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       padding: 6px 12px;
       background: $primary-light;
       border: 1px solid rgba(14, 165, 164, 0.3);
       border-radius: $radius-full;
       cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
       transition: all $transition-fast;
 
       &:hover {
@@ -74,11 +134,17 @@
 
       .coins-icon {
         color: $primary-end;
+        flex-shrink: 0;
       }
 
       .credit-text {
         font-size: 0.825rem;
         color: $text-primary;
+        white-space: nowrap;
+
+        strong {
+          font-weight: 700;
+        }
       }
 
       .upgrade-pill {
@@ -93,6 +159,8 @@
         align-items: center;
         gap: 2px;
         cursor: pointer;
+        white-space: nowrap;
+        flex-shrink: 0;
       }
     }
 
@@ -105,6 +173,7 @@
       border-radius: $radius-md;
       @include flex-center;
       cursor: pointer;
+      flex-shrink: 0;
       transition: all $transition-fast;
 
       &:hover {
@@ -116,6 +185,89 @@
         &:hover {
           color: $secondary;
         }
+      }
+    }
+  }
+}
+
+@media (max-width: 1024px) {
+  .app-header {
+    padding: 0 12px;
+    height: 60px;
+
+    .header-left {
+      gap: 8px;
+
+      .mobile-menu-btn {
+        display: flex;
+      }
+
+      .header-title h1 {
+        font-size: 1.05rem;
+      }
+    }
+
+    .header-actions {
+      gap: 6px;
+
+      .header-search {
+        display: none;
+      }
+
+      .credit-badge {
+        padding: 4px 8px;
+        gap: 4px;
+
+        .credit-text {
+          font-size: 0.75rem;
+        }
+
+        .upgrade-pill {
+          padding: 2px 6px;
+          font-size: 0.65rem;
+        }
+      }
+
+      .icon-btn {
+        width: 32px;
+        height: 32px;
+      }
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  .app-header {
+    padding: 0 8px;
+
+    .header-left {
+      .header-title h1 {
+        font-size: 0.95rem;
+      }
+    }
+
+    .header-actions {
+      gap: 4px;
+
+      .credit-badge {
+        padding: 3px 6px;
+
+        .credit-label-full {
+          display: none;
+        }
+
+        .upgrade-pill {
+          padding: 2px 4px;
+
+          .upgrade-text {
+            display: none;
+          }
+        }
+      }
+
+      .icon-btn {
+        width: 30px;
+        height: 30px;
       }
     }
   }

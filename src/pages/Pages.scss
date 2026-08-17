@@ -87,3 +87,33 @@
     &.LOW { background: rgba(239, 68, 68, 0.15); color: $low-intent; border: 1px solid rgba(239, 68, 68, 0.3); }
   }
 }
+
+@media (max-width: 768px) {
+  .page-container {
+    padding: $spacing-md !important;
+  }
+
+  .kpi-grid, .stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)) !important;
+    gap: 10px !important;
+  }
+
+  .table-responsive {
+    position: relative;
+    overflow-x: auto;
+    width: 100%;
+    -webkit-overflow-scrolling: touch;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 56px;
+      background: linear-gradient(to left, var(--bg-surface) 0%, transparent 100%);
+      pointer-events: none;
+      z-index: 10;
+    }
+  }
+}

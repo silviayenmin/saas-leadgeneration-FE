@@ -1,8 +1,8 @@
 import React from 'react';
-import { LayoutDashboard, MapPin, History, Kanban, User, Settings, Sparkles, LogOut } from 'lucide-react';
+import { LayoutDashboard, MapPin, History, Kanban, User, Settings, Sparkles, LogOut, X } from 'lucide-react';
 import './Sidebar.scss';
 
-const Sidebar = ({ activeTab, setActiveTab, user, onLogout }) => {
+const Sidebar = ({ activeTab, setActiveTab, user, onLogout, isMobileNavOpen, onCloseMobileNav }) => {
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'lead-discovery', label: 'Lead Discovery', icon: MapPin },
@@ -12,13 +12,25 @@ const Sidebar = ({ activeTab, setActiveTab, user, onLogout }) => {
     { id: 'outreach-config', label: 'Outreach Config', icon: Settings },
   ];
 
+  const handleNavClick = (id) => {
+    setActiveTab(id);
+    if (onCloseMobileNav) {
+      onCloseMobileNav();
+    }
+  };
+
   return (
-    <aside className="app-sidebar">
+    <aside className={`app-sidebar ${isMobileNavOpen ? 'mobile-open' : ''}`}>
       <div className="sidebar-brand">
-        <div className="brand-icon">
-          <Sparkles size={20} />
+        <div className="brand-left">
+          <div className="brand-icon">
+            <Sparkles size={20} />
+          </div>
+          <span className="brand-text">MAPFLOW AI</span>
         </div>
-        <span className="brand-text">MAPFLOW AI</span>
+        <button className="mobile-close-btn" onClick={onCloseMobileNav} title="Close Navigation">
+          <X size={18} />
+        </button>
       </div>
 
       <nav className="sidebar-nav">
@@ -29,7 +41,7 @@ const Sidebar = ({ activeTab, setActiveTab, user, onLogout }) => {
             <button
               key={item.id}
               className={`nav-item ${isActive ? 'active' : ''}`}
-              onClick={() => setActiveTab(item.id)}
+              onClick={() => handleNavClick(item.id)}
             >
               <Icon size={18} />
               <span>{item.label}</span>

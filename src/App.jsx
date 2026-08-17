@@ -15,7 +15,9 @@ import ForgotPassword from './pages/ForgotPassword';
 import api from './services/api';
 
 const App = () => {
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState(() => {
+    return localStorage.getItem('mapflow_active_tab') || 'dashboard';
+  });
   const [authState, setAuthState] = useState('login'); // 'login', 'signup', 'otp', 'onboarding', 'authenticated'
   const [user, setUser] = useState(null);
   const [otpEmail, setOtpEmail] = useState('');
@@ -26,6 +28,14 @@ const App = () => {
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem('mapflow_theme') || 'dark';
   });
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+
+  // Keep activeTab persisted in localStorage
+  useEffect(() => {
+    if (activeTab) {
+      localStorage.setItem('mapflow_active_tab', activeTab);
+    }
+  }, [activeTab]);
 
   // Keep theme attribute updated on html element & localStorage
   useEffect(() => {
@@ -70,21 +80,23 @@ const App = () => {
     checkAuth();
   }, []);
 
+  // Fetch Credits helper
+  const fetchCredits = async () => {
+    if (authState === 'authenticated' && user) {
+      try {
+        const res = await api.get('/credits/balance');
+        if (res.data.success) {
+          setCredits(res.data.data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch credits balance:', err);
+      }
+    }
+  };
+
   // Fetch Credits when Authenticated
   useEffect(() => {
-    if (authState === 'authenticated' && user) {
-      const fetchCredits = async () => {
-        try {
-          const res = await api.get('/credits/balance');
-          if (res.data.success) {
-            setCredits(res.data.data);
-          }
-        } catch (err) {
-          console.error('Failed to fetch credits balance:', err);
-        }
-      };
-      fetchCredits();
-    }
+    fetchCredits();
   }, [authState, user]);
 
   const handleLoginSuccess = (userData) => {
@@ -208,7 +220,7 @@ const App = () => {
       case 'lead-discovery': return <LeadDiscovery />;
       case 'maps-scans': return <MapsScans />;
       case 'outreach-pipeline': return <OutreachPipeline />;
-      case 'profile-subscription': return <ProfileSubscription />;
+      case 'profile-subscription': return <ProfileSubscription onUpgradeSuccess={fetchCredits} onProfileUpdate={(u) => setUser(u)} />;
       case 'outreach-config': return <OutreachConfig />;
       default: return <Dashboard />;
     }
@@ -227,12 +239,18 @@ const App = () => {
   };
 
   return (
-    <div style={{ display: 'flex', width: '100vw', height: '100vh', overflow: 'hidden' }}>
+    <div style={{ display: 'flex', width: '100vw', height: '100vh', overflow: 'hidden', position: 'relative' }}>
+      <div
+        className={`mobile-nav-backdrop ${isMobileNavOpen ? 'open' : ''}`}
+        onClick={() => setIsMobileNavOpen(false)}
+      />
       <Sidebar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         user={user}
         onLogout={handleLogout}
+        isMobileNavOpen={isMobileNavOpen}
+        onCloseMobileNav={() => setIsMobileNavOpen(false)}
       />
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <Header
@@ -241,6 +259,8 @@ const App = () => {
           onUpgradeClick={() => setActiveTab('profile-subscription')}
           theme={theme}
           onToggleTheme={toggleTheme}
+          isMobileNavOpen={isMobileNavOpen}
+          onToggleMobileNav={() => setIsMobileNavOpen(!isMobileNavOpen)}
         />
         <main style={{ flex: 1, overflowY: 'auto', background: 'var(--bg-main)' }}>
           {renderContent()}

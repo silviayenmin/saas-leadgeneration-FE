@@ -16,25 +16,47 @@
   .sidebar-brand {
     display: flex;
     align-items: center;
-    gap: 10px;
+    justify-content: space-between;
     padding: $spacing-sm $spacing-xs $spacing-lg $spacing-xs;
 
-    .brand-icon {
-      width: 34px;
-      height: 34px;
-      border-radius: $radius-md;
-      background: linear-gradient(135deg, $primary 0%, $primary-end 100%);
-      @include flex-center;
-      color: #fff;
+    .brand-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      .brand-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: $radius-md;
+        background: linear-gradient(135deg, $primary 0%, $primary-end 100%);
+        @include flex-center;
+        color: #fff;
+      }
+
+      .brand-text {
+        font-size: 1.15rem;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        background: linear-gradient(135deg, $text-primary 0%, $primary-end 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
     }
 
-    .brand-text {
-      font-size: 1.15rem;
-      font-weight: 800;
-      letter-spacing: 0.5px;
-      background: linear-gradient(135deg, $text-primary 0%, $primary-end 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+    .mobile-close-btn {
+      display: none;
+      background: transparent;
+      border: none;
+      color: $text-muted;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: $radius-sm;
+      transition: all $transition-fast;
+
+      &:hover {
+        background: $card-hover;
+        color: $text-primary;
+      }
     }
   }
 
@@ -128,6 +150,50 @@
         background: rgba(239, 68, 68, 0.15);
         color: $low-intent;
       }
+    }
+  }
+}
+
+// Mobile & Tablet Responsive Drawer
+@media (max-width: 1024px) {
+  .app-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 1000;
+    width: 270px;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: $shadow-lg;
+
+    .sidebar-brand .mobile-close-btn {
+      display: flex;
+    }
+
+    &.mobile-open {
+      transform: translateX(0);
+    }
+  }
+}
+
+.mobile-nav-backdrop {
+  display: none;
+
+  @media (max-width: 1024px) {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(4px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+
+    &.open {
+      opacity: 1;
+      pointer-events: auto;
     }
   }
 }
