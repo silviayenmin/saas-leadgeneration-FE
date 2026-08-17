@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { User, Shield, ShieldCheck, Zap, Coins, CheckCircle, AlertCircle, ArrowUpRight, Check, History, Building2, Briefcase, Globe, Phone, Mail, ChevronDown, X, Loader2 } from 'lucide-react';
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
 import api from '../services/api';
 import './ProfileSubscription.scss';
 
@@ -159,6 +161,7 @@ const ProfileSubscription = ({ onUpgradeSuccess, onProfileUpdate }) => {
         setUser(u);
         setFullName(u.fullName || '');
         setEmail(u.email || '');
+        // Phone stored as full number (e.g. 919345681200) — PhoneInput handles splitting
         setPhone(u.phone || '');
         setJobTitle(u.jobTitle || '');
         setLocation(u.location || '');
@@ -209,7 +212,7 @@ const ProfileSubscription = ({ onUpgradeSuccess, onProfileUpdate }) => {
     try {
       const res = await api.put('/users/profile', {
         fullName,
-        phone,
+        phone: phone ? `+${phone}` : '',
         jobTitle,
         location,
         bio,
@@ -383,12 +386,24 @@ const ProfileSubscription = ({ onUpgradeSuccess, onProfileUpdate }) => {
 
             <div className="form-row">
               <label>Phone Number</label>
-              <input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="+1 (555) 000-0000"
-              />
+              <div className="phone-input-package-wrapper">
+                <PhoneInput
+                  country={'us'}
+                  value={phone}
+                  onChange={(value) => setPhone(value)}
+                  enableSearch
+                  searchPlaceholder="Search country..."
+                  inputProps={{
+                    name: 'phone',
+                    placeholder: 'Enter phone number',
+                  }}
+                  containerClass="rpi-container"
+                  buttonClass="rpi-button"
+                  inputClass="rpi-input"
+                  dropdownClass="rpi-dropdown"
+                  searchClass="rpi-search"
+                />
+              </div>
             </div>
 
             <div className="form-row">
