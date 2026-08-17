@@ -87,12 +87,16 @@ const OtpVerification = ({ email, onVerifySuccess }) => {
           </div>
         )}
 
-        <form className="auth-form" onSubmit={handleVerify}>
+        <form className="auth-form" onSubmit={handleVerify} autoComplete="off">
           <div className="form-group">
             <label>6-Digit Verification Code</label>
             <div className="input-wrapper">
               <input
                 type="text"
+                name="otpCode"
+                id="otpCode"
+                autoComplete="one-time-code"
+                data-lpignore="true"
                 maxLength={6}
                 value={otpCode}
                 onChange={(e) => setOtpCode(e.target.value)}

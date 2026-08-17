@@ -3,20 +3,20 @@ import { Sparkles, ArrowRight, Eye, EyeOff, Lock, Mail, AlertCircle } from 'luci
 import api from '../services/api';
 import './Auth.scss';
 
-const Login = ({ onNavigate, onLoginSuccess, onRequireOtp }) => {
+const Login = ({ onNavigate, onLoginSuccess, onRequireOtp, successMessage }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [forgotMsg, setForgotMsg] = useState('');
+  const [infoMsg, setInfoMsg] = useState(successMessage || '');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
-    setForgotMsg('');
+    setInfoMsg('');
 
     try {
       const res = await api.post('/auth/login', { email, password });
@@ -40,18 +40,8 @@ const Login = ({ onNavigate, onLoginSuccess, onRequireOtp }) => {
     }
   };
 
-  const handleForgotPassword = async () => {
-    if (!email) {
-      setError('Please enter your business email first.');
-      return;
-    }
-    setError('');
-    try {
-      const res = await api.post('/auth/forgot-password', { email });
-      setForgotMsg(`Reset code sent to ${email} (Code: ${res.data.resetCode})`);
-    } catch (err) {
-      setError(err.response?.data?.detail || 'Failed to request password reset.');
-    }
+  const handleForgotPasswordClick = () => {
+    onNavigate('forgot-password', email);
   };
 
   return (
@@ -72,9 +62,9 @@ const Login = ({ onNavigate, onLoginSuccess, onRequireOtp }) => {
           </div>
         )}
 
-        {forgotMsg && (
+        {infoMsg && (
           <div className="banner-alert info">
-            <span>{forgotMsg}</span>
+            <span>{infoMsg}</span>
           </div>
         )}
 
@@ -95,7 +85,7 @@ const Login = ({ onNavigate, onLoginSuccess, onRequireOtp }) => {
           <div className="form-group">
             <label>
               <span>Password</span>
-              <span className="forgot-link" onClick={handleForgotPassword}>
+              <span className="forgot-link" onClick={handleForgotPasswordClick}>
                 Forgot Password?
               </span>
             </label>

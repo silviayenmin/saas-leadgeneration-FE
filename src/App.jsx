@@ -11,6 +11,7 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import OtpVerification from './pages/OtpVerification';
 import Onboarding from './pages/Onboarding';
+import ForgotPassword from './pages/ForgotPassword';
 import api from './services/api';
 
 const App = () => {
@@ -18,7 +19,8 @@ const App = () => {
   const [authState, setAuthState] = useState('login'); // 'login', 'signup', 'otp', 'onboarding', 'authenticated'
   const [user, setUser] = useState(null);
   const [otpEmail, setOtpEmail] = useState('');
-  const [otpHint, setOtpHint] = useState('');
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
+  const [loginSuccessMsg, setLoginSuccessMsg] = useState('');
   const [credits, setCredits] = useState({ creditsRemaining: 25, creditLimit: 25 });
   const [loading, setLoading] = useState(true);
 
@@ -113,6 +115,21 @@ const App = () => {
     setAuthState('login');
   };
 
+  const handleNavigate = (target, payload) => {
+    if (target === 'forgot-password') {
+      setForgotPasswordEmail(payload || '');
+    }
+    if (target === 'login') {
+      setLoginSuccessMsg(payload || '');
+    }
+    setAuthState(target);
+  };
+
+  const handleResetSuccess = (msg) => {
+    setLoginSuccessMsg(msg);
+    setAuthState('login');
+  };
+
   if (loading) {
     return (
       <div style={{ display: 'flex', height: '100vh', background: '#0A0F1C', color: '#F8FAFC', alignItems: 'center', justifyContent: 'center' }}>
@@ -125,9 +142,10 @@ const App = () => {
   if (authState === 'login') {
     return (
       <Login
-        onNavigate={(target) => setAuthState(target)}
+        onNavigate={handleNavigate}
         onLoginSuccess={handleLoginSuccess}
         onRequireOtp={handleRequireOtp}
+        successMessage={loginSuccessMsg}
       />
     );
   }
@@ -135,8 +153,18 @@ const App = () => {
   if (authState === 'signup') {
     return (
       <Signup
-        onNavigate={(target) => setAuthState(target)}
+        onNavigate={handleNavigate}
         onSignupSuccess={handleSignupSuccess}
+      />
+    );
+  }
+
+  if (authState === 'forgot-password') {
+    return (
+      <ForgotPassword
+        onNavigate={handleNavigate}
+        onResetSuccess={handleResetSuccess}
+        initialEmail={forgotPasswordEmail}
       />
     );
   }
