@@ -46,3 +46,11 @@ body {
   background: $card !important;
 }
 
+/* Global Draggable Textarea Bounds */
+textarea {
+  resize: vertical;
+  min-height: 84px;
+  max-height: 280px;
+  line-height: 1.5;
+}
+

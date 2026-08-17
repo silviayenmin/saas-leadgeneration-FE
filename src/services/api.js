@@ -8,7 +8,7 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('mapflow_token');
+  const token = localStorage.getItem('mapflow_token') || sessionStorage.getItem('mapflow_token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -21,6 +21,8 @@ api.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       localStorage.removeItem('mapflow_token');
       localStorage.removeItem('mapflow_user');
+      sessionStorage.removeItem('mapflow_token');
+      sessionStorage.removeItem('mapflow_user');
     }
     return Promise.reject(error);
   }

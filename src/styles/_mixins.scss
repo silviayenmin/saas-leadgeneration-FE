@@ -18,8 +18,8 @@
 
 // Primary Gradient Button Mixin
 @mixin gradient-button {
-  background: linear-gradient(135deg, $primary 0%, $primary-end 100%);
-  color: #FFFFFF;
+  background: linear-gradient(135deg, #037172 0%, #0EA5A4 100%) !important;
+  color: #FFFFFF !important;
   border: none;
   border-radius: $radius-md;
   font-weight: 600;
@@ -33,7 +33,9 @@
   box-shadow: 0 4px 14px rgba(3, 113, 114, 0.4);
 
   &:hover {
-    opacity: 0.92;
+    background: linear-gradient(135deg, #025C5D 0%, #0A8B8A 100%) !important;
+    color: #FFFFFF !important;
+    opacity: 0.98;
     transform: translateY(-1px);
     box-shadow: $shadow-glow;
   }
