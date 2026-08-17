@@ -1,8 +1,8 @@
 import React from 'react';
-import { Search, Bell, Coins, ArrowUpRight } from 'lucide-react';
+import { Search, Bell, Coins, ArrowUpRight, Sun, Moon } from 'lucide-react';
 import './Header.scss';
 
-const Header = ({ title, credits, onUpgradeClick }) => {
+const Header = ({ title, credits, onUpgradeClick, theme, onToggleTheme }) => {
   return (
     <header className="app-header">
       <div className="header-title">
@@ -24,6 +24,14 @@ const Header = ({ title, credits, onUpgradeClick }) => {
             Upgrade <ArrowUpRight size={12} />
           </button>
         </div>
+
+        <button
+          className="icon-btn theme-toggle-btn"
+          onClick={onToggleTheme}
+          title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+        >
+          {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+        </button>
 
         <button className="icon-btn" title="Notifications">
           <Bell size={18} />

@@ -11,15 +11,15 @@
   transition: all $transition-base;
 
   &:hover {
-    background: rgba(30, 42, 62, 0.85);
-    border-color: rgba(148, 163, 184, 0.20);
+    background: $card-hover;
+    border-color: $border-color;
   }
 }
 
 // Primary Gradient Button Mixin
 @mixin gradient-button {
   background: linear-gradient(135deg, $primary 0%, $primary-end 100%);
-  color: $text-primary;
+  color: #FFFFFF;
   border: none;
   border-radius: $radius-md;
   font-weight: 600;
