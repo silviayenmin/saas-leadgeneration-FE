@@ -23,6 +23,19 @@ const App = () => {
   const [loginSuccessMsg, setLoginSuccessMsg] = useState('');
   const [credits, setCredits] = useState({ creditsRemaining: 25, creditLimit: 25 });
   const [loading, setLoading] = useState(true);
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem('mapflow_theme') || 'dark';
+  });
+
+  // Keep theme attribute updated on html element & localStorage
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('mapflow_theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+  };
 
   // Initialize Auth Check
   useEffect(() => {
@@ -226,8 +239,10 @@ const App = () => {
           title={getPageTitle()}
           credits={credits}
           onUpgradeClick={() => setActiveTab('profile-subscription')}
+          theme={theme}
+          onToggleTheme={toggleTheme}
         />
-        <main style={{ flex: 1, overflowY: 'auto', background: '#0A0F1C' }}>
+        <main style={{ flex: 1, overflowY: 'auto', background: 'var(--bg-main)' }}>
           {renderContent()}
         </main>
       </div>

@@ -24,7 +24,7 @@
         width: 44px;
         height: 44px;
         border-radius: $radius-md;
-        background: rgba(3, 113, 114, 0.2);
+        background: $primary-light;
         color: $primary-end;
         @include flex-center;
       }
@@ -47,6 +47,10 @@
   .data-card {
     @include glass-card;
     padding: $spacing-lg;
+
+    h3 {
+      color: $text-primary;
+    }
   }
 
   .custom-table {
@@ -58,7 +62,7 @@
       padding: 12px;
       font-size: 0.8rem;
       color: $text-muted;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+      border-bottom: 1px solid $border-color;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
@@ -67,7 +71,7 @@
       padding: 14px 12px;
       font-size: 0.875rem;
       color: $text-primary;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+      border-bottom: 1px solid $border-color;
     }
   }
 
