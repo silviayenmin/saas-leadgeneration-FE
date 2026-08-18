@@ -326,7 +326,15 @@ const App = () => {
             onUpdateLead={handleUpdateLead}
           />
         );
-      case 'outreach-pipeline': return <OutreachPipeline />;
+      case 'outreach-pipeline':
+        return (
+          <OutreachPipeline
+            leads={leads}
+            onUpdateLead={handleUpdateLead}
+            onOpenLead={setActiveLead}
+            onRefresh={fetchLeadsAndSearches}
+          />
+        );
       case 'profile-subscription': return <ProfileSubscription onUpgradeSuccess={fetchCredits} onProfileUpdate={(u) => setUser(u)} />;
       case 'outreach-config': return <OutreachConfig />;
       default: 

@@ -604,9 +604,10 @@ export default function MapsScans({ leads = [], setLeads, searches = [], setSear
                       />
                     </th>
                     <th style={{ width: '25%' }}>Business / Company</th>
-                    <th style={{ width: '15%' }}>Rating & Reviews</th>
-                    <th style={{ width: '15%' }}>Phone</th>
-                    <th style={{ width: '25%' }}>Email Contact</th>
+                    <th style={{ width: '12%' }}>Rating & Reviews</th>
+                    <th style={{ width: '10%' }}>AI Match</th>
+                    <th style={{ width: '13%' }}>Phone</th>
+                    <th style={{ width: '20%' }}>Email Contact</th>
                     <th style={{ width: '16%' }}>CRM Lead</th>
                     <th style={{ width: '4%' }}>Maps</th>
                   </tr>
@@ -635,9 +636,9 @@ export default function MapsScans({ leads = [], setLeads, searches = [], setSear
                         <td>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <img 
-                              src={getCompanyLogoUrl(lead.companyName)} 
-                              alt="Logo" 
-                              style={{ width: '24px', height: '24px', borderRadius: '4px' }} 
+                               src={getCompanyLogoUrl(lead.companyName)} 
+                               alt="Logo" 
+                               style={{ width: '24px', height: '24px', borderRadius: '4px' }} 
                             />
                             <div style={{ display: 'flex', flexDirection: 'column' }}>
                               <span style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '0.85rem', lineHeight: '17px' }}>
@@ -659,6 +660,19 @@ export default function MapsScans({ leads = [], setLeads, searches = [], setSear
                               ({lead.reviews || 0})
                             </span>
                           </div>
+                        </td>
+                        <td>
+                          <span style={{ 
+                            fontSize: '0.72rem', 
+                            fontWeight: 700, 
+                            color: '#0EA5A4', 
+                            background: 'rgba(14, 165, 164, 0.1)', 
+                            padding: '3px 8px', 
+                            borderRadius: '4px',
+                            display: 'inline-block'
+                          }}>
+                            {lead.leadScore !== undefined ? `${lead.leadScore}%` : '85%'}
+                          </span>
                         </td>
                         <td>
                           <span style={{ fontSize: '0.8rem', color: lead.phone ? 'var(--text-primary)' : 'var(--text-secondary)' }}>

@@ -574,10 +574,15 @@
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
       border-color: rgba(14, 165, 164, 0.4);
 
-      .card-hover-overlay {
-        opacity: 1;
-        pointer-events: auto;
+      .btn-delete-card-hover {
+        opacity: 1 !important;
       }
+    }
+
+    .btn-delete-card-hover:hover {
+      background: #EF4444 !important;
+      color: #FFFFFF !important;
+      border-color: #EF4444 !important;
     }
 
     // Card Header Row
