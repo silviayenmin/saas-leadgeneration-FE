@@ -13,6 +13,7 @@ import OtpVerification from './pages/OtpVerification';
 import Onboarding from './pages/Onboarding';
 import ForgotPassword from './pages/ForgotPassword';
 import api from './services/api';
+import LeadDetailModal from './components/Modals/LeadDetailModal';
 
 const App = () => {
   const [activeTab, setActiveTab] = useState(() => {
@@ -29,6 +30,40 @@ const App = () => {
     return localStorage.getItem('mapflow_theme') || 'dark';
   });
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+  const [leads, setLeads] = useState([]);
+  const [searches, setSearches] = useState([]);
+  const [activeLead, setActiveLead] = useState(null);
+
+  const fetchLeadsAndSearches = async () => {
+    try {
+      const resLeads = await api.get('/leads');
+      if (resLeads.data && resLeads.data.leads) {
+        setLeads(resLeads.data.leads);
+      }
+      
+      const resSearches = await api.get('/searches');
+      if (resSearches.data && resSearches.data.searches) {
+        setSearches(resSearches.data.searches);
+      }
+    } catch (err) {
+      console.error("Failed to load initial lead or search data:", err);
+    }
+  };
+
+  useEffect(() => {
+    if (authState === 'authenticated') {
+      fetchLeadsAndSearches();
+    }
+  }, [authState]);
+
+  const handleUpdateLead = (updatedLead) => {
+    setLeads((prevLeads) =>
+      prevLeads.map((l) => (l.sourceUrl === updatedLead.sourceUrl ? updatedLead : l))
+    );
+    if (activeLead && activeLead.sourceUrl === updatedLead.sourceUrl) {
+      setActiveLead(updatedLead);
+    }
+  };
 
   // Keep activeTab persisted in localStorage
   useEffect(() => {
@@ -216,13 +251,50 @@ const App = () => {
   // Render Authenticated Dashboard & Workspace Layout
   const renderContent = () => {
     switch (activeTab) {
-      case 'dashboard': return <Dashboard onUpgradeClick={() => setActiveTab('profile-subscription')} />;
-      case 'lead-discovery': return <LeadDiscovery />;
-      case 'maps-scans': return <MapsScans />;
+      case 'dashboard': 
+        return (
+          <Dashboard 
+            leads={leads} 
+            searches={searches} 
+            onOpenLead={setActiveLead} 
+            onSwitchTab={setActiveTab} 
+            onUpgradeClick={() => setActiveTab('profile-subscription')} 
+          />
+        );
+      case 'lead-discovery': 
+        return (
+          <LeadDiscovery 
+            leads={leads}
+            setLeads={setLeads}
+            searches={searches}
+            setSearches={setSearches}
+            onSwitchTab={setActiveTab}
+            onOpenLead={setActiveLead}
+          />
+        );
+      case 'maps-scans': 
+        return (
+          <MapsScans 
+            leads={leads}
+            setLeads={setLeads}
+            searches={searches}
+            setSearches={setSearches}
+            onOpenLead={setActiveLead}
+          />
+        );
       case 'outreach-pipeline': return <OutreachPipeline />;
       case 'profile-subscription': return <ProfileSubscription onUpgradeSuccess={fetchCredits} onProfileUpdate={(u) => setUser(u)} />;
       case 'outreach-config': return <OutreachConfig />;
-      default: return <Dashboard />;
+      default: 
+        return (
+          <Dashboard 
+            leads={leads} 
+            searches={searches} 
+            onOpenLead={setActiveLead} 
+            onSwitchTab={setActiveTab} 
+            onUpgradeClick={() => setActiveTab('profile-subscription')} 
+          />
+        );
     }
   };
 
@@ -266,6 +338,13 @@ const App = () => {
           {renderContent()}
         </main>
       </div>
+      {activeLead && (
+        <LeadDetailModal
+          lead={activeLead}
+          onClose={() => setActiveLead(null)}
+          onUpdateLead={handleUpdateLead}
+        />
+      )}
     </div>
   );
 };
