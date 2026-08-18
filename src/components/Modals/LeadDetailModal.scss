@@ -1,76 +1,82 @@
 @import '../../styles/_variables.scss';
 @import '../../styles/_mixins.scss';
 
-.modal-overlay {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(8, 12, 24, 0.7);
-  backdrop-filter: blur(16px);
-  z-index: 1000;
-  justify-content: center;
-  align-items: center;
-  transition: opacity 0.25s ease-in-out;
-  padding: 20px;
-}
-
-.modal-overlay.active {
-  display: flex;
-}
-
-.modal-content {
-  width: 1160px;
-  max-width: 100%;
-  height: 85vh;
-  min-height: 560px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+// Full Page Profile Dashboard Container
+.lead-detail-page {
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  animation: zoomIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  height: 100%;
+  width: 100%;
+  background: var(--bg-main);
   color: var(--text-primary);
+  overflow: hidden;
+  animation: fadeInPage 0.25s ease-in-out;
 }
 
-@keyframes zoomIn {
+@keyframes fadeInPage {
   from {
-    transform: scale(0.96);
     opacity: 0;
+    transform: translateY(6px);
   }
   to {
-    transform: scale(1);
     opacity: 1;
+    transform: translateY(0);
   }
 }
 
-.modal-header-premium {
-  padding: 20px 28px;
+.page-header-premium {
+  padding: 16px 24px;
   border-bottom: 1px solid var(--border-color);
   background: var(--bg-surface);
   display: flex;
-  gap: 20px;
+  justify-content: space-between;
   align-items: center;
-  position: relative;
   flex-shrink: 0;
   
+  .header-left-side {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  
+  .back-icon-btn {
+    background: var(--bg-hover);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    transition: all 0.2s ease-in-out;
+    
+    &:hover {
+      color: var(--text-primary);
+      background: var(--border-color);
+      transform: translateX(-3px);
+    }
+  }
+  
+  .header-divider {
+    width: 1px;
+    height: 24px;
+    background: var(--border-color);
+  }
+  
   .header-avatar {
-    width: 48px;
-    height: 48px;
-    border-radius: 10px;
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
     border: 1.5px solid var(--border-color);
     object-fit: cover;
   }
   
   .header-text {
-    flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 3px;
+    gap: 2px;
     
     .company-title-row {
       display: flex;
@@ -78,7 +84,7 @@
       gap: 10px;
       
       h3 {
-        font-size: 1.25rem;
+        font-size: 1.2rem;
         font-weight: 700;
         letter-spacing: -0.02em;
         color: var(--text-primary);
@@ -90,8 +96,8 @@
     .platform-row {
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-size: 0.78rem;
+      gap: 6px;
+      font-size: 0.76rem;
       color: var(--text-muted);
       
       .platform-badge {
@@ -100,33 +106,19 @@
         gap: 4px;
         background: var(--bg-hover);
         color: var(--secondary);
-        padding: 2px 8px;
+        padding: 1px 6px;
         border-radius: 4px;
         font-weight: 600;
-        font-size: 0.7rem;
+        font-size: 0.68rem;
         border: 1px solid var(--border-color);
       }
     }
   }
-}
 
-.modal-close-premium {
-  background: var(--bg-hover);
-  border: 1px solid var(--border-color);
-  color: var(--text-muted);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
-  transition: all 0.2s ease;
-  
-  &:hover {
-    color: var(--text-primary);
-    background: var(--border-color);
-    transform: rotate(90deg);
+  .header-right-side {
+    display: flex;
+    align-items: center;
+    gap: 12px;
   }
 }
 
@@ -139,8 +131,8 @@
 }
 
 .modal-main-column {
-  flex: 1.35;
-  padding: 24px 28px;
+  flex: 1.4;
+  padding: 24px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -179,7 +171,7 @@
   }
   
   .sidebar-section {
-    padding: 24px 28px;
+    padding: 20px 24px;
     display: flex;
     flex-direction: column;
     gap: 16px;

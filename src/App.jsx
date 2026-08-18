@@ -334,17 +334,18 @@ const App = () => {
           isMobileNavOpen={isMobileNavOpen}
           onToggleMobileNav={() => setIsMobileNavOpen(!isMobileNavOpen)}
         />
-        <main style={{ flex: 1, overflowY: 'auto', background: 'var(--bg-main)' }}>
-          {renderContent()}
+        <main style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: 'var(--bg-main)' }}>
+          {activeLead ? (
+            <LeadDetailModal
+              lead={activeLead}
+              onClose={() => setActiveLead(null)}
+              onUpdateLead={handleUpdateLead}
+            />
+          ) : (
+            renderContent()
+          )}
         </main>
       </div>
-      {activeLead && (
-        <LeadDetailModal
-          lead={activeLead}
-          onClose={() => setActiveLead(null)}
-          onUpdateLead={handleUpdateLead}
-        />
-      )}
     </div>
   );
 };
