@@ -211,121 +211,6 @@ const INTENT_OPTIONS = [
   { value: 'LOW', label: 'Low Intent (<50%)' },
 ];
 
-// Initial Demo Leads Fallback
-const DEFAULT_DEMO_LEADS = [
-  {
-    _id: '1',
-    sourceUrl: 'https://maps.google.com/?cid=1001',
-    isConverted: false,
-    crmStatus: 'New',
-    createdAt: '2026-08-16T10:00:00Z',
-    authorName: 'Apex Dental Care',
-    companyName: 'Apex Dental Clinic',
-    platform: 'Google Maps',
-    leadCategory: 'Dental & Health',
-    search_type: 'sales',
-    leadScore: 94,
-    confidenceScore: 92,
-    serviceRequired: 'Local SEO & Google Ads Management',
-    needDescription: 'Looking for a digital agency to overhaul GMB ranking and run local search ads for dental implants in Austin.',
-    rating: 4.8,
-    reviews: 142,
-    phone: '+1 (555) 234-5678',
-    location: 'Austin, TX',
-  },
-  {
-    _id: '2',
-    sourceUrl: 'https://weworkremotely.com/jobs/dev-lead-01',
-    isConverted: false,
-    crmStatus: 'New',
-    createdAt: '2026-08-15T14:20:00Z',
-    authorName: 'Sarah Jenkins',
-    companyName: 'CloudScale Tech',
-    platform: 'WeWorkRemotely',
-    leadCategory: 'Senior React Architect',
-    search_type: 'recruiter',
-    leadScore: 96,
-    confidenceScore: 90,
-    serviceRequired: 'Fullstack React & Node Specialist',
-    needDescription: 'Senior Frontend Architect with 6+ years experience in React, TypeScript, and WebSockets.',
-    location: 'Remote (US)',
-    experienceLevel: 'Senior (6+ yrs)',
-    workPreference: 'Full-time Remote',
-    skills: 'React, TypeScript, Node.js, GraphQL',
-  },
-  {
-    _id: '3',
-    sourceUrl: 'https://tenders.gov/req-88912',
-    isConverted: false,
-    crmStatus: 'Drafted',
-    createdAt: '2026-08-14T09:15:00Z',
-    authorName: 'Dept of Urban Transport',
-    companyName: 'Austin Municipal Govt',
-    platform: 'Govt Tenders',
-    leadCategory: 'Smart Traffic GIS Mapping',
-    search_type: 'sales',
-    leadScore: 89,
-    confidenceScore: 85,
-    serviceRequired: 'GIS & Real-time Location Analytics',
-    needDescription: 'RFP for cloud-based traffic density mapping and automated lead dispatch system for public transit.',
-    location: 'Austin, TX',
-  },
-  {
-    _id: '4',
-    sourceUrl: 'https://linkedin.com/posts/techcorp-lead-401',
-    isConverted: false,
-    crmStatus: 'Emailed',
-    createdAt: '2026-08-13T11:45:00Z',
-    authorName: 'David Miller',
-    companyName: 'Starlight Media SaaS',
-    platform: 'LinkedIn',
-    leadCategory: 'B2B Lead Generation',
-    search_type: 'sales',
-    leadScore: 82,
-    confidenceScore: 84,
-    serviceRequired: 'Outbound Cold Email Automation',
-    needDescription: 'We need an automated cold email infrastructure setup to target SMB healthcare directors.',
-    location: 'San Francisco, CA',
-  },
-  {
-    _id: '5',
-    sourceUrl: 'https://upwork.com/jobs/~01fe92841ab',
-    isConverted: false,
-    crmStatus: 'Replied',
-    createdAt: '2026-08-12T16:30:00Z',
-    authorName: 'Marcus Vance',
-    companyName: 'Vance Capital',
-    platform: 'Upwork',
-    leadCategory: 'AI Automation Workflow',
-    search_type: 'sales',
-    leadScore: 91,
-    confidenceScore: 89,
-    serviceRequired: 'Custom OpenAI Agent Development',
-    needDescription: 'Build a Python FastAPI backend to auto-parse incoming PDF quotes and populate Hubspot CRM.',
-    location: 'New York, NY',
-  },
-  {
-    _id: '6',
-    sourceUrl: 'https://twitter.com/dev_hiring/status/19823412',
-    isConverted: false,
-    crmStatus: 'Disqualified',
-    createdAt: '2026-08-10T08:10:00Z',
-    authorName: 'TechRecruiter_X',
-    companyName: 'NextGen Staffing',
-    platform: 'Twitter / X',
-    leadCategory: 'Python Backend Dev',
-    search_type: 'recruiter',
-    leadScore: 42,
-    confidenceScore: 50,
-    serviceRequired: 'Junior Django Developer',
-    needDescription: 'Hiring junior devs with 1 yr experience.',
-    location: 'Chicago, IL',
-    experienceLevel: 'Junior (1 yr)',
-    workPreference: 'On-site Chicago',
-    skills: 'Python, Django',
-  }
-];
-
 const OutreachPipeline = ({
   leads: propsLeads,
   onUpdateLead,
@@ -334,8 +219,8 @@ const OutreachPipeline = ({
   onDeleteLeads,
 }) => {
   // Local state if propsLeads is not provided
-  const [internalLeads, setInternalLeads] = useState(DEFAULT_DEMO_LEADS);
-  const activeLeads = propsLeads && propsLeads.length > 0 ? propsLeads : internalLeads;
+  const [internalLeads, setInternalLeads] = useState([]);
+  const activeLeads = (propsLeads && propsLeads.length > 0 ? propsLeads : internalLeads).filter((l) => l.isConverted === true);
 
   // Filter Toolbar State
   const [searchQuery, setSearchQuery] = useState('');
@@ -743,137 +628,197 @@ const OutreachPipeline = ({
                       <p>No leads in {stage.label}</p>
                     </div>
                   ) : (
-                    stageLeads.map((lead, idx) => {
-                      const name = lead.authorName || lead.companyName || 'Business Lead';
-                      const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                        name
-                      )}&background=0EA5A4&color=fff&bold=true`;
+                     stageLeads.map((lead, idx) => {
+                       const name = lead.companyName || lead.authorName || 'Business Lead';
+                       const getInitial = (s) => (s ? s.trim().charAt(0).toUpperCase() : 'B');
+                       const initial = getInitial(name);
+                       
+                       // Generate beautiful premium gradients based on name monogram
+                       let gradient = 'linear-gradient(135deg, #0ea5a9 0%, #3b82f6 100%)';
+                       if ('AEIOU'.includes(initial)) {
+                         gradient = 'linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%)';
+                       } else if ('BCDFG'.includes(initial)) {
+                         gradient = 'linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%)';
+                       } else if ('HJKLM'.includes(initial)) {
+                         gradient = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+                       } else if ('NPRST'.includes(initial)) {
+                         gradient = 'linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)';
+                       }
 
-                      return (
-                        <div
-                          key={lead._id || lead.sourceUrl || idx}
-                          className="kanban-card"
-                          draggable
-                          onDragStart={(e) => handleDragStart(e, lead)}
-                          onClick={() => handleCardClick(lead)}
-                        >
-                          {/* Hover Quick Actions Overlay */}
-                          <div className="card-hover-overlay">
+                       const score = lead.leadScore !== undefined ? lead.leadScore : 85;
+                       let scoreColor = '#EF4444'; 
+                       let scoreBg = 'rgba(239, 68, 68, 0.08)';
+                       if (score >= 80) {
+                         scoreColor = '#10B981'; 
+                         scoreBg = 'rgba(16, 185, 129, 0.08)';
+                       } else if (score >= 50) {
+                         scoreColor = '#F59E0B'; 
+                         scoreBg = 'rgba(245, 158, 11, 0.08)';
+                       }
+
+                       const platformName = lead.platform || 'Google Maps';
+                       const isGmaps = platformName.toLowerCase().includes('maps') || platformName.toLowerCase().includes('google');
+
+                       return (
+                         <div
+                           key={lead._id || lead.sourceUrl || idx}
+                           className="kanban-card"
+                           draggable
+                           onDragStart={(e) => handleDragStart(e, lead)}
+                           onClick={() => handleCardClick(lead)}
+                           style={{ transition: 'all 0.2s ease-in-out' }}
+                         >
+                            {/* Hover Delete Action Button */}
                             <button
-                              title="Expand Lead Details"
+                              className="btn-delete-card-hover"
+                              title="Delete Lead"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                handleCardClick(lead);
+                                handleDeleteCard(lead, e);
+                              }}
+                              style={{
+                                position: 'absolute',
+                                top: '8px',
+                                right: '8px',
+                                width: '24px',
+                                height: '24px',
+                                borderRadius: '6px',
+                                background: 'rgba(239, 68, 68, 0.1)',
+                                border: '1px solid rgba(239, 68, 68, 0.15)',
+                                color: '#EF4444',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                cursor: 'pointer',
+                                opacity: 0,
+                                transition: 'all 0.2s ease',
+                                zIndex: 10
                               }}
                             >
-                              <Eye size={14} />
+                              <Trash2 size={12} />
                             </button>
-                            <a
-                              href={lead.sourceUrl}
-                              target="_blank"
-                              rel="noreferrer"
-                              title="View Source Post"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <ExternalLink size={14} />
-                            </a>
-                            <button
-                              className="btn-delete"
-                              title="Delete Lead"
-                              onClick={(e) => handleDeleteCard(lead, e)}
-                            >
-                              <Trash2 size={14} />
-                            </button>
-                          </div>
 
-                          {/* Header Row */}
-                          <div className="card-header-row">
-                            <div className="author-info">
-                              <img
-                                src={avatarUrl}
-                                alt={name}
-                                className="avatar-img"
-                                onError={(e) => {
-                                  e.target.onerror = null;
-                                  e.target.style.display = 'none';
-                                }}
-                              />
-                              <div className="author-text">
-                                <span className="author-name">{name}</span>
-                                {lead.companyName && (
-                                  <span className="company-name">{lead.companyName}</span>
-                                )}
-                              </div>
-                            </div>
+                           {/* Header Row */}
+                           <div className="card-header-row" style={{ alignItems: 'flex-start' }}>
+                             <div className="author-info" style={{ gap: '10px' }}>
+                               <div style={{
+                                 width: '32px',
+                                 height: '32px',
+                                 borderRadius: '8px',
+                                 background: gradient,
+                                 display: 'flex',
+                                 alignItems: 'center',
+                                 justifyContent: 'center',
+                                 fontWeight: '700',
+                                 color: '#fff',
+                                 fontSize: '0.85rem',
+                                 boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
+                                 flexShrink: 0
+                               }}>
+                                 {initial}
+                               </div>
+                               <div className="author-text">
+                                 <span className="author-name" style={{ fontSize: '0.82rem', fontWeight: '700', color: 'var(--text-primary)', lineHeight: '1.25' }}>
+                                   {name}
+                                 </span>
+                               </div>
+                             </div>
+                           </div>
 
-                            <PlatformIcon platform={lead.platform} />
-                          </div>
+                           {/* Body Content - Platform Specific */}
+                           <div className="card-body-content" style={{ gap: '8px' }}>
+                             {/* Styled Brand Platform Tag */}
+                             <div>
+                               <span style={{
+                                 display: 'inline-flex',
+                                 alignItems: 'center',
+                                 gap: '4px',
+                                 fontSize: '0.65rem',
+                                 fontWeight: '700',
+                                 color: isGmaps ? '#4285F4' : '#0EA5A4',
+                                 background: isGmaps ? 'rgba(66, 133, 244, 0.08)' : 'rgba(14, 165, 164, 0.08)',
+                                 border: isGmaps ? '1px solid rgba(66, 133, 244, 0.15)' : '1px solid rgba(14, 165, 164, 0.15)',
+                                 padding: '3px 8px',
+                                 borderRadius: '12px',
+                                 textTransform: 'uppercase',
+                                 letterSpacing: '0.3px'
+                               }}>
+                                 <MapPin size={10} />
+                                 {platformName}
+                               </span>
+                             </div>
 
-                          {/* Body Content - Platform Specific */}
-                          <div className="card-body-content">
-                            {lead.needDescription && (
-                              <p className="req-description">{lead.needDescription}</p>
-                            )}
+                             {/* Contact Info Overview Box */}
+                             {(lead.contactInfo || lead.phone) && (
+                               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '2px', borderTop: '1px dashed rgba(255, 255, 255, 0.06)', paddingTop: '6px' }}>
+                                 {lead.contactInfo && (
+                                   <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.7rem', color: 'var(--text-secondary)' }} title={lead.contactInfo}>
+                                     <span style={{ color: '#0EA5A4', fontSize: '0.8rem' }}>✉</span>
+                                     <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '180px' }}>
+                                       {lead.contactInfo}
+                                     </span>
+                                   </div>
+                                 )}
+                                 {lead.phone && (
+                                   <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
+                                     <span style={{ color: '#0EA5A4', fontSize: '0.8rem' }}>📞</span>
+                                     <span>{lead.phone}</span>
+                                   </div>
+                                 )}
+                               </div>
+                             )}
 
-                            {/* Google Maps Details */}
-                            {lead.platform === 'Google Maps' && (
-                              <div className="gmaps-spec">
-                                {lead.rating && (
-                                  <span className="star-rating">
-                                    <Star size={12} fill="#F59E0B" /> {lead.rating} ({lead.reviews || 0})
-                                  </span>
-                                )}
-                                {lead.phone && (
-                                  <span className="phone-info">
-                                    <Phone size={12} /> {lead.phone}
-                                  </span>
-                                )}
-                              </div>
-                            )}
+                             {/* Govt Tenders Details */}
+                             {lead.platform === 'Govt Tenders' && (
+                               <div className="tender-spec">
+                                 <span>🏛️ {lead.authorName || 'Public Agency'}</span>
+                                 <span>💵 Est. $50k+</span>
+                               </div>
+                             )}
 
-                            {/* Govt Tenders Details */}
-                            {lead.platform === 'Govt Tenders' && (
-                              <div className="tender-spec">
-                                <span>🏛️ {lead.authorName || 'Public Agency'}</span>
-                                <span>💵 Est. $50k+</span>
-                              </div>
-                            )}
+                             {/* Freelance (Upwork / Freelancer) Details */}
+                             {(lead.platform === 'Upwork' || lead.platform === 'Freelancer') && (
+                               <div className="freelance-spec">
+                                 <span>💼 Freelance Project</span>
+                                 <span>💵 Fixed / Hourly</span>
+                               </div>
+                             )}
 
-                            {/* Freelance (Upwork / Freelancer) Details */}
-                            {(lead.platform === 'Upwork' || lead.platform === 'Freelancer') && (
-                              <div className="freelance-spec">
-                                <span>💼 Freelance Project</span>
-                                <span>💵 Fixed / Hourly</span>
-                              </div>
-                            )}
+                             {/* Candidate / Recruiter Badges */}
+                             {(lead.search_type === 'recruiter' || filterMode === 'recruiter') && (
+                               <div className="recruiter-spec">
+                                 {lead.experienceLevel && (
+                                   <span className="exp-tag">{lead.experienceLevel}</span>
+                                 )}
+                                 {lead.workPreference && (
+                                   <span className="skill-tag">{lead.workPreference}</span>
+                                 )}
+                                 {lead.skills && (
+                                   <span className="skill-tag">{lead.skills}</span>
+                                 )}
+                               </div>
+                             )}
+                           </div>
 
-                            {/* Candidate / Recruiter Badges */}
-                            {(lead.search_type === 'recruiter' || filterMode === 'recruiter') && (
-                              <div className="recruiter-spec">
-                                {lead.experienceLevel && (
-                                  <span className="exp-tag">{lead.experienceLevel}</span>
-                                )}
-                                {lead.workPreference && (
-                                  <span className="skill-tag">{lead.workPreference}</span>
-                                )}
-                                {lead.skills && (
-                                  <span className="skill-tag">{lead.skills}</span>
-                                )}
-                              </div>
-                            )}
-                          </div>
+                           {/* Footer Metrics */}
+                           <div className="card-footer-metrics" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid rgba(255, 255, 255, 0.05)', paddingTop: '8px', marginTop: '8px' }}>
+                             {lead.rating ? (
+                               <div className="rating-tag" style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.72rem', color: '#F59E0B', fontWeight: 600 }}>
+                                 <Star size={11} fill="#F59E0B" stroke="#F59E0B" />
+                                 <span>{lead.rating} <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>({lead.reviews || 0})</span></span>
+                               </div>
+                             ) : (
+                               <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                                 No rating
+                               </div>
+                             )}
 
-                          {/* Footer Metrics */}
-                          <div className="card-footer-metrics">
-                            <div className="location-tag">
-                              <MapPin size={13} />
-                              <span>{lead.location || lead.platform || 'Global'}</span>
-                            </div>
-
-                            <ScoreRing score={lead.leadScore || 85} />
-                          </div>
-                        </div>
-                      );
+                             <div className="score-tag" style={{ fontSize: '0.68rem', fontWeight: 700, color: scoreColor, background: scoreBg, padding: '3px 8px', borderRadius: '4px', border: `1px solid ${scoreColor}20` }}>
+                               Match: {score}%
+                             </div>
+                           </div>
+                         </div>
+                       );
                     })
                   )}
                 </div>
