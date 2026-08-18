@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  X,
+  ArrowLeft,
   Search,
   Sparkles,
   Send,
@@ -258,10 +258,14 @@ Source: ${lead.sourceUrl}`;
   };
 
   return (
-    <div id="detail-modal" className="modal-overlay active">
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        {/* Premium Header */}
-        <div className="modal-header-premium">
+    <div className="lead-detail-page">
+      {/* Premium Header */}
+      <div className="page-header-premium">
+        <div className="header-left-side">
+          <button onClick={onClose} className="back-icon-btn" title="Back to Leads list">
+            <ArrowLeft size={18} />
+          </button>
+          <div className="header-divider" />
           <img
             src={getCompanyLogoUrl(companyName)}
             alt={companyName}
@@ -282,516 +286,523 @@ Source: ${lead.sourceUrl}`;
               </span>
             </div>
           </div>
-          <button onClick={onClose} className="modal-close-premium" title="Close details">
-            <X size={16} />
-          </button>
         </div>
 
-        {/* 2-Column Split Body Layout */}
-        <div className="modal-split-container">
+        <div className="header-right-side">
+          <span className={`badge ${getIntentBadgeClass(buyingIntent || 'Low')}`} style={{ padding: '6px 12px', fontSize: '0.75rem', textTransform: 'capitalize', fontWeight: '700' }}>
+            {buyingIntent || 'Low'} Intent
+          </span>
+          <span className="contact-meta-pill" style={{ height: '30px', padding: '0 12px', fontSize: '0.75rem', display: 'flex', alignItems: 'center', fontWeight: '600' }}>
+            Stage: {crmStatus || 'New'}
+          </span>
+        </div>
+      </div>
+
+      {/* 2-Column Split Body Layout */}
+      <div className="modal-split-container">
+        
+        {/* LEFT COLUMN: Data Details Panel (Scrollable) */}
+        <div className="modal-main-column">
           
-          {/* LEFT COLUMN: Data Details Panel (Scrollable) */}
-          <div className="modal-main-column">
-            
-            {/* CARD 1: Profile Info */}
-            <div className="detail-card">
-              <div className="card-header-row">
-                <h4 className="card-title">
-                  <Users size={14} className="header-icon" />
-                  Lead Profile
-                </h4>
-              </div>
+          {/* CARD 1: Profile Info */}
+          <div className="detail-card">
+            <div className="card-header-row">
+              <h4 className="card-title">
+                <Users size={14} className="header-icon" />
+                Lead Profile
+              </h4>
+            </div>
 
-              <div className="info-grid-2">
-                {!isMaps && (
-                  <div className="field-group">
-                    <label>Poster Full Name</label>
-                    <div className="field-value">
-                      <span className="value-text">{authorName || 'N/A'}</span>
-                    </div>
-                  </div>
-                )}
-                <div className="field-group">
-                  <label>Target Company Name</label>
-                  <div className="field-value">
-                    <span className="value-text">{companyName || 'N/A'}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="info-grid-2">
-                <div className="field-group">
-                  <label>Classified Industry</label>
-                  <div className="field-value">
-                    <span className="value-text">{industry || 'N/A'}</span>
-                  </div>
-                </div>
-                <div className="field-group">
-                  <label>Lead Location</label>
-                  <div className="field-value">
-                    <span className="value-text">{location || 'N/A'}</span>
-                  </div>
-                </div>
-              </div>
-
+            <div className="info-grid-2">
               {!isMaps && (
-                <div className="info-grid-2">
-                  <div className="field-group">
-                    <label>Buying Intent Level</label>
-                    <div className="field-value" style={{ border: 'none', background: 'transparent', padding: 0, minHeight: 'auto' }}>
-                      <span className={`badge ${getIntentBadgeClass(buyingIntent || 'Low')}`} style={{ textTransform: 'capitalize' }}>
-                        {buyingIntent || 'Low'}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="field-group">
-                    <label>Signal Type</label>
-                    <div className="field-value">
-                      <span className="value-text">{intentType || 'N/A'}</span>
-                    </div>
+                <div className="field-group">
+                  <label>Poster Full Name</label>
+                  <div className="field-value">
+                    <span className="value-text">{authorName || 'N/A'}</span>
                   </div>
                 </div>
               )}
-              
+              <div className="field-group">
+                <label>Target Company Name</label>
+                <div className="field-value">
+                  <span className="value-text">{companyName || 'N/A'}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="info-grid-2">
+              <div className="field-group">
+                <label>Classified Industry</label>
+                <div className="field-value">
+                  <span className="value-text">{industry || 'N/A'}</span>
+                </div>
+              </div>
+              <div className="field-group">
+                <label>Lead Location</label>
+                <div className="field-value">
+                  <span className="value-text">{location || 'N/A'}</span>
+                </div>
+              </div>
+            </div>
+
+            {!isMaps && (
               <div className="info-grid-2">
                 <div className="field-group">
-                  <label>Pipeline Stage</label>
-                  <div className="field-value">
-                    <span className="value-text">{crmStatus || 'N/A'}</span>
+                  <label>Buying Intent Level</label>
+                  <div className="field-value" style={{ border: 'none', background: 'transparent', padding: 0, minHeight: 'auto' }}>
+                    <span className={`badge ${getIntentBadgeClass(buyingIntent || 'Low')}`} style={{ textTransform: 'capitalize' }}>
+                      {buyingIntent || 'Low'}
+                    </span>
                   </div>
                 </div>
-                
-                {!isMaps && (
-                  <div className="field-group">
-                    <label>Email Source</label>
-                    <div className="contact-meta-pill" style={{ height: '38px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <span>Source: {lead.contactSource || 'guessed'}</span>
-                      <span>•</span>
-                      <span>Conf: {lead.contactConfidence || 'low'}</span>
-                    </div>
+                <div className="field-group">
+                  <label>Signal Type</label>
+                  <div className="field-value">
+                    <span className="value-text">{intentType || 'N/A'}</span>
                   </div>
-                )}
+                </div>
               </div>
-
+            )}
+            
+            <div className="info-grid-2">
+              <div className="field-group">
+                <label>Pipeline Stage</label>
+                <div className="field-value">
+                  <span className="value-text">{crmStatus || 'N/A'}</span>
+                </div>
+              </div>
+              
               {!isMaps && (
                 <div className="field-group">
-                  <label>Extracted Service Required</label>
-                  <div className="field-value">
-                    <span className="value-text">{serviceRequired || 'N/A'}</span>
+                  <label>Email Source</label>
+                  <div className="contact-meta-pill" style={{ height: '38px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <span>Source: {lead.contactSource || 'guessed'}</span>
+                    <span>•</span>
+                    <span>Conf: {lead.contactConfidence || 'low'}</span>
                   </div>
                 </div>
               )}
             </div>
 
-            {/* CARD 2: Candidate details (Recruiter mode only) */}
-            {isRecruiter && (
-              <div className="detail-card">
-                <div className="card-header-row">
-                  <h4 className="card-title">Candidate Details</h4>
-                </div>
-                <div className="field-group">
-                  <label>Candidate Skills</label>
-                  <div className="field-value">
-                    <span className="value-text">{skills || 'N/A'}</span>
-                  </div>
-                </div>
-                <div className="info-grid-2">
-                  <div className="field-group">
-                    <label>Experience Level</label>
-                    <div className="field-value">
-                      <span className="value-text">{experienceLevel || 'N/A'}</span>
-                    </div>
-                  </div>
-                  <div className="field-group">
-                    <label>Work Preference</label>
-                    <div className="field-value">
-                      <span className="value-text">{workPreference || 'N/A'}</span>
-                    </div>
-                  </div>
+            {!isMaps && (
+              <div className="field-group">
+                <label>Extracted Service Required</label>
+                <div className="field-value">
+                  <span className="value-text">{serviceRequired || 'N/A'}</span>
                 </div>
               </div>
             )}
+          </div>
 
-            {/* CARD 3: Contact & Media Channels */}
+          {/* CARD 2: Candidate details (Recruiter mode only) */}
+          {isRecruiter && (
             <div className="detail-card">
               <div className="card-header-row">
-                <h4 className="card-title">
-                  <Mail size={14} className="header-icon" />
-                  Contact & Links
-                </h4>
+                <h4 className="card-title">Candidate Details</h4>
+              </div>
+              <div className="field-group">
+                <label>Candidate Skills</label>
+                <div className="field-value">
+                  <span className="value-text">{skills || 'N/A'}</span>
+                </div>
+              </div>
+              <div className="info-grid-2">
+                <div className="field-group">
+                  <label>Experience Level</label>
+                  <div className="field-value">
+                    <span className="value-text">{experienceLevel || 'N/A'}</span>
+                  </div>
+                </div>
+                <div className="field-group">
+                  <label>Work Preference</label>
+                  <div className="field-value">
+                    <span className="value-text">{workPreference || 'N/A'}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* CARD 3: Contact & Media Channels */}
+          <div className="detail-card">
+            <div className="card-header-row">
+              <h4 className="card-title">
+                <Mail size={14} className="header-icon" />
+                Contact & Links
+              </h4>
+            </div>
+
+            <div className="field-group">
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                <label style={{ margin: 0 }}>Contact Email</label>
+                {contactInfo && (
+                  <span className="contact-meta-pill">
+                    Source: {contactSource || 'unknown'}
+                  </span>
+                )}
+              </div>
+              <div className="field-value" style={{ paddingRight: '4px' }}>
+                <span className="value-text" style={{ 
+                  color: contactInfo ? 'var(--text-primary)' : 'var(--text-muted)', 
+                  fontStyle: contactInfo ? 'normal' : 'italic',
+                  fontWeight: contactInfo ? '600' : '400'
+                }}>
+                  {contactInfo || 'Email not found'}
+                </span>
+                <button
+                  type="button"
+                  id="btn-enrich-contact"
+                  className="btn btn-secondary"
+                  onClick={handleEnrich}
+                  disabled={enriching}
+                  style={{ height: '30px', padding: '0 12px', fontSize: '0.72rem', margin: 0 }}
+                >
+                  <Search size={11} />
+                  {enriching ? 'Enriching...' : 'Find Email'}
+                </button>
+              </div>
+            </div>
+
+            {isMaps && (
+              <>
+                <div className="field-group">
+                  <label>Contact Number (Phone)</label>
+                  <div className="field-value">
+                    <span className="value-text">{phone || 'N/A'}</span>
+                  </div>
+                </div>
+
+                <div className="field-group">
+                  <label>Google Maps Rating</label>
+                  <div className="rating-pill-container">
+                    {rating && (
+                      <div className="rating-pill">
+                        <span className="rating-star">★</span>
+                        <span>{rating} / 5 Rating</span>
+                      </div>
+                    )}
+                    {reviews && (
+                      <div className="rating-pill">
+                        <span className="review-bubble">💬</span>
+                        <span>{reviews} Reviews</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
+
+            <div className="info-grid-2">
+              <div className="field-group">
+                <label>Website Link</label>
+                <div className="field-value" style={{ paddingRight: '4px' }}>
+                  <span className="value-text">
+                    {website || 'N/A'}
+                  </span>
+                  {website && (
+                    <a
+                      href={website.startsWith('http') ? website : `https://${website}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="visit-link-btn"
+                      title="Visit Website"
+                    >
+                      <ExternalLink size={12} />
+                    </a>
+                  )}
+                </div>
               </div>
 
               <div className="field-group">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                  <label style={{ margin: 0 }}>Contact Email</label>
-                  {contactInfo && (
-                    <span className="contact-meta-pill">
-                      Source: {contactSource || 'unknown'}
-                    </span>
+                <label>LinkedIn Profile</label>
+                <div className="field-value" style={{ paddingRight: '4px' }}>
+                  <span className="value-text">
+                    {linkedin || 'N/A'}
+                  </span>
+                  {linkedin && (
+                    <a
+                      href={linkedin.startsWith('http') ? linkedin : `https://${linkedin}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="visit-link-btn"
+                      title="Visit LinkedIn"
+                    >
+                      <ExternalLink size={12} />
+                    </a>
                   )}
                 </div>
-                <div className="field-value" style={{ paddingRight: '4px' }}>
-                  <span className="value-text" style={{ 
-                    color: contactInfo ? 'var(--text-primary)' : 'var(--text-muted)', 
-                    fontStyle: contactInfo ? 'normal' : 'italic',
-                    fontWeight: contactInfo ? '600' : '400'
-                  }}>
-                    {contactInfo || 'Email not found'}
-                  </span>
-                  <button
-                    type="button"
-                    id="btn-enrich-contact"
-                    className="btn btn-secondary"
-                    onClick={handleEnrich}
-                    disabled={enriching}
-                    style={{ height: '30px', padding: '0 12px', fontSize: '0.72rem', margin: 0 }}
-                  >
-                    <Search size={11} />
-                    {enriching ? 'Enriching...' : 'Find Email'}
-                  </button>
-                </div>
               </div>
+            </div>
+          </div>
 
-              {isMaps && (
-                <>
-                  <div className="field-group">
-                    <label>Contact Number (Phone)</label>
-                    <div className="field-value">
-                      <span className="value-text">{phone || 'N/A'}</span>
-                    </div>
-                  </div>
-
-                  <div className="field-group">
-                    <label>Google Maps Rating</label>
-                    <div className="rating-pill-container">
-                      {rating && (
-                        <div className="rating-pill">
-                          <span className="rating-star">★</span>
-                          <span>{rating} / 5 Rating</span>
-                        </div>
-                      )}
-                      {reviews && (
-                        <div className="rating-pill">
-                          <span className="review-bubble">💬</span>
-                          <span>{reviews} Reviews</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </>
-              )}
+          {/* CARD 4: Company metrics (for Maps scans) */}
+          {isMaps && (
+            <div className="detail-card">
+              <div className="card-header-row">
+                <h4 className="card-title">
+                  <Sparkles size={14} className="header-icon" />
+                  Company Metrics
+                </h4>
+              </div>
 
               <div className="info-grid-2">
                 <div className="field-group">
-                  <label>Website Link</label>
-                  <div className="field-value" style={{ paddingRight: '4px' }}>
-                    <span className="value-text">
-                      {website || 'N/A'}
-                    </span>
-                    {website && (
-                      <a
-                        href={website.startsWith('http') ? website : `https://${website}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="visit-link-btn"
-                        title="Visit Website"
-                      >
-                        <ExternalLink size={12} />
-                      </a>
-                    )}
+                  <label>Employee Count</label>
+                  <div className="field-value">
+                    <span className="value-text">{employeeCount || 'N/A'}</span>
                   </div>
                 </div>
-
                 <div className="field-group">
-                  <label>LinkedIn Profile</label>
-                  <div className="field-value" style={{ paddingRight: '4px' }}>
-                    <span className="value-text">
-                      {linkedin || 'N/A'}
-                    </span>
-                    {linkedin && (
-                      <a
-                        href={linkedin.startsWith('http') ? linkedin : `https://${linkedin}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="visit-link-btn"
-                        title="Visit LinkedIn"
-                      >
-                        <ExternalLink size={12} />
-                      </a>
-                    )}
+                  <label>Founded Year</label>
+                  <div className="field-value">
+                    <span className="value-text">{foundedYear || 'N/A'}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="info-grid-2">
+                <div className="field-group">
+                  <label>Annual Revenue</label>
+                  <div className="field-value">
+                    <span className="value-text">{annualRevenue || 'N/A'}</span>
+                  </div>
+                </div>
+                <div className="field-group">
+                  <label>Total Funding</label>
+                  <div className="field-value">
+                    <span className="value-text">{totalFunding || 'N/A'}</span>
                   </div>
                 </div>
               </div>
             </div>
+          )}
 
-            {/* CARD 4: Company metrics (for Maps scans) */}
-            {isMaps && (
-              <div className="detail-card">
-                <div className="card-header-row">
-                  <h4 className="card-title">
-                    <Sparkles size={14} className="header-icon" />
-                    Company Metrics
-                  </h4>
-                </div>
+          {/* CARD 5: B2B Key Team & Contacts */}
+          <div className="detail-card">
+            <div className="card-header-row">
+              <h4 className="card-title">
+                <Users size={14} className="header-icon" />
+                Key Team & Decision Makers
+              </h4>
+              <button
+                type="button"
+                id="btn-enrich-team"
+                className="btn btn-secondary"
+                onClick={handleEnrichTeam}
+                disabled={enrichingTeam}
+                style={{ height: '30px', padding: '0 12px', fontSize: '0.72rem', margin: 0 }}
+              >
+                <Users size={11} />
+                {enrichingTeam ? 'Fetching...' : 'Find Team'}
+              </button>
+            </div>
 
-                <div className="info-grid-2">
-                  <div className="field-group">
-                    <label>Employee Count</label>
-                    <div className="field-value">
-                      <span className="value-text">{employeeCount || 'N/A'}</span>
-                    </div>
-                  </div>
-                  <div className="field-group">
-                    <label>Founded Year</label>
-                    <div className="field-value">
-                      <span className="value-text">{foundedYear || 'N/A'}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="info-grid-2">
-                  <div className="field-group">
-                    <label>Annual Revenue</label>
-                    <div className="field-value">
-                      <span className="value-text">{annualRevenue || 'N/A'}</span>
-                    </div>
-                  </div>
-                  <div className="field-group">
-                    <label>Total Funding</label>
-                    <div className="field-value">
-                      <span className="value-text">{totalFunding || 'N/A'}</span>
-                    </div>
-                  </div>
-                </div>
+            {getTeamSource() && (
+              <div>
+                <span className="contact-meta-pill" style={{ textTransform: 'capitalize' }}>
+                  Source: {getTeamSource()}
+                </span>
               </div>
             )}
 
-            {/* CARD 5: B2B Key Team & Contacts */}
-            <div className="detail-card">
-              <div className="card-header-row">
-                <h4 className="card-title">
-                  <Users size={14} className="header-icon" />
-                  Key Team & Decision Makers
-                </h4>
-                <button
-                  type="button"
-                  id="btn-enrich-team"
-                  className="btn btn-secondary"
-                  onClick={handleEnrichTeam}
-                  disabled={enrichingTeam}
-                  style={{ height: '30px', padding: '0 12px', fontSize: '0.72rem', margin: 0 }}
-                >
-                  <Users size={11} />
-                  {enrichingTeam ? 'Fetching...' : 'Find Team'}
-                </button>
+            {enrichingTeam && (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '16px', border: '1px dashed var(--border-color)', borderRadius: '10px', background: 'rgba(255, 255, 255, 0.01)' }}>
+                <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" style={{ width: '12px', height: '12px', border: '2px solid var(--primary)', borderRightColor: 'transparent', borderRadius: '50%', display: 'inline-block', animation: 'spinner-border .75s linear infinite' }}></span>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Searching decision-makers & team details...</span>
               </div>
+            )}
 
-              {getTeamSource() && (
-                <div>
-                  <span className="contact-meta-pill" style={{ textTransform: 'capitalize' }}>
-                    Source: {getTeamSource()}
-                  </span>
-                </div>
-              )}
-
-              {enrichingTeam && (
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '16px', border: '1px dashed var(--border-color)', borderRadius: '10px', background: 'rgba(255, 255, 255, 0.01)' }}>
-                  <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" style={{ width: '12px', height: '12px', border: '2px solid var(--primary)', borderRightColor: 'transparent', borderRadius: '50%', display: 'inline-block', animation: 'spinner-border .75s linear infinite' }}></span>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Searching decision-makers & team details...</span>
-                </div>
-              )}
-
-              {!keyContacts || keyContacts.length === 0 ? (
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontStyle: 'italic', padding: '16px', border: '1px dashed rgba(255, 255, 255, 0.1)', borderRadius: '10px', textAlign: 'center', background: 'rgba(255, 255, 255, 0.01)' }}>
-                  No contact persons identified yet. Click "Find Team" to fetch contacts.
-                </div>
-              ) : (
-                <div className="team-list-container">
-                  {keyContacts.map((contact, cIdx) => (
-                    <div className="team-member-card" key={cIdx}>
-                      <div className="member-left">
-                        <div className="member-initials">
-                          {contact.name ? contact.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'U'}
-                        </div>
-                        <div className="member-info">
-                          <div className="member-name-row">
-                            <span className="member-name">{contact.name}</span>
-                            {contact.linkedin && (
-                              <a
-                                href={contact.linkedin.startsWith('http') ? contact.linkedin : `https://${contact.linkedin}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="member-linkedin"
-                                title="LinkedIn profile"
-                              >
-                                {getPlatformIcon('linkedin', 12)}
-                              </a>
-                            )}
-                          </div>
-                          <span className="member-title">
-                            {contact.title === 'Ceo' ? 'CEO' : contact.title === 'Md' ? 'MD' : contact.title}
-                          </span>
-                        </div>
+            {!keyContacts || keyContacts.length === 0 ? (
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontStyle: 'italic', padding: '16px', border: '1px dashed rgba(255, 255, 255, 0.1)', borderRadius: '10px', textAlign: 'center', background: 'rgba(255, 255, 255, 0.01)' }}>
+                No contact persons identified yet. Click "Find Team" to fetch contacts.
+              </div>
+            ) : (
+              <div className="team-list-container">
+                {keyContacts.map((contact, cIdx) => (
+                  <div className="team-member-card" key={cIdx}>
+                    <div className="member-left">
+                      <div className="member-initials">
+                        {contact.name ? contact.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'U'}
                       </div>
-
-                      <div className="member-right">
-                        {contact.email && contact.email !== 'No Email Found' ? (
-                          <>
-                            <span className="member-email">{contact.email}</span>
-                            <button
-                              type="button"
-                              className="copy-member-btn"
-                              onClick={() => {
-                                navigator.clipboard.writeText(contact.email);
-                                if (addToast) addToast('Copied', `${contact.name}'s email copied!`, 'success');
-                              }}
-                              title="Copy email"
+                      <div className="member-info">
+                        <div className="member-name-row">
+                          <span className="member-name">{contact.name}</span>
+                          {contact.linkedin && (
+                            <a
+                              href={contact.linkedin.startsWith('http') ? contact.linkedin : `https://${contact.linkedin}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="member-linkedin"
+                              title="LinkedIn profile"
                             >
-                              <Copy size={11} />
-                            </button>
-                          </>
-                        ) : (
-                          <span className="member-email pending">Pending Lookup</span>
-                        )}
+                              {getPlatformIcon('linkedin', 12)}
+                            </a>
+                          )}
+                        </div>
+                        <span className="member-title">
+                          {contact.title === 'Ceo' ? 'CEO' : contact.title === 'Md' ? 'MD' : contact.title}
+                        </span>
                       </div>
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
 
-            {/* CARD 6: Requirement Details */}
-            <div className="detail-card">
-              <div className="card-header-row">
-                <h4 className="card-title">
-                  <MessageSquare size={14} className="header-icon" />
-                  Requirement / Description
-                </h4>
+                    <div className="member-right">
+                      {contact.email && contact.email !== 'No Email Found' ? (
+                        <>
+                          <span className="member-email">{contact.email}</span>
+                          <button
+                            type="button"
+                            className="copy-member-btn"
+                            onClick={() => {
+                              navigator.clipboard.writeText(contact.email);
+                              if (addToast) addToast('Copied', `${contact.name}'s email copied!`, 'success');
+                            }}
+                            title="Copy email"
+                          >
+                            <Copy size={11} />
+                          </button>
+                        </>
+                      ) : (
+                        <span className="member-email pending">Pending Lookup</span>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
-              <div className="field-value-textarea">
-                {needDescription || 'No company description or service specifications extracted.'}
-              </div>
-            </div>
-            
+            )}
           </div>
 
-          {/* RIGHT COLUMN: AI Copy & CRM Executions Sidebar (Static / Pinned) */}
-          <div className="modal-sidebar-column">
-            
-            {/* SECTION 1: Intent Score */}
-            <div className="sidebar-section">
-              <div className="detail-card" style={{ width: '100%' }}>
-                <div className="score-flex-box">
-                  <div style={{ flex: 1 }}>
-                    <h4 className="card-title" style={{ fontSize: '0.78rem', textTransform: 'uppercase', color: 'var(--text-muted)', margin: '0 0 4px 0', letterSpacing: '0.04em' }}>Lead Fit Score</h4>
-                    <span className={`badge ${getIntentBadgeClass(buyingIntent || 'Low')}`} style={{ textTransform: 'capitalize' }}>
-                      {(buyingIntent || 'Low') + ' Intent'}
-                    </span>
-                  </div>
-                  <div className="score-number-badge">
-                    {lead.leadScore !== undefined ? lead.leadScore : Math.round((parseFloat(lead.confidenceScore) || 0) * 100)}
-                    <span className="total-points">/100</span>
-                  </div>
+          {/* CARD 6: Requirement Details */}
+          <div className="detail-card">
+            <div className="card-header-row">
+              <h4 className="card-title">
+                <MessageSquare size={14} className="header-icon" />
+                Requirement / Description
+              </h4>
+            </div>
+            <div className="field-value-textarea">
+              {needDescription || 'No company description or service specifications extracted.'}
+            </div>
+          </div>
+          
+        </div>
+
+        {/* RIGHT COLUMN: AI Copy & CRM Executions Sidebar (Static / Pinned) */}
+        <div className="modal-sidebar-column">
+          
+          {/* SECTION 1: Intent Score */}
+          <div className="sidebar-section">
+            <div className="detail-card" style={{ width: '100%' }}>
+              <div className="score-flex-box">
+                <div style={{ flex: 1 }}>
+                  <h4 className="card-title" style={{ fontSize: '0.78rem', textTransform: 'uppercase', color: 'var(--text-muted)', margin: '0 0 4px 0', letterSpacing: '0.04em' }}>Lead Fit Score</h4>
+                  <span className={`badge ${getIntentBadgeClass(buyingIntent || 'Low')}`} style={{ textTransform: 'capitalize' }}>
+                    {(buyingIntent || 'Low') + ' Intent'}
+                  </span>
+                </div>
+                <div className="score-number-badge">
+                  {lead.leadScore !== undefined ? lead.leadScore : Math.round((parseFloat(lead.confidenceScore) || 0) * 100)}
+                  <span className="total-points">/100</span>
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* SECTION 2: AI Email Outreach Copywriting */}
-            <div className="sidebar-section" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-              <div className="detail-card ai-glow" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                <div className="card-header-row" style={{ flexShrink: 0 }}>
-                  <h4 className="card-title">
-                    <Sparkles size={14} className="header-icon" />
-                    AI Outreach Copywriter
-                  </h4>
-                  <button
-                    type="button"
-                    id="btn-generate-pitch"
-                    className="btn btn-primary"
-                    onClick={handleGeneratePitch}
-                    disabled={generatingPitch}
-                    style={{ height: '30px', padding: '0 12px', fontSize: '0.72rem', margin: 0 }}
-                  >
-                    <Sparkles size={11} />
-                    {generatingPitch ? 'Drafting...' : 'Generate Pitch'}
-                  </button>
-                </div>
-
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', marginTop: '12px', minHeight: '200px' }}>
-                  {generatingPitch && (
-                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '10px', padding: '20px', border: '1px dashed rgba(3, 113, 114, 0.3)', borderRadius: '10px', background: 'rgba(3, 113, 114, 0.02)' }}>
-                      <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" style={{ width: '16px', height: '16px', border: '2px solid var(--primary)', borderRightColor: 'transparent', borderRadius: '50%', display: 'inline-block', animation: 'spinner-border .75s linear infinite' }}></span>
-                      <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 500 }}>Drafting customized pitch via LLM...</span>
-                    </div>
-                  )}
-
-                  {hasGenerated && !generatingPitch && (
-                    <textarea
-                      id="modal-email-body"
-                      className="form-control textarea-email"
-                      placeholder="Personalized pitch text..."
-                      value={emailBody}
-                      onChange={(e) => {
-                        setEmailBody(e.target.value);
-                      }}
-                      style={{ height: '100%', flex: 1, resize: 'none' }}
-                    />
-                  )}
-
-                  {!hasGenerated && !generatingPitch && (
-                    <div className="email-placeholder" style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      Click 'Generate Pitch' to automatically draft personalized email copy.
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* SECTION 3: CRM Pinned Actions & Execution */}
-            <div className="sidebar-section" style={{ background: 'var(--bg-main)', borderTop: '1px solid var(--border-color)', marginTop: 'auto', flexShrink: 0 }}>
-              {!lead.isConverted && (
+          {/* SECTION 2: AI Email Outreach Copywriting */}
+          <div className="sidebar-section" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <div className="detail-card ai-glow" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+              <div className="card-header-row" style={{ flexShrink: 0 }}>
+                <h4 className="card-title">
+                  <Sparkles size={14} className="header-icon" />
+                  AI Outreach Copywriter
+                </h4>
                 <button
                   type="button"
-                  id="modal-btn-convert-crm"
+                  id="btn-generate-pitch"
                   className="btn btn-primary"
-                  onClick={() => {
-                    onUpdateLead(lead.sourceUrl, { isConverted: true, crmStatus: 'New' });
-                    if (addToast) {
-                      addToast('Lead Converted', 'Converted to Outreach Pipeline!', 'success');
-                    }
-                  }}
-                  style={{ width: '100%', marginBottom: '10px' }}
+                  onClick={handleGeneratePitch}
+                  disabled={generatingPitch}
+                  style={{ height: '30px', padding: '0 12px', fontSize: '0.72rem', margin: 0 }}
                 >
-                  <Sparkles size={13} />
-                  Convert to CRM Lead
+                  <Sparkles size={11} />
+                  {generatingPitch ? 'Drafting...' : 'Generate Pitch'}
                 </button>
-              )}
+              </div>
+
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', marginTop: '12px', minHeight: '200px' }}>
+                {generatingPitch && (
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '10px', padding: '20px', border: '1px dashed rgba(3, 113, 114, 0.3)', borderRadius: '10px', background: 'rgba(3, 113, 114, 0.02)' }}>
+                    <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" style={{ width: '16px', height: '16px', border: '2px solid var(--primary)', borderRightColor: 'transparent', borderRadius: '50%', display: 'inline-block', animation: 'spinner-border .75s linear infinite' }}></span>
+                    <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 500 }}>Drafting customized pitch via LLM...</span>
+                  </div>
+                )}
+
+                {hasGenerated && !generatingPitch && (
+                  <textarea
+                    id="modal-email-body"
+                    className="form-control textarea-email"
+                    placeholder="Personalized pitch text..."
+                    value={emailBody}
+                    onChange={(e) => {
+                      setEmailBody(e.target.value);
+                    }}
+                    style={{ height: '100%', flex: 1, resize: 'none' }}
+                  />
+                )}
+
+                {!hasGenerated && !generatingPitch && (
+                  <div className="email-placeholder" style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    Click 'Generate Pitch' to automatically draft personalized email copy.
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* SECTION 3: CRM Pinned Actions & Execution */}
+          <div className="sidebar-section" style={{ background: 'var(--bg-main)', borderTop: '1px solid var(--border-color)', marginTop: 'auto', flexShrink: 0 }}>
+            {!lead.isConverted && (
+              <button
+                type="button"
+                id="modal-btn-convert-crm"
+                className="btn btn-primary"
+                onClick={() => {
+                  onUpdateLead(lead.sourceUrl, { isConverted: true, crmStatus: 'New' });
+                  if (addToast) {
+                    addToast('Lead Converted', 'Converted to Outreach Pipeline!', 'success');
+                  }
+                }}
+                style={{ width: '100%', marginBottom: '10px' }}
+              >
+                <Sparkles size={13} />
+                Convert to CRM Lead
+              </button>
+            )}
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                {isMaps ? (
+                  <a href={lead.sourceUrl} id="modal-btn-linkedin" className="btn btn-secondary" target="_blank" rel="noreferrer" style={{ flex: 1 }}>
+                    <MapPin size={13} color="#EF4444" fill="#EF4444" /> Maps Source
+                  </a>
+                ) : (
+                  <a href={lead.sourceUrl} id="modal-btn-linkedin" className="btn btn-secondary" target="_blank" rel="noreferrer" style={{ flex: 1 }}>
+                    <ExternalLink size={13} /> View Source
+                  </a>
+                )}
+                <button
+                  id="modal-btn-send"
+                  className="btn btn-success-outline"
+                  disabled={!emailBody}
+                  onClick={handleSendPitch}
+                  style={{ flex: 1 }}
+                >
+                  <Send size={13} /> Send Pitch
+                </button>
+              </div>
               
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  {isMaps ? (
-                    <a href={lead.sourceUrl} id="modal-btn-linkedin" className="btn btn-secondary" target="_blank" rel="noreferrer" style={{ flex: 1 }}>
-                      <MapPin size={13} color="#EF4444" fill="#EF4444" /> Maps Source
-                    </a>
-                  ) : (
-                    <a href={lead.sourceUrl} id="modal-btn-linkedin" className="btn btn-secondary" target="_blank" rel="noreferrer" style={{ flex: 1 }}>
-                      <ExternalLink size={13} /> View Source
-                    </a>
-                  )}
-                  <button
-                    id="modal-btn-send"
-                    className="btn btn-success-outline"
-                    disabled={!emailBody}
-                    onClick={handleSendPitch}
-                    style={{ flex: 1 }}
-                  >
-                    <Send size={13} /> Send Pitch
-                  </button>
-                </div>
-                
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <button id="modal-btn-copy" onClick={handleCopyDetails} className="btn btn-secondary" style={{ flex: 1 }}>
-                    <Copy size={13} /> Copy Details
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button id="modal-btn-copy" onClick={handleCopyDetails} className="btn btn-secondary" style={{ flex: 1 }}>
+                  <Copy size={13} /> Copy Details
                   </button>
                   <button
                     id="modal-btn-copy-email"
@@ -810,6 +821,5 @@ Source: ${lead.sourceUrl}`;
 
         </div>
       </div>
-    </div>
   );
 }
