@@ -575,10 +575,10 @@ export default function MapsScans({ leads = [], setLeads, searches = [], setSear
                               style={{ width: '24px', height: '24px', borderRadius: '4px' }} 
                             />
                             <div style={{ display: 'flex', flexDirection: 'column' }}>
-                              <span style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '0.85rem' }}>
+                              <span style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '0.85rem', lineHeight: '17px' }}>
                                 {lead.companyName || 'Unknown Business'}
                               </span>
-                              <span style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>
+                              <span style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', lineHeight: '17px' }}>
                                 {lead.location || 'Not Specified'}
                               </span>
                             </div>
