@@ -22,7 +22,7 @@ import api from '../../services/api';
 import './LeadDetailModal.scss';
 
 export default function LeadDetailModal({ lead, onClose, onUpdateLead, workspaceName, agencyInfo, addToast }) {
-  // Local edit state
+  // Local state
   const [authorName, setAuthorName] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [buyingIntent, setBuyingIntent] = useState('Low');
@@ -108,41 +108,6 @@ export default function LeadDetailModal({ lead, onClose, onUpdateLead, workspace
   const isRecruiter = lead.search_type === 'recruiter';
   const isMaps = platform === 'google_maps';
 
-  // Save changes locally and sync to backend
-  const handleFieldChange = (fieldName, val) => {
-    // Optimistically update parent list state
-    onUpdateLead(lead.sourceUrl, { [fieldName]: val });
-  };
-
-  const handleBlurSave = () => {
-    // Parent onUpdateLead syncs with backend via api
-    const payload = {
-      authorName,
-      companyName,
-      buyingIntent,
-      intentType,
-      crmStatus,
-      serviceRequired,
-      industry,
-      location,
-      needDescription,
-      contactInfo,
-      contactSource,
-      skills,
-      experienceLevel,
-      workPreference,
-      phone,
-      website,
-      linkedin,
-      employeeCount,
-      foundedYear,
-      keyContacts,
-      annualRevenue,
-      totalFunding
-    };
-    onUpdateLead(lead.sourceUrl, payload);
-  };
-
   const getTeamSource = () => {
     if (keyContactsSource && keyContactsSource !== 'none') return keyContactsSource;
     if (keyContacts && keyContacts.length > 0) {
@@ -223,18 +188,9 @@ export default function LeadDetailModal({ lead, onClose, onUpdateLead, workspace
   const handleGeneratePitch = async () => {
     setGeneratingPitch(true);
     
-    // Resolve email copywriting tone from localStorage settings or default
     const savedTone = localStorage.getItem('silvia_email_tone') || 'Short & Conversational';
     const agName = workspaceName || localStorage.getItem('silvia_agency_name') || 'My Business';
     const agInfo = agencyInfo || localStorage.getItem('silvia_agency_info') || 'premier design & development services';
-
-    // Synchronize latest modal changes before triggering AI gen to ensure fresh context
-    onUpdateLead(lead.sourceUrl, {
-      authorName,
-      companyName,
-      needDescription,
-      serviceRequired
-    });
 
     try {
       const response = await api.post('/generate-pitch', {
@@ -247,7 +203,6 @@ export default function LeadDetailModal({ lead, onClose, onUpdateLead, workspace
       const data = response.data;
       setEmailBody(data.pitch || '');
       setHasGenerated(true);
-      // Save generated pitch locally & sync
       onUpdateLead(lead.sourceUrl, { 
         draftEmail: data.pitch || '',
         crmStatus: data.crmStatus || 'Drafted',
@@ -280,8 +235,6 @@ export default function LeadDetailModal({ lead, onClose, onUpdateLead, workspace
     const mailtoUrl = `mailto:${encodeURIComponent(recipient)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     window.open(mailtoUrl, '_blank');
 
-    // Update CRM Stage automatically to Emailed
-    setCrmStatus('Emailed');
     onUpdateLead(lead.sourceUrl, { 
       crmStatus: 'Emailed',
       isConverted: true
@@ -329,735 +282,532 @@ Source: ${lead.sourceUrl}`;
               </span>
             </div>
           </div>
-          <button onClick={onClose} className="modal-close-premium" title="Close drawer">
+          <button onClick={onClose} className="modal-close-premium" title="Close details">
             <X size={16} />
           </button>
         </div>
 
-        {/* Premium Scroll Body */}
-        <div className="modal-body-premium">
-          {/* CARD 1: Lead Information */}
-          <div className="detail-card">
-            <div className="card-header-row">
-              <h4 className="card-title">
-                <Users size={14} className="header-icon" />
-                Lead Profile
-              </h4>
-            </div>
-
-            <div className="info-grid-2">
-              {!isMaps && (
-                <div className="field-group">
-                  <label htmlFor="modal-author-name">Poster Full Name</label>
-                  <input
-                    type="text"
-                    id="modal-author-name"
-                    className="form-control modal-dense-input"
-                    placeholder="Poster Name"
-                    value={authorName}
-                    onChange={(e) => {
-                      setAuthorName(e.target.value);
-                      handleFieldChange('authorName', e.target.value);
-                    }}
-                    onBlur={handleBlurSave}
-                  />
-                </div>
-              )}
-              <div className="field-group">
-                <label htmlFor="modal-company-name">Target Company Name</label>
-                <input
-                  type="text"
-                  id="modal-company-name"
-                  className="form-control modal-dense-input"
-                  placeholder="Company Name"
-                  value={companyName}
-                  onChange={(e) => {
-                    setCompanyName(e.target.value);
-                    handleFieldChange('companyName', e.target.value);
-                  }}
-                  onBlur={handleBlurSave}
-                />
-              </div>
-            </div>
-
-            <div className="info-grid-2">
-              <div className="field-group">
-                <label htmlFor="modal-industry">Classified Industry</label>
-                <input
-                  type="text"
-                  id="modal-industry"
-                  className="form-control modal-dense-input"
-                  value={industry}
-                  onChange={(e) => {
-                    setIndustry(e.target.value);
-                    handleFieldChange('industry', e.target.value);
-                  }}
-                  onBlur={handleBlurSave}
-                />
-              </div>
-              <div className="field-group">
-                <label htmlFor="modal-location">Lead Location</label>
-                <input
-                  type="text"
-                  id="modal-location"
-                  className="form-control modal-dense-input"
-                  value={location}
-                  onChange={(e) => {
-                    setLocation(e.target.value);
-                    handleFieldChange('location', e.target.value);
-                  }}
-                  onBlur={handleBlurSave}
-                />
-              </div>
-            </div>
-
-            {!isMaps && (
-              <div className="info-grid-2">
-                <div className="field-group">
-                  <label htmlFor="modal-buying-intent">Buying Intent Level</label>
-                  <select
-                    id="modal-buying-intent"
-                    className="select-dense"
-                    value={buyingIntent}
-                    onChange={(e) => {
-                      setBuyingIntent(e.target.value);
-                      handleFieldChange('buyingIntent', e.target.value);
-                      handleFieldChange('leadCategory', e.target.value);
-                    }}
-                    onBlur={handleBlurSave}
-                  >
-                    <option value="High">High</option>
-                    <option value="Hiring">Hiring</option>
-                    <option value="Research">Research</option>
-                    <option value="Medium">Medium</option>
-                    <option value="Low">Low</option>
-                    <option value="None">None</option>
-                    <option value="Unknown">Unknown</option>
-                  </select>
-                </div>
-                <div className="field-group">
-                  <label htmlFor="modal-intent-type">Signal Type</label>
-                  <select
-                    id="modal-intent-type"
-                    className="select-dense"
-                    value={intentType}
-                    onChange={(e) => {
-                      setIntentType(e.target.value);
-                      handleFieldChange('intentType', e.target.value);
-                    }}
-                    onBlur={handleBlurSave}
-                  >
-                    <option value="Looking For Service">Looking For Service</option>
-                    <option value="Recommendation Request">Recommendation Request</option>
-                    <option value="Hiring Signal">Hiring Signal</option>
-                    <option value="Expansion Signal">Expansion Signal</option>
-                    <option value="Funding Signal">Funding Signal</option>
-                    <option value="General Discussion">General Discussion</option>
-                  </select>
-                </div>
-              </div>
-            )}
+        {/* 2-Column Split Body Layout */}
+        <div className="modal-split-container">
+          
+          {/* LEFT COLUMN: Data Details Panel (Scrollable) */}
+          <div className="modal-main-column">
             
-            <div className="info-grid-2">
-              <div className="field-group">
-                <label htmlFor="modal-crm-status">Pipeline Stage</label>
-                <select
-                  id="modal-crm-status"
-                  className="select-dense"
-                  value={crmStatus}
-                  onChange={(e) => {
-                    setCrmStatus(e.target.value);
-                    handleFieldChange('crmStatus', e.target.value);
-                  }}
-                  onBlur={handleBlurSave}
-                >
-                  <option value="New">New</option>
-                  <option value="New Discovery">New Discovery</option>
-                  <option value="Drafted">Drafted</option>
-                  <option value="Emailed">Emailed</option>
-                  <option value="Replied">Replied</option>
-                  <option value="Disqualified">Disqualified</option>
-                </select>
-              </div>
-              
-              {!isMaps && (
-                <div className="field-group">
-                  <label>Email Source</label>
-                  <div className="contact-meta-pill">
-                    <span>Source: {lead.contactSource || 'guessed'}</span>
-                    <span>•</span>
-                    <span>Conf: {lead.contactConfidence || 'low'}</span>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {!isMaps && (
-              <div className="field-group">
-                <label htmlFor="modal-service-required">Extracted Service Required</label>
-                <input
-                  type="text"
-                  id="modal-service-required"
-                  className="form-control modal-dense-input"
-                  placeholder="e.g. React Developer"
-                  value={serviceRequired}
-                  onChange={(e) => {
-                    setServiceRequired(e.target.value);
-                    handleFieldChange('serviceRequired', e.target.value);
-                  }}
-                  onBlur={handleBlurSave}
-                />
-              </div>
-            )}
-          </div>
-
-          {/* CARD 2: Candidate details (Recruiter mode only) */}
-          {isRecruiter && (
-            <div className="detail-card">
-              <div className="card-header-row">
-                <h4 className="card-title">Candidate Details</h4>
-              </div>
-              <div className="field-group">
-                <label htmlFor="modal-skills">Candidate Skills</label>
-                <input
-                  type="text"
-                  id="modal-skills"
-                  className="form-control modal-dense-input"
-                  value={skills}
-                  onChange={(e) => {
-                    setSkills(e.target.value);
-                    handleFieldChange('skills', e.target.value);
-                  }}
-                  onBlur={handleBlurSave}
-                />
-              </div>
-              <div className="info-grid-2">
-                <div className="field-group">
-                  <label htmlFor="modal-experience-level">Experience Level</label>
-                  <select
-                    id="modal-experience-level"
-                    className="select-dense"
-                    value={experienceLevel}
-                    onChange={(e) => {
-                      setExperienceLevel(e.target.value);
-                      handleFieldChange('experienceLevel', e.target.value);
-                    }}
-                    onBlur={handleBlurSave}
-                  >
-                    <option value="Unknown">Unknown</option>
-                    <option value="Junior">Junior</option>
-                    <option value="Mid-level">Mid-level</option>
-                    <option value="Senior">Senior</option>
-                    <option value="Lead">Lead</option>
-                  </select>
-                </div>
-                <div className="field-group">
-                  <label htmlFor="modal-work-preference">Work Preference</label>
-                  <select
-                    id="modal-work-preference"
-                    className="select-dense"
-                    value={workPreference}
-                    onChange={(e) => {
-                      setWorkPreference(e.target.value);
-                      handleFieldChange('workPreference', e.target.value);
-                    }}
-                    onBlur={handleBlurSave}
-                  >
-                    <option value="Unknown">Unknown</option>
-                    <option value="Remote">Remote</option>
-                    <option value="Hybrid">Hybrid</option>
-                    <option value="Onsite">Onsite</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* CARD 3: Contact & Media Channels */}
-          <div className="detail-card">
-            <div className="card-header-row">
-              <h4 className="card-title">
-                <Mail size={14} className="header-icon" />
-                Contact & Links
-              </h4>
-            </div>
-
-            <div className="field-group">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                <label htmlFor="modal-contact-info" style={{ margin: 0 }}>Contact Email</label>
-                {contactInfo && (
-                  <span className="contact-meta-pill">
-                    Source: {contactSource || 'unknown'}
-                  </span>
-                )}
-              </div>
-              <div className="field-input-wrapper">
-                <input
-                  type="text"
-                  id="modal-contact-info"
-                  className="form-control modal-dense-input"
-                  placeholder="Lead contact email..."
-                  value={contactInfo}
-                  onChange={(e) => {
-                    setContactInfo(e.target.value);
-                    handleFieldChange('contactInfo', e.target.value);
-                  }}
-                  onBlur={handleBlurSave}
-                  style={{ paddingRight: enriching ? '100px' : '90px' }}
-                />
-                <button
-                  type="button"
-                  id="btn-enrich-contact"
-                  className="btn btn-secondary"
-                  onClick={handleEnrich}
-                  disabled={enriching}
-                  style={{ position: 'absolute', right: '4px', top: '4px', bottom: '4px', height: '30px', padding: '0 10px', fontSize: '0.72rem', margin: 0 }}
-                >
-                  <Search size={11} />
-                  {enriching ? 'Enriching...' : 'Find Email'}
-                </button>
-              </div>
-            </div>
-
-            {isMaps && (
-              <>
-                <div className="field-group">
-                  <label htmlFor="modal-maps-phone">Contact Number (Phone)</label>
-                  <input
-                    type="text"
-                    id="modal-maps-phone"
-                    className="form-control modal-dense-input"
-                    value={phone}
-                    onChange={(e) => {
-                      setPhone(e.target.value);
-                      handleFieldChange('phone', e.target.value);
-                    }}
-                    onBlur={handleBlurSave}
-                  />
-                </div>
-
-                <div className="field-group">
-                  <label>Google Maps Rating</label>
-                  <div className="rating-pill-container">
-                    {rating && (
-                      <div className="rating-pill">
-                        <span className="rating-star">★</span>
-                        <span>{rating} / 5 Rating</span>
-                      </div>
-                    )}
-                    {reviews && (
-                      <div className="rating-pill">
-                        <span className="review-bubble">💬</span>
-                        <span>{reviews} Reviews</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </>
-            )}
-
-            <div className="info-grid-2">
-              <div className="field-group">
-                <label htmlFor="modal-website">Website Link</label>
-                <div className="field-input-wrapper">
-                  <input
-                    type="text"
-                    id="modal-website"
-                    className="form-control modal-dense-input"
-                    placeholder="Website URL"
-                    value={website}
-                    onChange={(e) => {
-                      setWebsite(e.target.value);
-                      handleFieldChange('website', e.target.value);
-                    }}
-                    onBlur={handleBlurSave}
-                    style={{ paddingRight: '32px' }}
-                  />
-                  {website && (
-                    <a
-                      href={website.startsWith('http') ? website : `https://${website}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="input-icon-right"
-                      title="Visit Website"
-                    >
-                      <ExternalLink size={14} />
-                    </a>
-                  )}
-                </div>
-              </div>
-
-              <div className="field-group">
-                <label htmlFor="modal-linkedin">LinkedIn Profile</label>
-                <div className="field-input-wrapper">
-                  <input
-                    type="text"
-                    id="modal-linkedin"
-                    className="form-control modal-dense-input"
-                    placeholder="LinkedIn Profile URL"
-                    value={linkedin}
-                    onChange={(e) => {
-                      setLinkedin(e.target.value);
-                      handleFieldChange('linkedin', e.target.value);
-                    }}
-                    onBlur={handleBlurSave}
-                    style={{ paddingRight: '32px' }}
-                  />
-                  {linkedin && (
-                    <a
-                      href={linkedin.startsWith('http') ? linkedin : `https://${linkedin}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="input-icon-right"
-                      title="Visit LinkedIn"
-                    >
-                      <ExternalLink size={14} />
-                    </a>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* CARD 4: Company metrics (for Maps scans) */}
-          {isMaps && (
+            {/* CARD 1: Profile Info */}
             <div className="detail-card">
               <div className="card-header-row">
                 <h4 className="card-title">
-                  <Sparkles size={14} className="header-icon" />
-                  Company Metrics
+                  <Users size={14} className="header-icon" />
+                  Lead Profile
                 </h4>
               </div>
 
               <div className="info-grid-2">
+                {!isMaps && (
+                  <div className="field-group">
+                    <label>Poster Full Name</label>
+                    <div className="field-value">
+                      <span className="value-text">{authorName || 'N/A'}</span>
+                    </div>
+                  </div>
+                )}
                 <div className="field-group">
-                  <label htmlFor="modal-maps-employee-count">Employee Count</label>
-                  <input
-                    type="text"
-                    id="modal-maps-employee-count"
-                    className="form-control modal-dense-input"
-                    placeholder="e.g. 10 - 50 employees"
-                    value={employeeCount}
-                    onChange={(e) => {
-                      setEmployeeCount(e.target.value);
-                      handleFieldChange('employeeCount', e.target.value);
-                    }}
-                    onBlur={handleBlurSave}
-                  />
-                </div>
-                <div className="field-group">
-                  <label htmlFor="modal-maps-founded-year">Founded Year</label>
-                  <input
-                    type="text"
-                    id="modal-maps-founded-year"
-                    className="form-control modal-dense-input"
-                    placeholder="e.g. 2015"
-                    value={foundedYear}
-                    onChange={(e) => {
-                      setFoundedYear(e.target.value);
-                      handleFieldChange('foundedYear', e.target.value);
-                    }}
-                    onBlur={handleBlurSave}
-                  />
+                  <label>Target Company Name</label>
+                  <div className="field-value">
+                    <span className="value-text">{companyName || 'N/A'}</span>
+                  </div>
                 </div>
               </div>
 
               <div className="info-grid-2">
                 <div className="field-group">
-                  <label htmlFor="modal-maps-annual-revenue">Annual Revenue</label>
-                  <input
-                    type="text"
-                    id="modal-maps-annual-revenue"
-                    className="form-control modal-dense-input"
-                    placeholder="e.g. $5M"
-                    value={annualRevenue}
-                    onChange={(e) => {
-                      setAnnualRevenue(e.target.value);
-                      handleFieldChange('annualRevenue', e.target.value);
-                    }}
-                    onBlur={handleBlurSave}
-                  />
+                  <label>Classified Industry</label>
+                  <div className="field-value">
+                    <span className="value-text">{industry || 'N/A'}</span>
+                  </div>
                 </div>
                 <div className="field-group">
-                  <label htmlFor="modal-maps-total-funding">Total Funding</label>
-                  <input
-                    type="text"
-                    id="modal-maps-total-funding"
-                    className="form-control modal-dense-input"
-                    placeholder="e.g. $1.5M"
-                    value={totalFunding}
-                    onChange={(e) => {
-                      setTotalFunding(e.target.value);
-                      handleFieldChange('totalFunding', e.target.value);
-                    }}
-                    onBlur={handleBlurSave}
-                  />
+                  <label>Lead Location</label>
+                  <div className="field-value">
+                    <span className="value-text">{location || 'N/A'}</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
 
-          {/* CARD 5: B2B Key Team & Contacts */}
-          <div className="detail-card">
-            <div className="card-header-row">
-              <h4 className="card-title">
-                <Users size={14} className="header-icon" />
-                Key Team & Decision Makers
-              </h4>
-              <button
-                type="button"
-                id="btn-enrich-team"
-                className="btn btn-secondary"
-                onClick={handleEnrichTeam}
-                disabled={enrichingTeam}
-                style={{ height: '30px', padding: '0 12px', fontSize: '0.72rem', margin: 0 }}
-              >
-                <Users size={11} />
-                {enrichingTeam ? 'Fetching...' : 'Find Team'}
-              </button>
-            </div>
-
-            {getTeamSource() && (
-              <div>
-                <span className="contact-meta-pill" style={{ textTransform: 'capitalize' }}>
-                  Source: {getTeamSource()}
-                </span>
-              </div>
-            )}
-
-            {enrichingTeam && (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '16px', border: '1px dashed var(--border-color)', borderRadius: '10px', background: 'rgba(255, 255, 255, 0.01)' }}>
-                <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" style={{ width: '12px', height: '12px', border: '2px solid var(--primary)', borderRightColor: 'transparent', borderRadius: '50%', display: 'inline-block', animation: 'spinner-border .75s linear infinite' }}></span>
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Searching decision-makers & team details...</span>
-              </div>
-            )}
-
-            {!keyContacts || keyContacts.length === 0 ? (
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontStyle: 'italic', padding: '16px', border: '1px dashed rgba(255, 255, 255, 0.1)', borderRadius: '10px', textAlign: 'center', background: 'rgba(255, 255, 255, 0.01)' }}>
-                No contact persons identified yet. Click "Find Team" to fetch contacts.
-              </div>
-            ) : (
-              <div className="team-list-container">
-                {keyContacts.map((contact, cIdx) => (
-                  <div className="team-member-card" key={cIdx}>
-                    <div className="member-left">
-                      <div className="member-initials">
-                        {contact.name ? contact.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'U'}
-                      </div>
-                      <div className="member-info">
-                        <div className="member-name-row">
-                          <span className="member-name">{contact.name}</span>
-                          {contact.linkedin && (
-                            <a
-                              href={contact.linkedin.startsWith('http') ? contact.linkedin : `https://${contact.linkedin}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="member-linkedin"
-                              title="LinkedIn profile"
-                            >
-                              {getPlatformIcon('linkedin', 12)}
-                            </a>
-                          )}
-                        </div>
-                        <span className="member-title">
-                          {contact.title === 'Ceo' ? 'CEO' : contact.title === 'Md' ? 'MD' : contact.title}
-                        </span>
-                      </div>
+              {!isMaps && (
+                <div className="info-grid-2">
+                  <div className="field-group">
+                    <label>Buying Intent Level</label>
+                    <div className="field-value" style={{ border: 'none', background: 'transparent', padding: 0, minHeight: 'auto' }}>
+                      <span className={`badge ${getIntentBadgeClass(buyingIntent || 'Low')}`} style={{ textTransform: 'capitalize' }}>
+                        {buyingIntent || 'Low'}
+                      </span>
                     </div>
+                  </div>
+                  <div className="field-group">
+                    <label>Signal Type</label>
+                    <div className="field-value">
+                      <span className="value-text">{intentType || 'N/A'}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              <div className="info-grid-2">
+                <div className="field-group">
+                  <label>Pipeline Stage</label>
+                  <div className="field-value">
+                    <span className="value-text">{crmStatus || 'N/A'}</span>
+                  </div>
+                </div>
+                
+                {!isMaps && (
+                  <div className="field-group">
+                    <label>Email Source</label>
+                    <div className="contact-meta-pill" style={{ height: '38px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span>Source: {lead.contactSource || 'guessed'}</span>
+                      <span>•</span>
+                      <span>Conf: {lead.contactConfidence || 'low'}</span>
+                    </div>
+                  </div>
+                )}
+              </div>
 
-                    <div className="member-right">
-                      {contact.email && contact.email !== 'No Email Found' ? (
-                        <>
-                          <span className="member-email">{contact.email}</span>
-                          <button
-                            type="button"
-                            className="copy-member-btn"
-                            onClick={() => {
-                              navigator.clipboard.writeText(contact.email);
-                              if (addToast) addToast('Copied', `${contact.name}'s email copied!`, 'success');
-                            }}
-                            title="Copy email"
-                          >
-                            <Copy size={11} />
-                          </button>
-                        </>
-                      ) : (
-                        <span className="member-email pending">Pending Lookup</span>
+              {!isMaps && (
+                <div className="field-group">
+                  <label>Extracted Service Required</label>
+                  <div className="field-value">
+                    <span className="value-text">{serviceRequired || 'N/A'}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* CARD 2: Candidate details (Recruiter mode only) */}
+            {isRecruiter && (
+              <div className="detail-card">
+                <div className="card-header-row">
+                  <h4 className="card-title">Candidate Details</h4>
+                </div>
+                <div className="field-group">
+                  <label>Candidate Skills</label>
+                  <div className="field-value">
+                    <span className="value-text">{skills || 'N/A'}</span>
+                  </div>
+                </div>
+                <div className="info-grid-2">
+                  <div className="field-group">
+                    <label>Experience Level</label>
+                    <div className="field-value">
+                      <span className="value-text">{experienceLevel || 'N/A'}</span>
+                    </div>
+                  </div>
+                  <div className="field-group">
+                    <label>Work Preference</label>
+                    <div className="field-value">
+                      <span className="value-text">{workPreference || 'N/A'}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* CARD 3: Contact & Media Channels */}
+            <div className="detail-card">
+              <div className="card-header-row">
+                <h4 className="card-title">
+                  <Mail size={14} className="header-icon" />
+                  Contact & Links
+                </h4>
+              </div>
+
+              <div className="field-group">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                  <label style={{ margin: 0 }}>Contact Email</label>
+                  {contactInfo && (
+                    <span className="contact-meta-pill">
+                      Source: {contactSource || 'unknown'}
+                    </span>
+                  )}
+                </div>
+                <div className="field-value" style={{ paddingRight: '4px' }}>
+                  <span className="value-text" style={{ 
+                    color: contactInfo ? 'var(--text-primary)' : 'var(--text-muted)', 
+                    fontStyle: contactInfo ? 'normal' : 'italic',
+                    fontWeight: contactInfo ? '600' : '400'
+                  }}>
+                    {contactInfo || 'Email not found'}
+                  </span>
+                  <button
+                    type="button"
+                    id="btn-enrich-contact"
+                    className="btn btn-secondary"
+                    onClick={handleEnrich}
+                    disabled={enriching}
+                    style={{ height: '30px', padding: '0 12px', fontSize: '0.72rem', margin: 0 }}
+                  >
+                    <Search size={11} />
+                    {enriching ? 'Enriching...' : 'Find Email'}
+                  </button>
+                </div>
+              </div>
+
+              {isMaps && (
+                <>
+                  <div className="field-group">
+                    <label>Contact Number (Phone)</label>
+                    <div className="field-value">
+                      <span className="value-text">{phone || 'N/A'}</span>
+                    </div>
+                  </div>
+
+                  <div className="field-group">
+                    <label>Google Maps Rating</label>
+                    <div className="rating-pill-container">
+                      {rating && (
+                        <div className="rating-pill">
+                          <span className="rating-star">★</span>
+                          <span>{rating} / 5 Rating</span>
+                        </div>
+                      )}
+                      {reviews && (
+                        <div className="rating-pill">
+                          <span className="review-bubble">💬</span>
+                          <span>{reviews} Reviews</span>
+                        </div>
                       )}
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
+                </>
+              )}
 
-          {/* CARD 6: Requirement Details */}
-          <div className="detail-card">
-            <div className="card-header-row">
-              <h4 className="card-title">
-                <MessageSquare size={14} className="header-icon" />
-                Requirement / Description
-              </h4>
-            </div>
-            <textarea
-              id="modal-need-description"
-              className="form-control textarea-dense"
-              placeholder={isMaps ? "Scraped website company description..." : "Requirements details..."}
-              value={needDescription}
-              onChange={(e) => {
-                setNeedDescription(e.target.value);
-                handleFieldChange('needDescription', e.target.value);
-              }}
-              onBlur={handleBlurSave}
-            />
-          </div>
+              <div className="info-grid-2">
+                <div className="field-group">
+                  <label>Website Link</label>
+                  <div className="field-value" style={{ paddingRight: '4px' }}>
+                    <span className="value-text">
+                      {website || 'N/A'}
+                    </span>
+                    {website && (
+                      <a
+                        href={website.startsWith('http') ? website : `https://${website}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="visit-link-btn"
+                        title="Visit Website"
+                      >
+                        <ExternalLink size={12} />
+                      </a>
+                    )}
+                  </div>
+                </div>
 
-          {/* CARD 7: AI Outreach Pitch Generator */}
-          <div className="detail-card ai-glow">
-            <div className="card-header-row">
-              <h4 className="card-title">
-                <Sparkles size={14} className="header-icon" />
-                AI Outreach Pitch Draft
-              </h4>
-              <button
-                type="button"
-                id="btn-generate-pitch"
-                className="btn btn-primary"
-                onClick={handleGeneratePitch}
-                disabled={generatingPitch}
-                style={{ height: '30px', padding: '0 12px', fontSize: '0.72rem', margin: 0 }}
-              >
-                <Sparkles size={11} />
-                {generatingPitch ? 'Drafting...' : 'Generate AI pitch'}
-              </button>
-            </div>
-
-            {generatingPitch && (
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '10px', padding: '20px', border: '1px dashed rgba(3, 113, 114, 0.3)', borderRadius: '10px', background: 'rgba(3, 113, 114, 0.02)' }}>
-                <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" style={{ width: '16px', height: '16px', border: '2px solid var(--primary)', borderRightColor: 'transparent', borderRadius: '50%', display: 'inline-block', animation: 'spinner-border .75s linear infinite' }}></span>
-                <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 500 }}>Drafting customized pitch via Llama LLM...</span>
-              </div>
-            )}
-
-            {hasGenerated && !generatingPitch && (
-              <textarea
-                id="modal-email-body"
-                className="form-control textarea-email"
-                placeholder="Personalized pitch text..."
-                value={emailBody}
-                onChange={(e) => {
-                  setEmailBody(e.target.value);
-                  handleFieldChange('draftEmail', e.target.value);
-                }}
-                onBlur={handleBlurSave}
-              />
-            )}
-
-            {!hasGenerated && !generatingPitch && (
-              <div className="email-placeholder">
-                Click 'Generate AI pitch' to draft customized email copy based on agency settings and lead requirement.
-              </div>
-            )}
-          </div>
-
-          {/* CARD 8: Lead score banner */}
-          <div className="detail-card">
-            <div className="score-flex-box">
-              <div style={{ flex: 1 }}>
-                <h4 className="card-title" style={{ fontSize: '0.8rem', textTransform: 'uppercase', color: 'var(--text-muted)', margin: '0 0 4px 0', letterSpacing: '0.04em' }}>Lead Fit Score</h4>
-                <span className={`badge ${getIntentBadgeClass(buyingIntent || 'Low')}`} style={{ textTransform: 'capitalize' }}>
-                  {(buyingIntent || 'Low') + ' Intent'}
-                </span>
-              </div>
-              <div className="score-number-badge">
-                {lead.leadScore !== undefined ? lead.leadScore : Math.round((parseFloat(lead.confidenceScore) || 0) * 100)}
-                <span className="total-points">/100</span>
+                <div className="field-group">
+                  <label>LinkedIn Profile</label>
+                  <div className="field-value" style={{ paddingRight: '4px' }}>
+                    <span className="value-text">
+                      {linkedin || 'N/A'}
+                    </span>
+                    {linkedin && (
+                      <a
+                        href={linkedin.startsWith('http') ? linkedin : `https://${linkedin}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="visit-link-btn"
+                        title="Visit LinkedIn"
+                      >
+                        <ExternalLink size={12} />
+                      </a>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* CARD 9: Inbox replies */}
-          {lead.replies && lead.replies.length > 0 && (
-            <div className="detail-card" style={{ borderLeft: '3px solid var(--success)' }}>
-              <div className="card-header-row">
-                <h4 className="card-title" style={{ color: 'var(--success)' }}>
-                  <MessageSquare size={14} className="header-icon" style={{ color: 'var(--success)' }} />
-                  Inbox Replies ({lead.replies.length})
-                </h4>
-              </div>
-              <div className="team-list-container" style={{ maxHeight: '280px' }}>
-                {lead.replies.map((reply, rIdx) => (
-                  <div key={rIdx} className="team-member-card" style={{ flexDirection: 'column', alignItems: 'stretch', gap: '6px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                      <span style={{ fontWeight: '600' }}>{reply.from || reply.from_email}</span>
-                      <span>{reply.date}</span>
-                    </div>
-                    <div style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--accent)' }}>
-                      Sub: {reply.subject}
-                    </div>
-                    <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', whiteSpace: 'pre-wrap', lineHeight: 1.4 }}>
-                      {reply.snippet}
+            {/* CARD 4: Company metrics (for Maps scans) */}
+            {isMaps && (
+              <div className="detail-card">
+                <div className="card-header-row">
+                  <h4 className="card-title">
+                    <Sparkles size={14} className="header-icon" />
+                    Company Metrics
+                  </h4>
+                </div>
+
+                <div className="info-grid-2">
+                  <div className="field-group">
+                    <label>Employee Count</label>
+                    <div className="field-value">
+                      <span className="value-text">{employeeCount || 'N/A'}</span>
                     </div>
                   </div>
-                ))}
+                  <div className="field-group">
+                    <label>Founded Year</label>
+                    <div className="field-value">
+                      <span className="value-text">{foundedYear || 'N/A'}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="info-grid-2">
+                  <div className="field-group">
+                    <label>Annual Revenue</label>
+                    <div className="field-value">
+                      <span className="value-text">{annualRevenue || 'N/A'}</span>
+                    </div>
+                  </div>
+                  <div className="field-group">
+                    <label>Total Funding</label>
+                    <div className="field-value">
+                      <span className="value-text">{totalFunding || 'N/A'}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* CARD 5: B2B Key Team & Contacts */}
+            <div className="detail-card">
+              <div className="card-header-row">
+                <h4 className="card-title">
+                  <Users size={14} className="header-icon" />
+                  Key Team & Decision Makers
+                </h4>
+                <button
+                  type="button"
+                  id="btn-enrich-team"
+                  className="btn btn-secondary"
+                  onClick={handleEnrichTeam}
+                  disabled={enrichingTeam}
+                  style={{ height: '30px', padding: '0 12px', fontSize: '0.72rem', margin: 0 }}
+                >
+                  <Users size={11} />
+                  {enrichingTeam ? 'Fetching...' : 'Find Team'}
+                </button>
+              </div>
+
+              {getTeamSource() && (
+                <div>
+                  <span className="contact-meta-pill" style={{ textTransform: 'capitalize' }}>
+                    Source: {getTeamSource()}
+                  </span>
+                </div>
+              )}
+
+              {enrichingTeam && (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '16px', border: '1px dashed var(--border-color)', borderRadius: '10px', background: 'rgba(255, 255, 255, 0.01)' }}>
+                  <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" style={{ width: '12px', height: '12px', border: '2px solid var(--primary)', borderRightColor: 'transparent', borderRadius: '50%', display: 'inline-block', animation: 'spinner-border .75s linear infinite' }}></span>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Searching decision-makers & team details...</span>
+                </div>
+              )}
+
+              {!keyContacts || keyContacts.length === 0 ? (
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontStyle: 'italic', padding: '16px', border: '1px dashed rgba(255, 255, 255, 0.1)', borderRadius: '10px', textAlign: 'center', background: 'rgba(255, 255, 255, 0.01)' }}>
+                  No contact persons identified yet. Click "Find Team" to fetch contacts.
+                </div>
+              ) : (
+                <div className="team-list-container">
+                  {keyContacts.map((contact, cIdx) => (
+                    <div className="team-member-card" key={cIdx}>
+                      <div className="member-left">
+                        <div className="member-initials">
+                          {contact.name ? contact.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'U'}
+                        </div>
+                        <div className="member-info">
+                          <div className="member-name-row">
+                            <span className="member-name">{contact.name}</span>
+                            {contact.linkedin && (
+                              <a
+                                href={contact.linkedin.startsWith('http') ? contact.linkedin : `https://${contact.linkedin}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="member-linkedin"
+                                title="LinkedIn profile"
+                              >
+                                {getPlatformIcon('linkedin', 12)}
+                              </a>
+                            )}
+                          </div>
+                          <span className="member-title">
+                            {contact.title === 'Ceo' ? 'CEO' : contact.title === 'Md' ? 'MD' : contact.title}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="member-right">
+                        {contact.email && contact.email !== 'No Email Found' ? (
+                          <>
+                            <span className="member-email">{contact.email}</span>
+                            <button
+                              type="button"
+                              className="copy-member-btn"
+                              onClick={() => {
+                                navigator.clipboard.writeText(contact.email);
+                                if (addToast) addToast('Copied', `${contact.name}'s email copied!`, 'success');
+                              }}
+                              title="Copy email"
+                            >
+                              <Copy size={11} />
+                            </button>
+                          </>
+                        ) : (
+                          <span className="member-email pending">Pending Lookup</span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* CARD 6: Requirement Details */}
+            <div className="detail-card">
+              <div className="card-header-row">
+                <h4 className="card-title">
+                  <MessageSquare size={14} className="header-icon" />
+                  Requirement / Description
+                </h4>
+              </div>
+              <div className="field-value-textarea">
+                {needDescription || 'No company description or service specifications extracted.'}
               </div>
             </div>
-          )}
-        </div>
+            
+          </div>
 
-        {/* Premium Sticky Footer */}
-        <div className="drawer-footer-premium">
-          {!lead.isConverted && (
-            <div className="footer-row">
-              <button
-                type="button"
-                id="modal-btn-convert-crm"
-                className="btn btn-primary"
-                onClick={() => {
-                  onUpdateLead(lead.sourceUrl, { isConverted: true, crmStatus: 'New' });
-                  if (addToast) {
-                    addToast('Lead Converted', 'Successfully converted to Outreach Pipeline Lead!', 'success');
-                  }
-                }}
-                style={{ width: '100%' }}
-              >
-                <Sparkles size={13} />
-                Convert to CRM Lead
-              </button>
+          {/* RIGHT COLUMN: AI Copy & CRM Executions Sidebar (Static / Pinned) */}
+          <div className="modal-sidebar-column">
+            
+            {/* SECTION 1: Intent Score */}
+            <div className="sidebar-section">
+              <div className="detail-card" style={{ width: '100%' }}>
+                <div className="score-flex-box">
+                  <div style={{ flex: 1 }}>
+                    <h4 className="card-title" style={{ fontSize: '0.78rem', textTransform: 'uppercase', color: 'var(--text-muted)', margin: '0 0 4px 0', letterSpacing: '0.04em' }}>Lead Fit Score</h4>
+                    <span className={`badge ${getIntentBadgeClass(buyingIntent || 'Low')}`} style={{ textTransform: 'capitalize' }}>
+                      {(buyingIntent || 'Low') + ' Intent'}
+                    </span>
+                  </div>
+                  <div className="score-number-badge">
+                    {lead.leadScore !== undefined ? lead.leadScore : Math.round((parseFloat(lead.confidenceScore) || 0) * 100)}
+                    <span className="total-points">/100</span>
+                  </div>
+                </div>
+              </div>
             </div>
-          )}
-          <div className="footer-row">
-            {isMaps ? (
-              <a href={lead.sourceUrl} id="modal-btn-linkedin" className="btn btn-secondary" target="_blank" rel="noreferrer">
-                <MapPin size={13} color="#EF4444" fill="#EF4444" /> Show in Google Maps
-              </a>
-            ) : (
-              <a href={lead.sourceUrl} id="modal-btn-linkedin" className="btn btn-secondary" target="_blank" rel="noreferrer">
-                <ExternalLink size={13} /> View Source
-              </a>
-            )}
-            <button
-              id="modal-btn-send"
-              className="btn btn-success-outline"
-              disabled={!emailBody}
-              onClick={handleSendPitch}
-            >
-              <Send size={13} /> Send Pitch
-            </button>
+
+            {/* SECTION 2: AI Email Outreach Copywriting */}
+            <div className="sidebar-section" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+              <div className="detail-card ai-glow" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                <div className="card-header-row" style={{ flexShrink: 0 }}>
+                  <h4 className="card-title">
+                    <Sparkles size={14} className="header-icon" />
+                    AI Outreach Copywriter
+                  </h4>
+                  <button
+                    type="button"
+                    id="btn-generate-pitch"
+                    className="btn btn-primary"
+                    onClick={handleGeneratePitch}
+                    disabled={generatingPitch}
+                    style={{ height: '30px', padding: '0 12px', fontSize: '0.72rem', margin: 0 }}
+                  >
+                    <Sparkles size={11} />
+                    {generatingPitch ? 'Drafting...' : 'Generate Pitch'}
+                  </button>
+                </div>
+
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', marginTop: '12px', minHeight: '200px' }}>
+                  {generatingPitch && (
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '10px', padding: '20px', border: '1px dashed rgba(3, 113, 114, 0.3)', borderRadius: '10px', background: 'rgba(3, 113, 114, 0.02)' }}>
+                      <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" style={{ width: '16px', height: '16px', border: '2px solid var(--primary)', borderRightColor: 'transparent', borderRadius: '50%', display: 'inline-block', animation: 'spinner-border .75s linear infinite' }}></span>
+                      <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 500 }}>Drafting customized pitch via LLM...</span>
+                    </div>
+                  )}
+
+                  {hasGenerated && !generatingPitch && (
+                    <textarea
+                      id="modal-email-body"
+                      className="form-control textarea-email"
+                      placeholder="Personalized pitch text..."
+                      value={emailBody}
+                      onChange={(e) => {
+                        setEmailBody(e.target.value);
+                      }}
+                      style={{ height: '100%', flex: 1, resize: 'none' }}
+                    />
+                  )}
+
+                  {!hasGenerated && !generatingPitch && (
+                    <div className="email-placeholder" style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      Click 'Generate Pitch' to automatically draft personalized email copy.
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* SECTION 3: CRM Pinned Actions & Execution */}
+            <div className="sidebar-section" style={{ background: 'var(--bg-main)', borderTop: '1px solid var(--border-color)', marginTop: 'auto', flexShrink: 0 }}>
+              {!lead.isConverted && (
+                <button
+                  type="button"
+                  id="modal-btn-convert-crm"
+                  className="btn btn-primary"
+                  onClick={() => {
+                    onUpdateLead(lead.sourceUrl, { isConverted: true, crmStatus: 'New' });
+                    if (addToast) {
+                      addToast('Lead Converted', 'Converted to Outreach Pipeline!', 'success');
+                    }
+                  }}
+                  style={{ width: '100%', marginBottom: '10px' }}
+                >
+                  <Sparkles size={13} />
+                  Convert to CRM Lead
+                </button>
+              )}
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  {isMaps ? (
+                    <a href={lead.sourceUrl} id="modal-btn-linkedin" className="btn btn-secondary" target="_blank" rel="noreferrer" style={{ flex: 1 }}>
+                      <MapPin size={13} color="#EF4444" fill="#EF4444" /> Maps Source
+                    </a>
+                  ) : (
+                    <a href={lead.sourceUrl} id="modal-btn-linkedin" className="btn btn-secondary" target="_blank" rel="noreferrer" style={{ flex: 1 }}>
+                      <ExternalLink size={13} /> View Source
+                    </a>
+                  )}
+                  <button
+                    id="modal-btn-send"
+                    className="btn btn-success-outline"
+                    disabled={!emailBody}
+                    onClick={handleSendPitch}
+                    style={{ flex: 1 }}
+                  >
+                    <Send size={13} /> Send Pitch
+                  </button>
+                </div>
+                
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button id="modal-btn-copy" onClick={handleCopyDetails} className="btn btn-secondary" style={{ flex: 1 }}>
+                    <Copy size={13} /> Copy Details
+                  </button>
+                  <button
+                    id="modal-btn-copy-email"
+                    className="btn btn-secondary"
+                    disabled={!emailBody}
+                    onClick={handleCopyEmail}
+                    style={{ flex: 1 }}
+                  >
+                    <Mail size={13} /> Copy Pitch
+                  </button>
+                </div>
+              </div>
+            </div>
+
           </div>
-          <div className="footer-row">
-            <button id="modal-btn-copy" onClick={handleCopyDetails} className="btn btn-secondary">
-              <Copy size={13} /> Copy Details
-            </button>
-            <button
-              id="modal-btn-copy-email"
-              className="btn btn-secondary"
-              disabled={!emailBody}
-              onClick={handleCopyEmail}
-            >
-              <Mail size={13} /> Copy Pitch
-            </button>
-          </div>
+
         </div>
       </div>
     </div>
