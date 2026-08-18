@@ -1,25 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Database,
-  Users,
+  Map,
+  Search,
   Sliders,
   Sparkles,
-  ArrowLeft,
-  Calendar,
-  Hash,
-  Activity,
   Building,
   MapPin,
-  Search,
+  Calendar,
+  Database,
+  Users,
+  ArrowLeft,
+  RefreshCw,
+  Hash,
+  Activity,
   Check,
-  FileText,
-  RefreshCw
+  FileText
 } from 'lucide-react';
 import { getPlatformIcon } from '../utils/helpers';
 import api from '../services/api';
 
 export default function LeadDiscovery({ leads, setLeads, searches, setSearches, onSwitchTab, onOpenLead }) {
-  const [goalMode, setGoalMode] = useState(null); // null, 'social', 'project', 'tenders'
+  const [goalMode, setGoalMode] = useState('social'); // Google Maps only (defaulted to social scan wrapper)
   const [step, setStep] = useState(1);
 
   // Portal selection state for Government Tenders Card (All default to checked)
@@ -114,12 +115,13 @@ export default function LeadDiscovery({ leads, setLeads, searches, setSearches, 
   };
 
   // Form inputs state
-  const [platform, setPlatform] = useState('linkedin');
+  const [platform, setPlatform] = useState('google_maps');
   const [keyword, setKeyword] = useState('');
   const [industry, setIndustry] = useState('');
   const [location, setLocation] = useState('');
   const [timeframe, setTimeframe] = useState('qdr:m3');
   const [limit, setLimit] = useState(10);
+  const [isOpenLimitDropdown, setIsOpenLimitDropdown] = useState(false);
   const [matchType, setMatchType] = useState('partial');
   const [minIntentScore, setMinIntentScore] = useState(40);
   const [searchType, setSearchType] = useState('sales');
@@ -131,7 +133,7 @@ export default function LeadDiscovery({ leads, setLeads, searches, setSearches, 
 
   // Reset wizard
   const resetWizard = () => {
-    setGoalMode(null);
+    setGoalMode('social');
     setStep(1);
     setKeyword('');
     setIndustry('');
@@ -145,14 +147,7 @@ export default function LeadDiscovery({ leads, setLeads, searches, setSearches, 
     setScanProgress(0);
   };
 
-  // Sync default platform when goalMode changes
-  useEffect(() => {
-    if (goalMode === 'social') {
-      setPlatform('linkedin');
-    } else if (goalMode === 'project') {
-      setPlatform('reddit');
-    }
-  }, [goalMode]);
+
 
   // Handle mode select
   const selectMode = (mode) => {
@@ -170,9 +165,7 @@ export default function LeadDiscovery({ leads, setLeads, searches, setSearches, 
   };
 
   const handleBack = () => {
-    if (step === 1) {
-      setGoalMode(null);
-    } else {
+    if (step > 1) {
       setStep(step - 1);
     }
   };
@@ -484,32 +477,33 @@ export default function LeadDiscovery({ leads, setLeads, searches, setSearches, 
           /* Discovery Wizard Form Panel */
           <div className="discovery-wizard-card" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-color)', borderRadius: '16px', padding: '2rem', boxShadow: 'var(--shadow-md)' }}>
             <div className="discovery-wizard-panel" id="discovery-wizard-panel" style={{ display: 'block' }}>
-              <div className="wizard-header-actions" style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', marginBottom: '1.5rem' }}>
-                <button
-                  type="button"
-                  id="btn-wizard-back"
-                  className="btn-text-back btn-wizard-back"
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)' }}
-                  onClick={handleBack}
-                >
-                  <ArrowLeft size={14} /> Back to {step === 1 ? 'Goal Selection' : `Step ${step - 1}`}
-                </button>
-              </div>
+              {step > 1 && (
+                <div className="wizard-header-actions" style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', marginBottom: '1.25rem' }}>
+                  <button
+                    type="button"
+                    id="btn-wizard-back"
+                    className="btn-text-back btn-wizard-back"
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)' }}
+                    onClick={handleBack}
+                  >
+                    <ArrowLeft size={14} /> Back to Step {step - 1}
+                  </button>
+                </div>
+              )}
 
               {/* Stepper Node header indicators */}
-              <div className="stepper-header" style={{ display: 'flex', justifyContent: 'space-between', position: 'relative', marginBottom: '2.5rem', padding: '0 1rem' }}>
+              <div className="stepper-header" style={{ display: 'flex', justifyContent: 'space-between', position: 'relative', marginBottom: '1.25rem', padding: '0 1rem' }}>
                 <div className="stepper-line" style={{ position: 'absolute', top: '18px', left: '2rem', right: '2rem', height: '2px', background: 'var(--border-color)', zIndex: 1 }}>
                   <div
                     className="stepper-progress-fill"
                     id="wizard-progress-fill"
-                    style={{ width: `${((step - 1) / 3) * 100}%`, height: '100%', background: 'var(--primary)', transition: 'width 0.3s ease' }}
+                    style={{ width: `${((step - 1) / 2) * 100}%`, height: '100%', background: 'var(--primary)', transition: 'width 0.3s ease' }}
                   ></div>
                 </div>
                 {[
-                  { label: 'Sources', icon: <Database size={14} />, s: 1 },
-                  { label: 'Audience', icon: <Users size={14} />, s: 2 },
-                  { label: 'Filters', icon: <Sliders size={14} />, s: 3 },
-                  { label: 'Qualify', icon: <Sparkles size={14} />, s: 4 }
+                  { label: 'Audience', icon: <Users size={14} />, s: 1 },
+                  { label: 'Filters', icon: <Sliders size={14} />, s: 2 },
+                  { label: 'Qualify', icon: <Sparkles size={14} />, s: 3 }
                 ].map((node) => (
                   <div key={node.s} className={`stepper-node ${step >= node.s ? 'active' : ''}`} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', zIndex: 2, cursor: 'pointer' }} onClick={() => step >= node.s && setStep(node.s)}>
                     <div className="stepper-circle" style={{
@@ -521,77 +515,15 @@ export default function LeadDiscovery({ leads, setLeads, searches, setSearches, 
                     }}>
                       {node.icon}
                     </div>
-                    <span className="stepper-label" style={{ fontSize: '0.75rem', fontWeight: step >= node.s ? 600 : 400, color: step >= node.s ? 'var(--text-primary)' : 'var(--text-secondary)' }}>{node.label}</span>
+                    <span className="stepper-label" style={{ fontSize: '0.72rem', fontWeight: 600, color: step >= node.s ? 'var(--text-primary)' : 'var(--text-secondary)' }}>{node.label}</span>
                   </div>
                 ))}
               </div>
 
-              <form onSubmit={step === 4 ? handleLaunch : handleNext} id="search-form" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                {/* Step 1: Select Platform Sources */}
+              <form onSubmit={step === 3 ? handleLaunch : handleNext} id="search-form" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                {/* Step 1: Define Audience */}
                 {step === 1 && (
-                  <div className="wizard-step-panel active" data-step="1">
-                    <div className="step-heading" style={{ marginBottom: '1.5rem' }}>
-                      <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <Database size={18} color="var(--primary)" />
-                        Select Platform Sources
-                      </h3>
-                      <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>Choose target networks to crawl and parse for matching B2B intent signals.</p>
-                    </div>
-                    <div className="platform-options-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem' }}>
-                      {goalMode === 'social' ? (
-                        <>
-                          {[
-                            { id: 'linkedin', label: 'LinkedIn' },
-                            { id: 'facebook', label: 'Facebook' },
-                            { id: 'google_maps', label: 'Google Maps' },
-                            { id: 'twitter', label: 'Twitter / X' }
-                          ].map((p) => (
-                            <div
-                              key={p.id}
-                              className={`platform-option-card ${platform === p.id ? 'active' : ''}`}
-                              onClick={() => setPlatform(p.id)}
-                              style={{
-                                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px',
-                                padding: '1.25rem', borderRadius: '10px', cursor: 'pointer', background: 'var(--bg-card)',
-                                border: `2px solid ${platform === p.id ? 'var(--primary)' : 'var(--border-color)'}`,
-                              }}
-                            >
-                              {getPlatformIcon(p.id, 24)}
-                              <span className="platform-option-label" style={{ fontSize: '0.8rem', fontWeight: 600 }}>{p.label}</span>
-                            </div>
-                          ))}
-                        </>
-                      ) : (
-                        <>
-                          {[
-                            { id: 'reddit', label: 'Reddit' },
-                            { id: 'weworkremotely', label: 'WeWork' },
-                            { id: 'freelancer', label: 'Freelancer' },
-                            { id: 'upwork', label: 'Upwork' }
-                          ].map((p) => (
-                            <div
-                              key={p.id}
-                              className={`platform-option-card ${platform === p.id ? 'active' : ''}`}
-                              onClick={() => setPlatform(p.id)}
-                              style={{
-                                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px',
-                                padding: '1.25rem', borderRadius: '10px', cursor: 'pointer', background: 'var(--bg-card)',
-                                border: `2px solid ${platform === p.id ? 'var(--primary)' : 'var(--border-color)'}`,
-                              }}
-                            >
-                              {getPlatformIcon(p.id, 24)}
-                              <span className="platform-option-label" style={{ fontSize: '0.8rem', fontWeight: 600 }}>{p.label}</span>
-                            </div>
-                          ))}
-                        </>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* Step 2: Define Audience */}
-                {step === 2 && (
-                  <div className="wizard-step-panel active" data-step="2" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                  <div className="wizard-step-panel active" data-step="1" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                     <div className="step-heading">
                       <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <Users size={18} color="var(--primary)" />
@@ -602,12 +534,12 @@ export default function LeadDiscovery({ leads, setLeads, searches, setSearches, 
                     <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                       <label htmlFor="keyword" style={{ fontSize: '0.85rem', fontWeight: 600 }}>Search Intent Query / Keyword</label>
                       <div className="input-wrapper" style={{ position: 'relative' }}>
-                        <Search className="input-icon" size={14} style={{ position: 'absolute', left: '10px', top: '11px', color: 'var(--text-secondary)' }} />
+                        <Map className="input-icon" size={14} style={{ position: 'absolute', left: '10px', top: '11px', color: 'var(--text-secondary)' }} />
                         <input
                           type="text"
                           id="keyword"
                           className="form-control"
-                          placeholder="e.g. looking for ui/ux designer, contract react developer"
+                          placeholder="e.g. logo designers, software companies, restaurants"
                           value={keyword}
                           onChange={(e) => setKeyword(e.target.value)}
                           style={{ width: '100%', padding: '8px 12px 8px 30px', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '6px', color: 'var(--text-primary)', fontSize: '0.85rem' }}
@@ -654,9 +586,9 @@ export default function LeadDiscovery({ leads, setLeads, searches, setSearches, 
                   </div>
                 )}
 
-                {/* Step 3: Configure Filters */}
-                {step === 3 && (
-                  <div className="wizard-step-panel active" data-step="3" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                {/* Step 2: Configure Filters */}
+                {step === 2 && (
+                  <div className="wizard-step-panel active" data-step="2" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                     <div className="step-heading">
                       <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <Sliders size={18} color="var(--primary)" />
@@ -688,22 +620,112 @@ export default function LeadDiscovery({ leads, setLeads, searches, setSearches, 
                       )}
 
                       <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                        <label htmlFor="limit" style={{ fontSize: '0.85rem', fontWeight: 600 }}>Maximum Records Scanned</label>
+                        <label style={{ fontSize: '0.85rem', fontWeight: 600 }}>Maximum Records Scanned</label>
                         <div className="input-wrapper" style={{ position: 'relative' }}>
-                          <Hash className="input-icon" size={14} style={{ position: 'absolute', left: '10px', top: '11px', color: 'var(--text-secondary)' }} />
-                          <select
-                            id="limit"
-                            className="form-control"
-                            value={limit}
-                            onChange={(e) => setLimit(parseInt(e.target.value))}
-                            style={{ width: '100%', padding: '8px 12px 8px 30px', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '6px', color: 'var(--text-primary)', fontSize: '0.85rem' }}
-                          >
-                            <option value={5}>5 Results</option>
-                            <option value={10}>10 Results (Quick)</option>
-                            <option value={20}>20 Results (Standard)</option>
-                            <option value={50}>50 Results (Deep)</option>
-                            <option value={100}>100 Results (Thorough)</option>
-                          </select>
+                          <Hash className="input-icon" size={14} style={{ position: 'absolute', left: '10px', top: '11px', color: 'var(--text-secondary)', zIndex: 10 }} />
+                          
+                          <div className="custom-select-wrapper" style={{ position: 'relative', width: '100%' }}>
+                            {/* Trigger Button */}
+                            <div
+                              onClick={() => setIsOpenLimitDropdown(!isOpenLimitDropdown)}
+                              className="form-control"
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                cursor: 'pointer',
+                                padding: '8px 12px 8px 30px',
+                                background: 'var(--bg-card)',
+                                border: '1px solid var(--border-color)',
+                                borderRadius: '6px',
+                                color: 'var(--text-primary)',
+                                fontSize: '0.85rem',
+                                minHeight: '38px',
+                                userSelect: 'none'
+                              }}
+                            >
+                              <span>
+                                {limit === 5 ? '5 Results' :
+                                 limit === 10 ? '10 Results (Quick)' :
+                                 limit === 20 ? '20 Results (Standard)' :
+                                 limit === 50 ? '50 Results (Deep)' :
+                                 '100 Results (Thorough)'}
+                              </span>
+                              <span style={{ 
+                                fontSize: '0.65rem', 
+                                color: 'var(--text-secondary)', 
+                                transition: 'transform 0.2s', 
+                                transform: isOpenLimitDropdown ? 'rotate(180deg)' : 'rotate(0deg)' 
+                              }}>
+                                ▼
+                              </span>
+                            </div>
+
+                            {/* Dropdown Options List */}
+                            {isOpenLimitDropdown && (
+                              <>
+                                {/* Overlay backdrop to close dropdown on outer click */}
+                                <div
+                                  onClick={() => setIsOpenLimitDropdown(false)}
+                                  style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 998 }}
+                                />
+                                <div
+                                  style={{
+                                    position: 'absolute',
+                                    top: 'calc(100% + 4px)',
+                                    left: 0,
+                                    right: 0,
+                                    background: 'var(--bg-card)',
+                                    border: '1px solid var(--border-color)',
+                                    borderRadius: '8px',
+                                    boxShadow: 'var(--shadow-lg)',
+                                    zIndex: 999,
+                                    overflow: 'hidden',
+                                    padding: '4px 0'
+                                  }}
+                                >
+                                  {[
+                                    { value: 5, label: '5 Results' },
+                                    { value: 10, label: '10 Results (Quick)' },
+                                    { value: 20, label: '20 Results (Standard)' },
+                                    { value: 50, label: '50 Results (Deep)' },
+                                    { value: 100, label: '100 Results (Thorough)' }
+                                  ].map((opt) => {
+                                    const isSelected = opt.value === limit;
+                                    return (
+                                      <div
+                                        key={opt.value}
+                                        onClick={() => {
+                                          setLimit(opt.value);
+                                          setIsOpenLimitDropdown(false);
+                                        }}
+                                        className="custom-select-option"
+                                        style={{
+                                          padding: '8px 16px',
+                                          fontSize: '0.85rem',
+                                          color: isSelected ? 'var(--primary)' : 'var(--text-primary)',
+                                          background: isSelected ? 'var(--bg-trans-5)' : 'transparent',
+                                          cursor: 'pointer',
+                                          transition: 'all 0.15s ease',
+                                          fontWeight: isSelected ? 600 : 400
+                                        }}
+                                        onMouseEnter={(e) => {
+                                          e.currentTarget.style.background = 'var(--bg-hover)';
+                                          e.currentTarget.style.color = 'var(--primary)';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                          e.currentTarget.style.background = isSelected ? 'var(--bg-trans-5)' : 'transparent';
+                                          e.currentTarget.style.color = isSelected ? 'var(--primary)' : 'var(--text-primary)';
+                                        }}
+                                      >
+                                        {opt.label}
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </>
+                            )}
+                          </div>
                         </div>
                       </div>
 
@@ -729,9 +751,9 @@ export default function LeadDiscovery({ leads, setLeads, searches, setSearches, 
                   </div>
                 )}
 
-                {/* Step 4: AI Qualification & Estimate */}
-                {step === 4 && (
-                  <div className="wizard-step-panel active" data-step="4" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                {/* Step 3: AI Qualification & Estimate */}
+                {step === 3 && (
+                  <div className="wizard-step-panel active" data-step="3" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                     <div className="step-heading">
                       <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <Sparkles size={18} color="var(--primary)" />
@@ -777,19 +799,8 @@ export default function LeadDiscovery({ leads, setLeads, searches, setSearches, 
                   </div>
                 )}
 
-                {/* Form Buttons */}
                 <div className="form-actions-row wizard-actions-row" style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
-                  {step > 1 && (
-                    <button
-                      type="button"
-                      className="btn btn-secondary"
-                      onClick={handleBack}
-                      style={{ padding: '8px 16px' }}
-                    >
-                      Back
-                    </button>
-                  )}
-                  {step < 4 ? (
+                  {step < 3 ? (
                     <button
                       type="button"
                       id="btn-wizard-continue"

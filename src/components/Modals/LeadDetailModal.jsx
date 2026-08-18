@@ -289,6 +289,13 @@ Source: ${lead.sourceUrl}`;
         </div>
 
         <div className="header-right-side">
+          <span className="contact-meta-pill" style={{ height: '30px', padding: '0 12px', fontSize: '0.75rem', display: 'flex', alignItems: 'center', fontWeight: '600', gap: '6px', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '20px' }}>
+            <span>AI Score:</span>
+            <strong style={{ color: 'var(--primary)', fontSize: '0.85rem', fontWeight: '800' }}>
+              {lead.leadScore !== undefined ? lead.leadScore : Math.round((parseFloat(lead.confidenceScore) || 0) * 100)}
+            </strong>
+            <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)' }}>/100</span>
+          </span>
           <span className={`badge ${getIntentBadgeClass(buyingIntent || 'Low')}`} style={{ padding: '6px 12px', fontSize: '0.75rem', textTransform: 'capitalize', fontWeight: '700' }}>
             {buyingIntent || 'Low'} Intent
           </span>
@@ -677,23 +684,6 @@ Source: ${lead.sourceUrl}`;
         {/* RIGHT COLUMN: AI Copy & CRM Executions Sidebar (Static / Pinned) */}
         <div className="modal-sidebar-column">
           
-          {/* SECTION 1: Intent Score */}
-          <div className="sidebar-section">
-            <div className="detail-card" style={{ width: '100%' }}>
-              <div className="score-flex-box">
-                <div style={{ flex: 1 }}>
-                  <h4 className="card-title" style={{ fontSize: '0.78rem', textTransform: 'uppercase', color: 'var(--text-muted)', margin: '0 0 4px 0', letterSpacing: '0.04em' }}>Lead Fit Score</h4>
-                  <span className={`badge ${getIntentBadgeClass(buyingIntent || 'Low')}`} style={{ textTransform: 'capitalize' }}>
-                    {(buyingIntent || 'Low') + ' Intent'}
-                  </span>
-                </div>
-                <div className="score-number-badge">
-                  {lead.leadScore !== undefined ? lead.leadScore : Math.round((parseFloat(lead.confidenceScore) || 0) * 100)}
-                  <span className="total-points">/100</span>
-                </div>
-              </div>
-            </div>
-          </div>
 
 
 

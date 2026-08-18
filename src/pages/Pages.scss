@@ -180,6 +180,14 @@
     }
   }
 }
+// Overrides generic form-control padding to prevent icon overlap
+.input-wrapper {
+  position: relative;
+  
+  .form-control {
+    padding-left: 32px !important;
+  }
+}
 
 @media (max-width: 768px) {
   .page-container {
