@@ -10,6 +10,11 @@
   padding: 0;
 }
 
+input[type="checkbox"] {
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
 html, body, #root {
   height: 100%;
   width: 100%;

@@ -314,18 +314,16 @@ Source: ${lead.sourceUrl}`;
             </div>
 
             <div className="info-grid-2">
-              {!isMaps && (
-                <div className="field-group">
-                  <label>Poster Full Name</label>
-                  <div className="field-value">
-                    <span className="value-text">{authorName || 'N/A'}</span>
-                  </div>
-                </div>
-              )}
               <div className="field-group">
                 <label>Target Company Name</label>
                 <div className="field-value">
                   <span className="value-text">{companyName || 'N/A'}</span>
+                </div>
+              </div>
+              <div className="field-group">
+                <label>Lead Location</label>
+                <div className="field-value">
+                  <span className="value-text">{location || 'N/A'}</span>
                 </div>
               </div>
             </div>
@@ -337,13 +335,42 @@ Source: ${lead.sourceUrl}`;
                   <span className="value-text">{industry || 'N/A'}</span>
                 </div>
               </div>
-              <div className="field-group">
-                <label>Lead Location</label>
-                <div className="field-value">
-                  <span className="value-text">{location || 'N/A'}</span>
+              {isMaps ? (
+                <div className="field-group">
+                  <label>Rating & Reviews</label>
+                  <div className="rating-pill-container" style={{ marginTop: 0, gap: '8px' }}>
+                    {rating && (
+                      <div className="rating-pill" style={{ padding: '6px 12px', height: '38px', boxSizing: 'border-box' }}>
+                        <span className="rating-star">★</span>
+                        <span>{rating} / 5 Rating</span>
+                      </div>
+                    )}
+                    {reviews && (
+                      <div className="rating-pill" style={{ padding: '6px 12px', height: '38px', boxSizing: 'border-box' }}>
+                        <span className="review-bubble">💬</span>
+                        <span>{reviews} Reviews</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
+              ) : (
+                <div className="field-group">
+                  <label>Poster Full Name</label>
+                  <div className="field-value">
+                    <span className="value-text">{authorName || 'N/A'}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            <div className="field-group" style={{ marginTop: '12px' }}>
+              <label>About Company</label>
+              <div className="field-value-textarea" style={{ minHeight: '80px', maxHeight: '140px' }}>
+                {needDescription || 'No company description or service specifications extracted.'}
               </div>
             </div>
+            
+
 
             {!isMaps && (
               <div className="info-grid-2">
@@ -364,15 +391,8 @@ Source: ${lead.sourceUrl}`;
               </div>
             )}
             
-            <div className="info-grid-2">
-              <div className="field-group">
-                <label>Pipeline Stage</label>
-                <div className="field-value">
-                  <span className="value-text">{crmStatus || 'N/A'}</span>
-                </div>
-              </div>
-              
-              {!isMaps && (
+            {!isMaps && (
+              <div className="info-grid-2">
                 <div className="field-group">
                   <label>Email Source</label>
                   <div className="contact-meta-pill" style={{ height: '38px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -381,8 +401,8 @@ Source: ${lead.sourceUrl}`;
                     <span>Conf: {lead.contactConfidence || 'low'}</span>
                   </div>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
 
             {!isMaps && (
               <div className="field-group">
@@ -392,6 +412,7 @@ Source: ${lead.sourceUrl}`;
                 </div>
               </div>
             )}
+
           </div>
 
           {/* CARD 2: Candidate details (Recruiter mode only) */}
@@ -464,32 +485,12 @@ Source: ${lead.sourceUrl}`;
             </div>
 
             {isMaps && (
-              <>
-                <div className="field-group">
-                  <label>Contact Number (Phone)</label>
-                  <div className="field-value">
-                    <span className="value-text">{phone || 'N/A'}</span>
-                  </div>
+              <div className="field-group">
+                <label>Contact Number (Phone)</label>
+                <div className="field-value">
+                  <span className="value-text">{phone || 'N/A'}</span>
                 </div>
-
-                <div className="field-group">
-                  <label>Google Maps Rating</label>
-                  <div className="rating-pill-container">
-                    {rating && (
-                      <div className="rating-pill">
-                        <span className="rating-star">★</span>
-                        <span>{rating} / 5 Rating</span>
-                      </div>
-                    )}
-                    {reviews && (
-                      <div className="rating-pill">
-                        <span className="review-bubble">💬</span>
-                        <span>{reviews} Reviews</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </>
+              </div>
             )}
 
             <div className="info-grid-2">
@@ -671,19 +672,6 @@ Source: ${lead.sourceUrl}`;
             )}
           </div>
 
-          {/* CARD 6: Requirement Details */}
-          <div className="detail-card">
-            <div className="card-header-row">
-              <h4 className="card-title">
-                <MessageSquare size={14} className="header-icon" />
-                Requirement / Description
-              </h4>
-            </div>
-            <div className="field-value-textarea">
-              {needDescription || 'No company description or service specifications extracted.'}
-            </div>
-          </div>
-          
         </div>
 
         {/* RIGHT COLUMN: AI Copy & CRM Executions Sidebar (Static / Pinned) */}
@@ -706,6 +694,8 @@ Source: ${lead.sourceUrl}`;
               </div>
             </div>
           </div>
+
+
 
           {/* SECTION 2: AI Email Outreach Copywriting */}
           <div className="sidebar-section" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>

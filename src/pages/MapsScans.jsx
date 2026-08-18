@@ -112,7 +112,7 @@ function CustomSelect({ value, onChange, options, style, onDeleteItem }) {
   );
 }
 
-export default function MapsScans({ leads = [], setLeads, searches = [], setSearches, onOpenLead }) {
+export default function MapsScans({ leads = [], setLeads, searches = [], setSearches, onOpenLead, onUpdateLead }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSearchId, setSelectedSearchId] = useState('all');
   const [filterIntent, setFilterIntent] = useState('all');
@@ -382,8 +382,8 @@ export default function MapsScans({ leads = [], setLeads, searches = [], setSear
   ];
 
   return (
-    <div className="page-container animate-fade-in" style={{ padding: '2rem' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+    <div className="page-container animate-fade-in" style={{ padding: '1rem', gap: '1rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <h2>Maps Search History & Scans</h2>
           <p style={{ color: 'var(--text-secondary)', marginTop: '4px' }}>Examine Google Maps queries, export CSV files, reveal contacts, and launch bulk pipeline deletions.</p>
@@ -399,7 +399,7 @@ export default function MapsScans({ leads = [], setLeads, searches = [], setSear
       </div>
 
       {/* Stats KPI Row */}
-      <div className="kpi-grid" style={{ marginBottom: '2rem' }}>
+      <div className="kpi-grid">
         <div className="kpi-card">
           <div className="kpi-icon"><Database size={18} /></div>
           <div className="kpi-details">
@@ -517,20 +517,7 @@ export default function MapsScans({ leads = [], setLeads, searches = [], setSear
           </button>
         </div>
 
-        {/* Bulk Action Panel */}
-        {selectedUrls.length > 0 && (
-          <div style={{ display: 'flex', gap: '10px', alignItems: 'center', padding: '8px 12px', background: 'var(--bg-trans-5)', borderRadius: '6px', marginBottom: '1rem' }}>
-            <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>{selectedUrls.length} leads selected</span>
-            <button
-              type="button"
-              onClick={handleBulkDelete}
-              className="btn btn-secondary"
-              style={{ color: 'var(--error)', border: '1px solid rgba(239,68,68,0.2)', padding: '4px 10px', fontSize: '0.78rem' }}
-            >
-              <Trash2 size={12} style={{ marginRight: '4px' }} /> Delete Selected
-            </button>
-          </div>
-        )}
+
 
         {/* Spreadsheet Data Grid */}
         {filteredLeads.length === 0 ? (
@@ -552,10 +539,10 @@ export default function MapsScans({ leads = [], setLeads, searches = [], setSear
                       />
                     </th>
                     <th style={{ width: '25%' }}>Business / Company</th>
-                    <th style={{ width: '18%' }}>Rating & Reviews</th>
-                    <th style={{ width: '18%' }}>Phone</th>
+                    <th style={{ width: '15%' }}>Rating & Reviews</th>
+                    <th style={{ width: '15%' }}>Phone</th>
                     <th style={{ width: '20%' }}>Email Contact</th>
-                    <th style={{ width: '10%' }}>CRM Stage</th>
+                    <th style={{ width: '16%' }}>CRM Lead</th>
                     <th style={{ width: '5%' }}>Maps</th>
                   </tr>
                 </thead>
@@ -616,16 +603,41 @@ export default function MapsScans({ leads = [], setLeads, searches = [], setSear
                           {isEmailValid ? (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
                               <span style={{ fontSize: '0.8rem', color: 'var(--text-primary)' }}>{emailVal}</span>
-                              <span className="intent-badge High" style={{ fontSize: '0.6rem', padding: '1px 5px', alignSelf: 'flex-start' }}>Verified</span>
+                              <span className="intent-badge High" style={{ fontSize: '0.6rem', padding: '2px 6px', alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: '3px', borderRadius: '4px', marginTop: '3px' }}>✓ Verified</span>
                             </div>
                           ) : (
                             <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>No email revealed</span>
                           )}
                         </td>
-                        <td>
-                          <span className={`intent-badge ${lead.crmStatus || 'New'}`} style={{ fontSize: '0.7rem', padding: '2px 8px' }}>
-                            {lead.crmStatus || 'New'}
-                          </span>
+                        <td onClick={(e) => e.stopPropagation()}>
+                          {lead.isConverted ? (
+                            <span className="intent-badge High" style={{ fontSize: '0.72rem', padding: '3px 10px', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '4px', textTransform: 'capitalize' }}>
+                              ✓ Converted
+                            </span>
+                          ) : (
+                            <button
+                              type="button"
+                              className="btn btn-primary"
+                              onClick={() => {
+                                onUpdateLead(lead.sourceUrl, { isConverted: true, crmStatus: 'New' });
+                              }}
+                              style={{
+                                padding: '4px 10px',
+                                fontSize: '0.72rem',
+                                height: '28px',
+                                minHeight: 'auto',
+                                borderRadius: '6px',
+                                margin: 0,
+                                background: 'var(--primary)',
+                                color: '#fff',
+                                border: 'none',
+                                fontWeight: '700',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              Convert to Lead
+                            </button>
+                          )}
                         </td>
                         <td onClick={(e) => e.stopPropagation()}>
                           <a href={lead.sourceUrl} target="_blank" rel="noreferrer" style={{ color: 'var(--primary)' }}>
@@ -667,6 +679,39 @@ export default function MapsScans({ leads = [], setLeads, searches = [], setSear
             )}
           </>
         )}
+      </div>
+      
+      {/* Floating Premium Bulk Action Bar */}
+      <div className={`floating-bulk-bar ${selectedUrls.length > 0 ? 'active' : ''}`}>
+        <span className="selected-count-pill">
+          {selectedUrls.length} {selectedUrls.length === 1 ? 'lead' : 'leads'} selected
+        </span>
+        
+        <div className="actions-group">
+          <button
+            type="button"
+            className="btn-bulk-action btn-bulk-secondary"
+            onClick={handleExportCSV}
+          >
+            <Download size={12} /> Export CSV
+          </button>
+          
+          <button
+            type="button"
+            className="btn-bulk-action btn-bulk-danger"
+            onClick={handleBulkDelete}
+          >
+            <Trash2 size={12} /> Delete Selected
+          </button>
+
+          <button
+            type="button"
+            className="btn-bulk-action btn-bulk-secondary"
+            onClick={() => setSelectedUrls([])}
+          >
+            Cancel
+          </button>
+        </div>
       </div>
     </div>
   );
