@@ -194,7 +194,7 @@ export default function Dashboard({ leads = [], searches = [], onOpenLead, onSwi
   };
 
   return (
-    <div className="page-container animate-fade-in" style={{ padding: '2rem' }}>
+    <div className="page-container animate-fade-in" style={{ padding: '1rem', gap: '1rem' }}>
       {/* KPI Cards Row */}
       <div className="kpi-grid">
         <div className="kpi-card">
@@ -494,7 +494,7 @@ export default function Dashboard({ leads = [], searches = [], onOpenLead, onSwi
                       const emailVal = lead.contactInfo || '';
                       const isEmailValid = emailVal && emailVal.includes('@') && emailVal !== 'hello@company.com';
                       const isEmailVerified = isEmailValid && lead.contactSource !== 'guessed';
-                      const emailBadgeLabel = isEmailVerified ? 'Verified' : (lead.contactSource === 'guessed' ? 'Guessed' : 'Unverified');
+                      const emailBadgeLabel = isEmailVerified ? '✓ Verified' : (lead.contactSource === 'guessed' ? '⚡ Guessed' : 'Unverified');
                       const emailBadgeClass = isEmailVerified ? 'intent-badge High' : (lead.contactSource === 'guessed' ? 'intent-badge Medium' : 'intent-badge Low');
 
                       const platform = getLeadPlatform(lead);
@@ -545,7 +545,7 @@ export default function Dashboard({ leads = [], searches = [], onOpenLead, onSwi
                             {isEmailValid ? (
                               <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', alignItems: 'flex-start' }}>
                                 <span style={{ fontSize: '0.8rem', color: 'var(--text-primary)' }}>{emailVal}</span>
-                                <span className={emailBadgeClass} style={{ fontSize: '0.62rem', padding: '1px 6px' }}>{emailBadgeLabel}</span>
+                                <span className={emailBadgeClass} style={{ fontSize: '0.62rem', padding: '2px 6px', borderRadius: '4px', marginTop: '3px', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>{emailBadgeLabel}</span>
                               </div>
                             ) : (
                               <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>No email found</span>

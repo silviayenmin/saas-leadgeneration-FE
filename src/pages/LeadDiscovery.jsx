@@ -261,9 +261,9 @@ export default function LeadDiscovery({ leads, setLeads, searches, setSearches, 
   const estimateMax = Math.max(2, Math.round(55 - minIntentScore / 2.2));
 
   return (
-    <div id="view-discovery" className="tab-view active" style={{ padding: '2rem' }}>
-      <div className="discovery-wizard-container">
-        <div className="view-header" style={{ marginBottom: '2rem' }}>
+    <div id="view-discovery" className="tab-view active" style={{ padding: '1rem' }}>
+      <div className="discovery-wizard-container" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <div className="view-header" style={{ marginBottom: '1rem' }}>
           <h2>Lead Discovery</h2>
           <p style={{ color: 'var(--text-secondary)', marginTop: '4px' }}>Guided AI scraper targeting buying signals across LinkedIn, Facebook, Google Maps, and other directories.</p>
         </div>

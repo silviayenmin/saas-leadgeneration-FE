@@ -34,6 +34,11 @@ const App = () => {
   const [searches, setSearches] = useState([]);
   const [activeLead, setActiveLead] = useState(null);
 
+  const handleTabChange = (tabName) => {
+    setActiveLead(null);
+    setActiveTab(tabName);
+  };
+
   const fetchLeadsAndSearches = async () => {
     try {
       const resLeads = await api.get('/leads');
@@ -56,12 +61,50 @@ const App = () => {
     }
   }, [authState]);
 
-  const handleUpdateLead = (updatedLead) => {
+  const handleUpdateLead = async (arg1, arg2) => {
+    let sourceUrl = '';
+    let fields = {};
+    let updatedLeadObj = null;
+
+    if (typeof arg1 === 'string') {
+      sourceUrl = arg1;
+      fields = arg2 || {};
+      const existing = leads.find((l) => l.sourceUrl === sourceUrl);
+      if (existing) {
+        updatedLeadObj = { ...existing, ...fields };
+      } else {
+        updatedLeadObj = { sourceUrl, ...fields };
+      }
+    } else {
+      updatedLeadObj = arg1;
+      sourceUrl = updatedLeadObj.sourceUrl;
+      fields = updatedLeadObj;
+    }
+
+    // Update local state instantly for crisp visual response
     setLeads((prevLeads) =>
-      prevLeads.map((l) => (l.sourceUrl === updatedLead.sourceUrl ? updatedLead : l))
+      prevLeads.map((l) => (l.sourceUrl === sourceUrl ? updatedLeadObj : l))
     );
-    if (activeLead && activeLead.sourceUrl === updatedLead.sourceUrl) {
-      setActiveLead(updatedLead);
+    if (activeLead && activeLead.sourceUrl === sourceUrl) {
+      setActiveLead(updatedLeadObj);
+    }
+
+    // Sync updates to MongoDB/JSON database in the BE
+    try {
+      await api.post('/leads/update', {
+        sourceUrl,
+        crmStatus: fields.crmStatus || updatedLeadObj.crmStatus || 'New',
+        draftEmail: fields.draftEmail || updatedLeadObj.draftEmail || '',
+        isConverted: fields.isConverted !== undefined ? fields.isConverted : updatedLeadObj.isConverted,
+        companyName: fields.companyName || updatedLeadObj.companyName,
+        buyingIntent: fields.buyingIntent || updatedLeadObj.buyingIntent,
+        intentType: fields.intentType || updatedLeadObj.intentType,
+        serviceRequired: fields.serviceRequired || updatedLeadObj.serviceRequired,
+        industry: fields.industry || updatedLeadObj.industry,
+        location: fields.location || updatedLeadObj.location
+      });
+    } catch (err) {
+      console.error('Failed to persist lead update to backend:', err);
     }
   };
 
@@ -257,8 +300,8 @@ const App = () => {
             leads={leads} 
             searches={searches} 
             onOpenLead={setActiveLead} 
-            onSwitchTab={setActiveTab} 
-            onUpgradeClick={() => setActiveTab('profile-subscription')} 
+            onSwitchTab={handleTabChange} 
+            onUpgradeClick={() => handleTabChange('profile-subscription')} 
           />
         );
       case 'lead-discovery': 
@@ -268,7 +311,7 @@ const App = () => {
             setLeads={setLeads}
             searches={searches}
             setSearches={setSearches}
-            onSwitchTab={setActiveTab}
+            onSwitchTab={handleTabChange}
             onOpenLead={setActiveLead}
           />
         );
@@ -280,6 +323,7 @@ const App = () => {
             searches={searches}
             setSearches={setSearches}
             onOpenLead={setActiveLead}
+            onUpdateLead={handleUpdateLead}
           />
         );
       case 'outreach-pipeline': return <OutreachPipeline />;
@@ -291,8 +335,8 @@ const App = () => {
             leads={leads} 
             searches={searches} 
             onOpenLead={setActiveLead} 
-            onSwitchTab={setActiveTab} 
-            onUpgradeClick={() => setActiveTab('profile-subscription')} 
+            onSwitchTab={handleTabChange} 
+            onUpgradeClick={() => handleTabChange('profile-subscription')} 
           />
         );
     }
@@ -318,7 +362,7 @@ const App = () => {
       />
       <Sidebar
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
+        setActiveTab={handleTabChange}
         user={user}
         onLogout={handleLogout}
         isMobileNavOpen={isMobileNavOpen}
@@ -328,13 +372,13 @@ const App = () => {
         <Header
           title={getPageTitle()}
           credits={credits}
-          onUpgradeClick={() => setActiveTab('profile-subscription')}
+          onUpgradeClick={() => handleTabChange('profile-subscription')}
           theme={theme}
           onToggleTheme={toggleTheme}
           isMobileNavOpen={isMobileNavOpen}
           onToggleMobileNav={() => setIsMobileNavOpen(!isMobileNavOpen)}
         />
-        <main style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: 'var(--bg-main)' }}>
+        <main style={activeLead ? { flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: 'var(--bg-main)' } : { flex: 1, overflowY: 'auto', background: 'var(--bg-main)' }}>
           {activeLead ? (
             <LeadDetailModal
               lead={activeLead}
