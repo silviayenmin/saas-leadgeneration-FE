@@ -289,16 +289,37 @@ Source: ${lead.sourceUrl}`;
         </div>
 
         <div className="header-right-side">
-          <span className="contact-meta-pill" style={{ height: '30px', padding: '0 12px', fontSize: '0.75rem', display: 'flex', alignItems: 'center', fontWeight: '600', gap: '6px', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '20px' }}>
-            <span>AI Score:</span>
-            <strong style={{ color: 'var(--primary)', fontSize: '0.85rem', fontWeight: '800' }}>
-              {lead.leadScore !== undefined ? lead.leadScore : Math.round((parseFloat(lead.confidenceScore) || 0) * 100)}
-            </strong>
-            <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)' }}>/100</span>
-          </span>
-          <span className={`badge ${getIntentBadgeClass(buyingIntent || 'Low')}`} style={{ padding: '6px 12px', fontSize: '0.75rem', textTransform: 'capitalize', fontWeight: '700' }}>
-            {buyingIntent || 'Low'} Intent
-          </span>
+          {platform === 'google_maps' ? (
+            <>
+              {lead.rating && (
+                <span className="contact-meta-pill" style={{ height: '30px', padding: '0 12px', fontSize: '0.75rem', display: 'flex', alignItems: 'center', fontWeight: '600', gap: '6px', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '20px' }}>
+                  <span>Rating:</span>
+                  <strong style={{ color: 'var(--warning)', fontSize: '0.85rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '2px' }}>
+                    {lead.rating} <span style={{ fontSize: '0.75rem' }}>★</span>
+                  </strong>
+                  {lead.reviews && (
+                    <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)' }}>({lead.reviews})</span>
+                  )}
+                </span>
+              )}
+              <span className="badge" style={{ padding: '6px 12px', fontSize: '0.75rem', fontWeight: '700', background: 'rgba(3, 113, 114, 0.12)', color: 'var(--secondary)', border: '1px solid rgba(3, 113, 114, 0.25)' }}>
+                Maps Listing
+              </span>
+            </>
+          ) : (
+            <>
+              <span className="contact-meta-pill" style={{ height: '30px', padding: '0 12px', fontSize: '0.75rem', display: 'flex', alignItems: 'center', fontWeight: '600', gap: '6px', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '20px' }}>
+                <span>AI Score:</span>
+                <strong style={{ color: 'var(--primary)', fontSize: '0.85rem', fontWeight: '800' }}>
+                  {lead.leadScore !== undefined ? lead.leadScore : Math.round((parseFloat(lead.confidenceScore) || 0) * 100)}
+                </strong>
+                <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)' }}>/100</span>
+              </span>
+              <span className={`badge ${getIntentBadgeClass(buyingIntent || 'Low')}`} style={{ padding: '6px 12px', fontSize: '0.75rem', textTransform: 'capitalize', fontWeight: '700' }}>
+                {buyingIntent || 'Low'} Intent
+              </span>
+            </>
+          )}
           <span className="contact-meta-pill" style={{ height: '30px', padding: '0 12px', fontSize: '0.75rem', display: 'flex', alignItems: 'center', fontWeight: '600' }}>
             Stage: {crmStatus || 'New'}
           </span>
