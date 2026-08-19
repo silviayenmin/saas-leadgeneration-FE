@@ -310,6 +310,13 @@ export default function OutreachConfig({ onProfileUpdate, initialSubTab = 'campa
       if (response.ok) {
         const data = await response.json();
         showToast(`Inbox replies synchronized successfully! Found ${data.newRepliesCount || 0} new replies.`, 'success');
+        const count = data.newRepliesCount || 0;
+        if (count > 0 && data.replies && data.replies.length > 0) {
+          const listStr = data.replies.map(r => `- ${r.companyName || 'Unknown'} (${r.email})`).join('\n');
+          alert(`Inbox replies synchronized successfully! Found ${count} new replies:\n\n${listStr}\n\nThese leads have been automatically moved to the "Replied" stage in your Outreach Pipeline.`);
+        } else {
+          alert('Inbox replies synchronized. No new replies found.');
+        }
       } else {
         showToast('Failed to sync replies.', 'error');
       }

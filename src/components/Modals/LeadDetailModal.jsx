@@ -808,6 +808,65 @@ Source: ${lead.sourceUrl}`;
             )}
           </div>
 
+          {/* CARD 6: Inbox Sync Replies Thread */}
+          <div className="detail-card replies-card" style={{ marginTop: '20px' }}>
+            <div className="card-header-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h4 className="card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px', margin: 0 }}>
+                <MessageSquare size={14} className="header-icon" />
+                Inbox Replies Thread
+              </h4>
+              <span className={`status-badge ${crmStatus === 'Replied' ? 'success' : 'neutral'}`} style={{
+                fontSize: '0.68rem',
+                padding: '3px 8px',
+                borderRadius: '4px',
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                background: crmStatus === 'Replied' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(255, 255, 255, 0.05)',
+                color: crmStatus === 'Replied' ? '#10b981' : 'var(--text-muted)'
+              }}>
+                {crmStatus === 'Replied' ? 'Replied' : 'No Reply Detected'}
+              </span>
+            </div>
+
+            {lead.receivedReplies && lead.receivedReplies.length > 0 ? (
+              <div className="replies-thread-container" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {lead.receivedReplies.map((reply, rIdx) => (
+                  <div key={rIdx} className="reply-bubble" style={{
+                    padding: '12px',
+                    borderRadius: '8px',
+                    background: 'rgba(14, 165, 164, 0.05)',
+                    border: '1px solid rgba(14, 165, 164, 0.15)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '6px'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.72rem', color: 'var(--text-secondary)' }}>
+                      <span style={{ fontWeight: 600 }}>Subject: {reply.subject || 'Re: Outreach'}</span>
+                      <span>{reply.receivedAt ? new Date(reply.receivedAt).toLocaleString() : ''}</span>
+                    </div>
+                    <div style={{ fontSize: '0.78rem', color: 'var(--text-primary)', whiteSpace: 'pre-wrap', lineHeight: '1.4' }}>
+                      {reply.body}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div style={{ 
+                fontSize: '0.75rem', 
+                color: 'var(--text-muted)', 
+                fontStyle: 'italic', 
+                padding: '16px', 
+                border: '1px dashed rgba(255, 255, 255, 0.1)', 
+                borderRadius: '10px', 
+                textAlign: 'center', 
+                background: 'rgba(255, 255, 255, 0.01)',
+                marginTop: '12px'
+              }}>
+                No reply emails detected from this lead yet. Use "Sync Replies" in Outreach Config to fetch updates.
+              </div>
+            )}
+          </div>
+
         </div>
 
         {/* RIGHT COLUMN: AI Copy & CRM Executions Sidebar (Static / Pinned) */}
