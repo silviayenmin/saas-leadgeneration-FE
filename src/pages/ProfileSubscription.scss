@@ -1190,7 +1190,7 @@
   display: flex;
   align-items: center;
   border: 1px solid var(--border-color);
-  border-radius: 6px;
+  border-radius: 8px;
   overflow: hidden;
   background: var(--bg-card);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -1206,14 +1206,15 @@
   }
 
   .input-group-icon {
-    width: 42px;
     height: 38px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--bg-trans-2);
-    border-right: 1px solid var(--border-color);
+    background: transparent !important;
+    border-right: none !important;
     color: var(--text-muted);
+    padding-left: 0.9rem;
+    padding-right: 0.4rem;
     flex-shrink: 0;
   }
   
