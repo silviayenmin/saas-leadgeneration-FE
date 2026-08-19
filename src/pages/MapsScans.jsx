@@ -144,6 +144,7 @@ export default function MapsScans({ leads = [], setLeads, searches = [], setSear
   const [spreadsheetOption, setSpreadsheetOption] = useState('new'); // 'new' | 'existing'
   const [existingSheetUrl, setExistingSheetUrl] = useState('');
   const [syncStatusText, setSyncStatusText] = useState('');
+  const [syncResultUrl, setSyncResultUrl] = useState('');
 
   // Filter searches list to map scans only
   const tabSearches = useMemo(() => {
@@ -357,16 +358,30 @@ export default function MapsScans({ leads = [], setLeads, searches = [], setSear
     URL.revokeObjectURL(url);
   };
 
-  const handleOpenSyncSheetsModal = () => {
+  const handleOpenSyncSheetsModal = async () => {
     const urlsToSync = selectedUrls.length > 0 ? selectedUrls : filteredLeads.map(l => l.sourceUrl);
     if (urlsToSync.length === 0) {
       alert('No leads selected to sync.');
       return;
     }
     setSyncStep('setup');
-    setSpreadsheetOption('new');
-    setExistingSheetUrl('');
+    setSyncResultUrl('');
     setShowSyncModal(true);
+
+    try {
+      const res = await api.get('/config/google-sheets');
+      if (res.data && res.data.sheet_id) {
+        setExistingSheetUrl(res.data.sheet_id);
+        setSpreadsheetOption('existing');
+      } else {
+        setSpreadsheetOption('new');
+        setExistingSheetUrl('');
+      }
+    } catch (e) {
+      console.error(e);
+      setSpreadsheetOption('new');
+      setExistingSheetUrl('');
+    }
   };
 
   const handleStartSync = async () => {
@@ -385,16 +400,20 @@ export default function MapsScans({ leads = [], setLeads, searches = [], setSear
       await new Promise(resolve => setTimeout(resolve, 800));
     }
     try {
-      await fetch('/api/sync-sheets', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          leads: baseLeads.filter(lead => (selectedUrls.length > 0 ? selectedUrls : filteredLeads.map(l => l.sourceUrl)).includes(lead.sourceUrl)),
-          option: spreadsheetOption,
-          url: existingSheetUrl
-        })
+      const res = await api.post('/sync-sheets', {
+        leads: baseLeads.filter(lead => (selectedUrls.length > 0 ? selectedUrls : filteredLeads.map(l => l.sourceUrl)).includes(lead.sourceUrl)),
+        option: spreadsheetOption,
+        url: existingSheetUrl
       });
-    } catch (e) {}
+      if (res.data && res.data.spreadsheet_url) {
+        setSyncResultUrl(res.data.spreadsheet_url);
+      }
+    } catch (e) {
+      console.error(e);
+      alert(e.response?.data?.detail || 'Failed to sync leads to Google Sheets.');
+      setSyncStep('setup');
+      return;
+    }
     setSyncStep('success');
   };
 
@@ -973,7 +992,7 @@ export default function MapsScans({ leads = [], setLeads, searches = [], setSear
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
                   <button type="button" className="btn btn-secondary" style={{ padding: '6px 14px', borderRadius: '20px', fontSize: '0.8rem' }} onClick={() => setShowSyncModal(false)}>Close</button>
                   <a
-                    href="https://docs.google.com/spreadsheets"
+                    href={syncResultUrl || "https://docs.google.com/spreadsheets"}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn btn-primary"
