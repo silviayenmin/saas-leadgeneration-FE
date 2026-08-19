@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import {
   Map,
   Search,
@@ -14,7 +15,10 @@ import {
   Hash,
   Activity,
   Check,
-  FileText
+  FileText,
+  AlertTriangle,
+  X,
+  CreditCard
 } from 'lucide-react';
 import { getPlatformIcon } from '../utils/helpers';
 import api from '../services/api';
@@ -22,6 +26,30 @@ import api from '../services/api';
 export default function LeadDiscovery({ leads, setLeads, searches, setSearches, onSwitchTab, onOpenLead }) {
   const [goalMode, setGoalMode] = useState('social'); // Google Maps only (defaulted to social scan wrapper)
   const [step, setStep] = useState(1);
+
+  // Modern Alert Modal State
+  const [alertModal, setAlertModal] = useState({
+    show: false,
+    title: '',
+    message: '',
+    type: 'error',
+    isCreditError: false
+  });
+
+  const showAlert = (message, title = 'Notice', type = 'error') => {
+    const isCredit = (message || '').toLowerCase().includes('credit') || (message || '').toLowerCase().includes('upgrade');
+    setAlertModal({
+      show: true,
+      title: isCredit ? 'Insufficient Credits' : title,
+      message,
+      type,
+      isCreditError: isCredit
+    });
+  };
+
+  const closeAlert = () => {
+    setAlertModal((prev) => ({ ...prev, show: false }));
+  };
 
   // Portal selection state for Government Tenders Card (All default to checked)
   const [selectedPortals, setSelectedPortals] = useState({
@@ -42,7 +70,7 @@ export default function LeadDiscovery({ leads, setLeads, searches, setSearches, 
   const handleStartTenderSync = async () => {
     const activePortals = Object.keys(selectedPortals).filter((k) => selectedPortals[k]);
     if (activePortals.length === 0) {
-      alert('Please select at least one portal to sync.');
+      showAlert('Please select at least one portal to sync.', 'Portal Required', 'warning');
       return;
     }
 
@@ -158,7 +186,7 @@ export default function LeadDiscovery({ leads, setLeads, searches, setSearches, 
   const handleNext = (e) => {
     if (e) e.preventDefault();
     if (step === 2 && !keyword.trim()) {
-      alert('Please enter a search intent keyword.');
+      showAlert('Please enter a search intent keyword.', 'Missing Keyword', 'warning');
       return;
     }
     setStep(step + 1);
@@ -245,7 +273,8 @@ export default function LeadDiscovery({ leads, setLeads, searches, setSearches, 
     } catch (err) {
       clearInterval(progressInterval);
       setIsScanning(false);
-      alert(`Lead scraper error: ${err.message || err}`);
+      const errMsg = err.response?.data?.detail || err.message || String(err);
+      showAlert(errMsg, 'Lead Scraper Error');
     }
   };
 
@@ -257,7 +286,6 @@ export default function LeadDiscovery({ leads, setLeads, searches, setSearches, 
     <div id="view-discovery" className="tab-view active" style={{ padding: '1rem' }}>
       <div className="discovery-wizard-container" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         <div className="view-header" style={{ marginBottom: '1rem' }}>
-          <h2>Lead Discovery</h2>
           <p style={{ color: 'var(--text-secondary)', marginTop: '4px' }}>Guided AI scraper targeting buying signals across LinkedIn, Facebook, Google Maps, and other directories.</p>
         </div>
 
@@ -821,6 +849,71 @@ export default function LeadDiscovery({ leads, setLeads, searches, setSearches, 
           </div>
         )}
       </div>
+
+      {/* Modern UI Popup Modal - Portaled to document.body for 100% Dead Center Alignment */}
+      {alertModal.show && createPortal(
+        <div className="global-modal-overlay">
+          <div className="modern-alert-card">
+            <button
+              type="button"
+              className="modal-close-btn"
+              onClick={closeAlert}
+              title="Close dialog"
+            >
+              <X size={14} />
+            </button>
+
+            {/* Icon Aura */}
+            <div className={`alert-icon-aura ${alertModal.isCreditError ? 'credit-aura' : 'error-aura'}`}>
+              {alertModal.isCreditError ? <CreditCard size={30} /> : <AlertTriangle size={30} />}
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', width: '100%' }}>
+              <h3 className="alert-title">
+                {alertModal.title}
+              </h3>
+              <p className="alert-message">
+                {alertModal.message}
+              </p>
+            </div>
+
+            <div className="alert-actions-row">
+              {alertModal.isCreditError ? (
+                <>
+                  <button
+                    type="button"
+                    className="btn-modal-cancel"
+                    onClick={closeAlert}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    className="btn-modal-primary"
+                    onClick={() => {
+                      closeAlert();
+                      if (onSwitchTab) onSwitchTab('profile-subscription');
+                    }}
+                  >
+                    <CreditCard size={14} />
+                    <span>Upgrade Plan</span>
+                  </button>
+                </>
+              ) : (
+                <button
+                  type="button"
+                  className="btn-modal-primary"
+                  onClick={closeAlert}
+                  style={{ width: '100%' }}
+                >
+                  Got it
+                </button>
+              )}
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 }

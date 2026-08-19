@@ -74,23 +74,42 @@
       border-radius: $radius-md;
       background: transparent;
       border: none;
-      color: $text-secondary;
+      color: var(--text-secondary) !important;
       font-size: 0.9rem;
       font-weight: 500;
       cursor: pointer;
-      transition: all $transition-fast;
+      transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease !important;
       text-align: left;
+      outline: none !important;
 
-      &:hover {
-        background: $card-hover;
-        color: $text-primary;
+      svg, i, span {
+        color: inherit;
+        transition: none !important;
       }
 
-      &.active {
-        background: linear-gradient(135deg, $primary 0%, $primary-end 100%);
-        color: #FFFFFF;
-        font-weight: 600;
-        box-shadow: 0 4px 12px rgba(3, 113, 114, 0.35);
+      &:focus, &:focus-visible, &:active {
+        outline: none !important;
+        box-shadow: none !important;
+      }
+
+      &:hover:not(.active) {
+        background: rgba(3, 113, 114, 0.08) !important;
+        color: var(--primary) !important;
+
+        svg, i, span {
+          color: var(--primary) !important;
+        }
+      }
+
+      &.active, &.active:hover, &.active:focus, &.active:active {
+        background: linear-gradient(135deg, #037172 0%, #0d9488 100%) !important;
+        color: #ffffff !important;
+        font-weight: 600 !important;
+        box-shadow: 0 4px 12px rgba(3, 113, 114, 0.35) !important;
+
+        svg, i, span {
+          color: #ffffff !important;
+        }
       }
     }
   }

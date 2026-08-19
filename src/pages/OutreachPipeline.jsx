@@ -23,6 +23,7 @@ import {
   Check
 } from 'lucide-react';
 import api from '../services/api';
+import { getLeadScoreVal } from '../utils/helpers';
 import './OutreachPipeline.scss';
 
 // Platform Brand SVG Icons / Badges (Icon-Only Mode)
@@ -205,10 +206,10 @@ const PLATFORM_OPTIONS = [
 ];
 
 const INTENT_OPTIONS = [
-  { value: 'ALL', label: 'All Intents' },
-  { value: 'HIGH', label: 'High Intent (80%+)' },
-  { value: 'MEDIUM', label: 'Medium Intent (50-79%)' },
-  { value: 'LOW', label: 'Low Intent (<50%)' },
+  { value: 'ALL', label: 'All Intent Scores' },
+  { value: 'Qualified', label: 'Qualified' },
+  { value: 'Potential Lead', label: 'Potential Lead' },
+  { value: 'Warm Lead', label: 'Warm Lead' }
 ];
 
 const OutreachPipeline = ({
@@ -230,6 +231,7 @@ const OutreachPipeline = ({
   const [filterMode, setFilterMode] = useState('sales'); // 'sales' | 'recruiter'
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [activePreset, setActivePreset] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -244,6 +246,7 @@ const OutreachPipeline = ({
 
   const handleDatePreset = (presetType) => {
     const now = new Date();
+    setActivePreset(presetType === 'clear' ? '' : presetType);
     if (presetType === 'today') {
       const dStr = formatDateForInput(now);
       setStartDate(dStr);
@@ -324,11 +327,13 @@ const OutreachPipeline = ({
       if (!p.includes(platformFilter.toLowerCase())) return false;
     }
 
-    // Intent Filter
-    const score = lead.leadScore || 50;
-    if (intentFilter === 'HIGH' && score < 80) return false;
-    if (intentFilter === 'MEDIUM' && (score < 50 || score >= 80)) return false;
-    if (intentFilter === 'LOW' && score >= 50) return false;
+    // Intent Filter (>75 -> Qualified, 40-75 -> Potential Lead, <40 -> Warm Lead)
+    if (intentFilter !== 'ALL') {
+      const score = getLeadScoreVal(lead);
+      if (intentFilter === 'Qualified' && score <= 75) return false;
+      if (intentFilter === 'Potential Lead' && (score < 40 || score > 75)) return false;
+      if (intentFilter === 'Warm Lead' && score >= 40) return false;
+    }
 
     // Mode Select (Sales vs Recruiter)
     if (modeFilter !== 'ALL' && lead.search_type && lead.search_type !== modeFilter) {
@@ -516,28 +521,28 @@ const OutreachPipeline = ({
                 <div className="quick-presets-row">
                   <button
                     type="button"
-                    className="preset-chip"
+                    className={`preset-chip ${activePreset === 'today' ? 'active' : ''}`}
                     onClick={() => handleDatePreset('today')}
                   >
                     Today
                   </button>
                   <button
                     type="button"
-                    className="preset-chip"
+                    className={`preset-chip ${activePreset === 'last7' ? 'active' : ''}`}
                     onClick={() => handleDatePreset('last7')}
                   >
                     7 Days
                   </button>
                   <button
                     type="button"
-                    className="preset-chip"
+                    className={`preset-chip ${activePreset === 'last30' ? 'active' : ''}`}
                     onClick={() => handleDatePreset('last30')}
                   >
                     30 Days
                   </button>
                   <button
                     type="button"
-                    className="preset-chip"
+                    className={`preset-chip ${activePreset === 'thisMonth' ? 'active' : ''}`}
                     onClick={() => handleDatePreset('thisMonth')}
                   >
                     This Month

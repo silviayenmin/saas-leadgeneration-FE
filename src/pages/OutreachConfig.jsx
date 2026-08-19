@@ -31,6 +31,57 @@ import {
 import { parseIsoDate, getPlatformIcon } from '../utils/helpers';
 import './OutreachConfig.scss';
 
+// Modern Custom Dropdown Component
+function ModernSelect({ icon: Icon, value, options, onChange }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const selectedOption = options.find((opt) => opt.value === value) || { label: value, value };
+
+  return (
+    <div ref={dropdownRef} className={`modern-custom-select ${isOpen ? 'open' : ''}`} style={{ marginTop: '0.35rem' }}>
+      <button
+        type="button"
+        className="modern-select-trigger"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        {Icon && <Icon className="input-icon" size={14} style={{ color: 'var(--primary)' }} />}
+        <span className="modern-select-label">{selectedOption.label || value}</span>
+        <ChevronDown size={14} className={`caret-icon ${isOpen ? 'rotated' : ''}`} />
+      </button>
+
+      {isOpen && (
+        <div className="modern-select-dropdown">
+          {options.map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              className={`modern-select-option ${value === opt.value ? 'selected' : ''}`}
+              onClick={() => {
+                onChange(opt.value);
+                setIsOpen(false);
+              }}
+            >
+              <span>{opt.label || opt.value}</span>
+              {value === opt.value && <span className="check-dot"></span>}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function OutreachConfig({ onProfileUpdate, initialSubTab = 'campaign' }) {
   const getHeaders = (contentType = 'application/json') => {
     const secretKey = localStorage.getItem('APP_SECRET_KEY') || 'silvia_dev_key';
@@ -521,44 +572,44 @@ export default function OutreachConfig({ onProfileUpdate, initialSubTab = 'campa
 
     if (emailTone === 'Professional & Formal') {
       emailSubject = `Inquiry: Support with ${testService} for ${testCompany} - ${agName}`;
-      emailBody = `Dear ${testAuthor},<br><br>
-I hope this message finds you well.<br><br>
-I am writing on behalf of <strong>${agName}</strong> regarding your recent request for assistance with ${testService} at ${testCompany}.<br><br>
-Our organization specializes in delivering premium solutions in the area of ${agInfo}. We have a proven track record of helping companies optimize their operations and implement high-performing technologies.<br><br>
-I would welcome the opportunity to schedule a formal introduction call next week to discuss how we can support your team in achieving its goals. Please let me know your availability.<br><br>
-Sincerely,<br>
-The ${agName} Team`;
+      emailBody = `<p style="margin: 0 0 0.75rem 0">Dear ${testAuthor},</p>
+<p style="margin: 0 0 0.75rem 0">I hope this message finds you well.</p>
+<p style="margin: 0 0 0.75rem 0">I am writing on behalf of <strong>${agName}</strong> regarding your recent request for assistance with ${testService} at ${testCompany}.</p>
+<p style="margin: 0 0 0.75rem 0">Our organization specializes in delivering premium solutions in the area of ${agInfo}. We have a proven track record of helping companies optimize their operations and implement high-performing technologies.</p>
+<p style="margin: 0 0 0.75rem 0">I would welcome the opportunity to schedule a formal introduction call next week to discuss how we can support your team in achieving its goals. Please let me know your availability.</p>
+<p style="margin: 0 0 0.35rem 0">Sincerely,</p>
+<p style="margin: 0">The ${agName} Team</p>`;
       
       linkedinMsg = `Hello ${testAuthor}. I trust you are having a productive week. I observed your inquiry regarding support for ${testService} at ${testCompany}. ${agName} offers extensive expertise in ${agInfo}, and we would be pleased to evaluate your project needs. Let me know if we can arrange a brief introductory call.`;
     } else if (emailTone === 'Value Pitch (Free Audit)') {
       emailSubject = `Free audit: ${testService} optimization for ${testCompany}`;
-      emailBody = `Hi ${testAuthor},<br><br>
-I noticed ${testCompany} is sourcing support for ${testService}. We specialize in ${agInfo} at <strong>${agName}</strong>.<br><br>
-To show you the value we can bring, we would love to conduct a complimentary audit of your current system or setup. No strings attached—we will simply identify 3 key performance or design bottlenecks and send over our recommendations.<br><br>
-Would you be open to a quick 10-minute session to kick off this audit?<br><br>
-Best regards,<br>
-The ${agName} Team`;
+      emailBody = `<p style="margin: 0 0 0.75rem 0">Hi ${testAuthor},</p>
+<p style="margin: 0 0 0.75rem 0">I noticed ${testCompany} is sourcing support for ${testService}. We specialize in ${agInfo} at <strong>${agName}</strong>.</p>
+<p style="margin: 0 0 0.75rem 0">To show you the value we can bring, we would love to conduct a complimentary audit of your current system or setup. No strings attached—we will simply identify 3 key performance or design bottlenecks and send over our recommendations.</p>
+<p style="margin: 0 0 0.75rem 0">Would you be open to a quick 10-minute session to kick off this audit?</p>
+<p style="margin: 0 0 0.35rem 0">Best regards,</p>
+<p style="margin: 0">The ${agName} Team</p>`;
 
       linkedinMsg = `Hi ${testAuthor}! Saw you're looking for support with ${testService}. We run ${agName} (specialists in ${agInfo}). To show you how we work, we'd love to run a free audit on your current setup and share 3 actionable optimization tips. Open to this?`;
     } else if (emailTone === 'Aggressive Pitch (Meeting link)') {
       emailSubject = `10x your ${testService} delivery - ${agName} + ${testCompany}`;
-      emailBody = `Hi ${testAuthor},<br><br>
-If you're looking for help with ${testService}, let's get straight to the point. Most agencies promise results but fail to deliver. At <strong>${agName}</strong>, we are experts in ${agInfo}.<br><br>
-We guarantee to streamline your ${testService} pipeline and deliver robust, production-ready code in half the time of standard timelines.<br><br>
-Let's skip the endless back-and-forth. Pick a time directly on my calendar here to discuss: <strong>calendly.com/${agName.toLowerCase().replace(/[^a-z0-9]/g, '')}/demo</strong><br><br>
-Thanks,<br>
-The ${agName} Team`;
+      emailBody = `<p style="margin: 0 0 0.75rem 0">Hi ${testAuthor},</p>
+<p style="margin: 0 0 0.75rem 0">If you're looking for help with ${testService}, let's get straight to the point. Most agencies promise results but fail to deliver. At <strong>${agName}</strong>, we are experts in ${agInfo}.</p>
+<p style="margin: 0 0 0.75rem 0">We guarantee to streamline your ${testService} pipeline and deliver robust, production-ready code in half the time of standard timelines.</p>
+<p style="margin: 0 0 0.75rem 0">Let's skip the endless back-and-forth. Pick a time directly on my calendar here to discuss: <strong>calendly.com/${agName.toLowerCase().replace(/[^a-z0-9]/g, '')}/demo</strong></p>
+<p style="margin: 0 0 0.35rem 0">Thanks,</p>
+<p style="margin: 0">The ${agName} Team</p>`;
 
       linkedinMsg = `Hey ${testAuthor} - saw your post about ${testService} for ${testCompany}. We build high-velocity ${agInfo} at ${agName}. Let's hop on a quick 5-min call to see if we can help you hit your milestones ahead of schedule: calendly.com/${agName.toLowerCase().replace(/[^a-z0-9]/g, '')}/demo`;
     } else {
       // Default: Short & Conversational
       emailSubject = `Outreach Pitch - ${agName}`;
-      emailBody = `Hi ${testAuthor},<br><br>
-I saw your recent post mentioning that ${testCompany} is looking for support with ${testService}.<br><br>
-We run <strong>${agName}</strong>, specializing in ${agInfo}. Given your requirements, I think our background aligns perfectly.<br><br>
-Are you open to a brief chat or a free code review this week?<br><br>
-Best,<br>
-The ${agName} Team`;
+      emailBody = `<p style="margin: 0 0 0.75rem 0">Hi ${testAuthor},</p>
+<p style="margin: 0 0 0.75rem 0">I saw your recent post mentioning that ${testCompany} is looking for support with ${testService}.</p>
+<p style="margin: 0 0 0.75rem 0">We run <strong>${agName}</strong>, specializing in ${agInfo}. Given your requirements, I think our background aligns perfectly.</p>
+<p style="margin: 0 0 0.75rem 0">Are you open to a brief chat or a free code review this week?</p>
+<p style="margin: 0 0 0.35rem 0">Best,</p>
+<p style="margin: 0">The ${agName} Team</p>`;
 
       linkedinMsg = `Hey ${testAuthor}! Saw your post about ${testCompany} looking for help with ${testService}. At ${agName}, we build ${agInfo}. I think our design/dev capabilities match your request exactly. Do you have 5 minutes to discuss this?`;
     }
@@ -570,7 +621,6 @@ The ${agName} Team`;
     <div id="view-settings" className="tab-view active">
       <div className="settings-view-header">
         <div>
-          <h2>Outreach Config & Settings</h2>
           <p>Customize parameters to optimize personalized pitches and developer configurations.</p>
         </div>
         
@@ -779,19 +829,21 @@ The ${agName} Team`;
                     {googleCredsActive ? (
                       <div className="form-group" style={{ marginBottom: 0 }}>
                         <label htmlFor="settings-sheets-email">Service Account Email</label>
-                        <div className="input-wrapper" style={{ marginTop: '0.35rem', position: 'relative', display: 'flex', gap: '8px' }}>
+                        <div className="input-wrapper" style={{ marginTop: '0.35rem', position: 'relative', display: 'flex', gap: '8px', alignItems: 'center' }}>
+                          <Mail className="input-icon" size={14} style={{ color: 'var(--primary)' }} />
                           <input
                             type="text"
                             id="settings-sheets-email"
                             className="form-control"
                             readOnly
-                            style={{ background: 'rgba(255, 255, 255, 0.02)', color: 'var(--text-secondary)' }}
+                            title={googleClientEmail}
+                            style={{ fontSize: '0.78rem', fontFamily: 'monospace', flexGrow: 1 }}
                             value={googleClientEmail}
                           />
                           <button
                             type="button"
                             className="btn btn-secondary"
-                            style={{ width: 'auto', padding: '0 0.85rem', height: '36px' }}
+                            style={{ width: 'auto', padding: '0 0.85rem', height: '42px', flexShrink: 0 }}
                             onClick={() => {
                               navigator.clipboard.writeText(googleClientEmail);
                               showToast('Service Account email copied to clipboard!', 'info');
@@ -801,7 +853,7 @@ The ${agName} Team`;
                             <Copy size={14} />
                           </button>
                         </div>
-                        <p style={{ fontSize: '11px', color: 'var(--primary)', marginTop: '0.5rem', fontWeight: '500' }}>
+                        <p style={{ fontSize: '11px', color: 'var(--primary)', marginTop: '0.4rem', lineHeight: '1.45', fontWeight: '500' }}>
                           * In Google sheets click <strong>Share</strong> and then give this email as an <strong>Editor</strong>.
                         </p>
                       </div>
@@ -836,50 +888,36 @@ The ${agName} Team`;
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', width: '100%' }}>
                       <div className="form-group" style={{ marginBottom: 0 }}>
                         <label htmlFor="settings-model-preset-select">Active Preset</label>
-                        <div className="input-wrapper" style={{ marginTop: '0.35rem' }}>
-                          <Cpu className="input-icon" size={14} style={{ color: 'var(--primary)' }} />
-                          <select
-                            id="settings-model-preset-select"
-                            className="form-control"
-                            style={{ paddingLeft: '2.25rem' }}
-                            value={activePreset}
-                            onChange={(e) => handlePresetChange(e.target.value)}
-                          >
-                            {modelConfig && modelConfig.providers ? (
-                              Object.keys(modelConfig.providers).map((presetName) => (
-                                <option key={presetName} value={presetName}>
-                                  {presetName}
-                                </option>
-                              ))
-                            ) : (
-                              <>
-                                <option value="groq">groq</option>
-                                <option value="openai">openai</option>
-                                <option value="ollama">ollama</option>
-                                <option value="anthropic">anthropic</option>
-                              </>
-                            )}
-                          </select>
-                        </div>
+                        <ModernSelect
+                          icon={Cpu}
+                          value={activePreset}
+                          options={
+                            modelConfig && modelConfig.providers
+                              ? Object.keys(modelConfig.providers).map((p) => ({ label: p, value: p }))
+                              : [
+                                  { label: 'groq', value: 'groq' },
+                                  { label: 'openai', value: 'openai' },
+                                  { label: 'ollama', value: 'ollama' },
+                                  { label: 'anthropic', value: 'anthropic' }
+                                ]
+                          }
+                          onChange={(val) => handlePresetChange(val)}
+                        />
                       </div>
 
                       <div className="form-group" style={{ marginBottom: 0 }}>
                         <label htmlFor="settings-model-type-select">Provider Type</label>
-                        <div className="input-wrapper" style={{ marginTop: '0.35rem' }}>
-                          <Server className="input-icon" size={14} style={{ color: 'var(--primary)' }} />
-                          <select
-                            id="settings-model-type-select"
-                            className="form-control"
-                            style={{ paddingLeft: '2.25rem' }}
-                            value={providerType}
-                            onChange={(e) => setProviderType(e.target.value)}
-                          >
-                            <option value="groq">Groq</option>
-                            <option value="openai">OpenAI</option>
-                            <option value="ollama">Ollama</option>
-                            <option value="anthropic">Anthropic (Claude)</option>
-                          </select>
-                        </div>
+                        <ModernSelect
+                          icon={Server}
+                          value={providerType}
+                          options={[
+                            { label: 'Groq', value: 'groq' },
+                            { label: 'OpenAI', value: 'openai' },
+                            { label: 'Ollama', value: 'ollama' },
+                            { label: 'Anthropic (Claude)', value: 'anthropic' }
+                          ]}
+                          onChange={(val) => setProviderType(val)}
+                        />
                       </div>
 
                       {providerType === 'ollama' && (

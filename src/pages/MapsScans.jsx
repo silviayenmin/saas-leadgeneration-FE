@@ -16,8 +16,11 @@ import {
   Download,
   RefreshCw,
   ChevronRight,
+  ChevronLeft,
   FileSpreadsheet,
-  Star
+  Star,
+  Loader2,
+  X
 } from 'lucide-react';
 import {
   getLeadPlatform,
@@ -25,7 +28,8 @@ import {
   getLeadAvatarUrl,
   getCompanyLogoUrl,
   getStatusBadgeClass,
-  parseIsoDate
+  parseIsoDate,
+  getLeadScoreVal
 } from '../utils/helpers';
 import api from '../services/api';
 import './Pages.scss';
@@ -47,66 +51,97 @@ function CustomSelect({ value, onChange, options, style, onDeleteItem }) {
   const selectedOption = options.find(opt => opt.value === value) || options[0];
 
   return (
-    <div className="filter-select-container" ref={dropdownRef} style={{ ...style, position: 'relative', display: 'inline-block' }}>
+    <div className={`modern-custom-select filter-select ${isOpen ? 'open' : ''}`} ref={dropdownRef} style={{ ...style }}>
       <button
         type="button"
-        className="filter-select-trigger"
+        className="modern-select-trigger filter-trigger"
         onClick={() => setIsOpen(!isOpen)}
-        style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '6px 12px', background: 'var(--bg-main)', border: '1px solid var(--border-color)',
-          borderRadius: '6px', color: 'var(--text-primary)', fontSize: '0.85rem', cursor: 'pointer',
-          width: '100%'
-        }}
       >
-        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'left' }}>
+        <span className="modern-select-label">
           {selectedOption ? selectedOption.label : ''}
         </span>
-        <ChevronDown size={14} style={{ marginLeft: '8px', flexShrink: 0 }} />
+        <ChevronDown size={13} className={`caret-icon ${isOpen ? 'rotated' : ''}`} />
       </button>
       {isOpen && (
-        <div style={{
-          position: 'absolute', top: '35px', left: 0, zIndex: 100,
-          background: 'var(--bg-surface)', border: '1px solid var(--border-color)',
-          borderRadius: '8px', padding: '4px', width: onDeleteItem ? '240px' : '100%',
-          boxShadow: 'var(--shadow-md)', maxHeight: '200px', overflowY: 'auto'
-        }}>
+        <div className="modern-select-dropdown filter-dropdown" style={{ width: onDeleteItem ? '240px' : '100%' }}>
           {options.map((opt) => (
             <div
               key={opt.value}
-              style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                padding: '4px 8px', borderRadius: '4px', cursor: 'pointer',
-                background: opt.value === value ? 'var(--bg-trans-5)' : 'transparent'
+              className={`modern-select-option ${opt.value === value ? 'selected' : ''}`}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+              onClick={() => {
+                onChange(opt.value);
+                setIsOpen(false);
               }}
             >
-              <button
-                type="button"
-                style={{
-                  background: 'none', border: 'none', color: 'var(--text-primary)',
-                  fontSize: '0.82rem', textAlign: 'left', flexGrow: 1, padding: '4px',
-                  cursor: 'pointer'
-                }}
-                onClick={() => {
-                  onChange(opt.value);
-                  setIsOpen(false);
-                }}
-              >
+              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {opt.label}
-              </button>
-              {onDeleteItem && opt.value !== 'all' && (
+              </span>
+              {onDeleteItem && opt.value !== 'all' ? (
                 <button
                   type="button"
-                  style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: '4px' }}
+                  style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: '2px 4px', display: 'flex', alignItems: 'center' }}
                   onClick={(e) => {
                     e.stopPropagation();
                     onDeleteItem(opt.value);
                   }}
+                  title="Delete query"
                 >
                   <Trash2 size={12} />
                 </button>
+              ) : (
+                opt.value === value && <span className="check-dot"></span>
               )}
             </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ModernFilterSelect({ value, options, onChange, minWidth = '125px' }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = React.useRef(null);
+
+  React.useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const selectedOption = options.find((opt) => opt.value === value) || { label: value, value };
+
+  return (
+    <div ref={dropdownRef} className={`modern-custom-select filter-select ${isOpen ? 'open' : ''}`} style={{ minWidth }}>
+      <button
+        type="button"
+        className="modern-select-trigger filter-trigger"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <span className="modern-select-label">{selectedOption.label || value}</span>
+        <ChevronDown size={13} className={`caret-icon ${isOpen ? 'rotated' : ''}`} />
+      </button>
+
+      {isOpen && (
+        <div className="modern-select-dropdown filter-dropdown">
+          {options.map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              className={`modern-select-option ${value === opt.value ? 'selected' : ''}`}
+              onClick={() => {
+                onChange(opt.value);
+                setIsOpen(false);
+              }}
+            >
+              <span>{opt.label || opt.value}</span>
+              {value === opt.value && <span className="check-dot"></span>}
+            </button>
           ))}
         </div>
       )}
@@ -125,6 +160,42 @@ export default function MapsScans({ leads = [], setLeads, searches = [], setSear
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [activePreset, setActivePreset] = useState('');
+
+  const formatDateForInput = (d) => {
+    if (!d) return '';
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const handleDatePreset = (presetType) => {
+    const now = new Date();
+    setActivePreset(presetType === 'clear' ? '' : presetType);
+    if (presetType === 'today') {
+      const dStr = formatDateForInput(now);
+      setStartDate(dStr);
+      setEndDate(dStr);
+    } else if (presetType === 'last7') {
+      const start = new Date(now);
+      start.setDate(now.getDate() - 7);
+      setStartDate(formatDateForInput(start));
+      setEndDate(formatDateForInput(now));
+    } else if (presetType === 'last30') {
+      const start = new Date(now);
+      start.setDate(now.getDate() - 30);
+      setStartDate(formatDateForInput(start));
+      setEndDate(formatDateForInput(now));
+    } else if (presetType === 'thisMonth') {
+      const start = new Date(now.getFullYear(), now.getMonth(), 1);
+      setStartDate(formatDateForInput(start));
+      setEndDate(formatDateForInput(now));
+    } else if (presetType === 'clear') {
+      setStartDate('');
+      setEndDate('');
+    }
+  };
 
   // Selected checkboxes
   const [selectedUrls, setSelectedUrls] = useState([]);
@@ -199,24 +270,15 @@ export default function MapsScans({ leads = [], setLeads, searches = [], setSear
         if (!company.includes(query) && !website.includes(query) && !location.includes(query)) return false;
       }
 
-      // Intent rating filter
-      const leadStatus = (lead.leadStatus || '').toLowerCase();
-      const buyingIntent = (lead.buyingIntent || '').toLowerCase();
+      // Intent rating filter (>75 -> Qualified, 40-75 -> Potential Lead, <40 -> Warm Lead)
       if (filterIntent !== 'all') {
+        const score = getLeadScoreVal(lead);
         if (filterIntent === 'Qualified') {
-          if (!leadStatus.includes('qualif') && !leadStatus.includes('new lead') && !leadStatus.includes('new') && buyingIntent !== 'high' && buyingIntent !== 'hiring') return false;
-        } else if (filterIntent === 'Unqualified') {
-          if (!leadStatus.includes('unqualified') && !leadStatus.includes('not qualified') && !leadStatus.includes('disqualified') && buyingIntent !== 'none' && buyingIntent !== 'low' && buyingIntent !== 'unknown') return false;
-        } else if (filterIntent === 'Warm Lead') {
-          if (!leadStatus.includes('warm') && buyingIntent !== 'research' && buyingIntent !== 'warm') return false;
+          if (score <= 75) return false;
         } else if (filterIntent === 'Potential Lead') {
-          if (!leadStatus.includes('potential') && !leadStatus.includes('cold') && buyingIntent !== 'potential') return false;
-        } else if (filterIntent === 'Not a Lead') {
-          if (!leadStatus.includes('not a lead') && !leadStatus.includes('not lead') && buyingIntent !== 'none') return false;
-        } else if (filterIntent === 'Informational') {
-          if (!leadStatus.includes('info') && buyingIntent !== 'low') return false;
-        } else {
-          if (!leadStatus.includes(filterIntent.toLowerCase()) && !buyingIntent.includes(filterIntent.toLowerCase())) return false;
+          if (score < 40 || score > 75) return false;
+        } else if (filterIntent === 'Warm Lead') {
+          if (score >= 40) return false;
         }
       }
 
@@ -441,10 +503,8 @@ export default function MapsScans({ leads = [], setLeads, searches = [], setSear
   const intentOptions = [
     { value: 'all', label: 'All Intent Scores' },
     { value: 'Qualified', label: 'Qualified' },
-    { value: 'Warm Lead', label: 'Warm Lead' },
     { value: 'Potential Lead', label: 'Potential Lead' },
-    { value: 'Informational', label: 'Informational' },
-    { value: 'Unqualified', label: 'Unqualified' }
+    { value: 'Warm Lead', label: 'Warm Lead' }
   ];
 
   const crmOptions = [
@@ -519,16 +579,26 @@ export default function MapsScans({ leads = [], setLeads, searches = [], setSear
 
       <div className="data-card">
         {/* Table Filters Toolbar */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'center', marginBottom: '1.25rem' }}>
-          <div style={{ position: 'relative', flexGrow: 1, minWidth: '200px' }}>
-            <Search size={14} style={{ position: 'absolute', left: '10px', top: '10px', color: 'var(--text-secondary)' }} />
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center', marginBottom: '1rem' }}>
+          <div className="modern-search-input-wrapper" style={{ flexGrow: 1, minWidth: '180px' }}>
+            <Search size={14} className="search-icon" />
             <input
               type="text"
+              className="modern-search-input"
               placeholder="Search company or website..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              style={{ width: '100%', padding: '6px 12px 6px 30px', background: 'var(--bg-main)', border: '1px solid var(--border-color)', borderRadius: '6px', color: 'var(--text-primary)', fontSize: '0.85rem' }}
             />
+            {searchQuery && (
+              <button
+                type="button"
+                className="clear-search-btn"
+                onClick={() => setSearchQuery('')}
+                title="Clear search"
+              >
+                <X size={12} />
+              </button>
+            )}
           </div>
 
           <CustomSelect
@@ -536,56 +606,136 @@ export default function MapsScans({ leads = [], setLeads, searches = [], setSear
             onChange={setSelectedSearchId}
             options={queryOptions}
             onDeleteItem={handleDeleteSearchQuery}
-            style={{ width: '160px' }}
           />
 
           <CustomSelect
             value={filterIntent}
             onChange={setFilterIntent}
             options={intentOptions}
-            style={{ width: '160px' }}
           />
 
           <CustomSelect
             value={filterCrm}
             onChange={setFilterCrm}
             options={crmOptions}
-            style={{ width: '130px' }}
           />
 
           {/* Quick Filters */}
-          <select
+          <ModernFilterSelect
             value={quickFilter}
-            onChange={(e) => setQuickFilter(e.target.value)}
-            style={{ padding: '6px 12px', background: 'var(--bg-main)', border: '1px solid var(--border-color)', borderRadius: '6px', color: 'var(--text-primary)', fontSize: '0.85rem' }}
-          >
-            <option value="all">All Records</option>
-            <option value="high">Highly Rated (4★+)</option>
-            <option value="phone">Phone Available</option>
-          </select>
+            onChange={setQuickFilter}
+            options={[
+              { value: 'all', label: 'All Records' },
+              { value: 'high', label: 'Highly Rated (4★+)' },
+              { value: 'phone', label: 'Phone Available' }
+            ]}
+          />
 
-          {/* Date Picker */}
-          <div style={{ position: 'relative' }}>
+          {/* Date Picker Trigger & Popover */}
+          <div className={`date-picker-wrapper ${showDatePicker ? 'is-open' : ''}`}>
             <button
               type="button"
+              className={`btn-date-trigger ${(startDate || endDate) ? 'active' : ''}`}
               onClick={() => setShowDatePicker(!showDatePicker)}
-              style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '6px 12px', background: 'var(--bg-main)', border: '1px solid var(--border-color)', borderRadius: '6px', color: 'var(--text-primary)', fontSize: '0.85rem', cursor: 'pointer' }}
             >
-              <Calendar size={13} />
-              <span>{startDate || endDate ? `${startDate || 'Start'} to ${endDate || 'End'}` : 'Select Dates'}</span>
-              {(startDate || endDate) && <span style={{ marginLeft: '4px', cursor: 'pointer', color: 'var(--primary)' }} onClick={clearDateFilter}>✕</span>}
+              <Calendar size={14} />
+              <span>
+                {startDate || endDate
+                  ? `${startDate || '...'} to ${endDate || '...'}`
+                  : 'Date Range'}
+              </span>
             </button>
+
             {showDatePicker && (
-              <div style={{ position: 'absolute', top: '35px', right: 0, zIndex: 10, background: 'var(--bg-surface)', border: '1px solid var(--border-color)', borderRadius: '8px', padding: '12px', width: '220px', display: 'flex', flexDirection: 'column', gap: '8px', boxShadow: 'var(--shadow-md)' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                  <label style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>Start Date</label>
-                  <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} style={{ padding: '4px 8px', background: 'var(--bg-main)', border: '1px solid var(--border-color)', borderRadius: '4px', color: 'var(--text-primary)', fontSize: '0.8rem' }} />
+              <div className="date-popover">
+                <div className="popover-header">
+                  <div className="popover-title">
+                    <Calendar size={14} className="title-icon" />
+                    <span>Filter Date Range</span>
+                  </div>
+                  {(startDate || endDate) && (
+                    <button
+                      type="button"
+                      className="btn-clear-date"
+                      onClick={() => handleDatePreset('clear')}
+                    >
+                      Clear All
+                    </button>
+                  )}
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                  <label style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>End Date</label>
-                  <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} style={{ padding: '4px 8px', background: 'var(--bg-main)', border: '1px solid var(--border-color)', borderRadius: '4px', color: 'var(--text-primary)', fontSize: '0.8rem' }} />
+
+                {/* Quick Presets Chips */}
+                <div className="quick-presets-row">
+                  <button
+                    type="button"
+                    className={`preset-chip ${activePreset === 'today' ? 'active' : ''}`}
+                    onClick={() => handleDatePreset('today')}
+                  >
+                    Today
+                  </button>
+                  <button
+                    type="button"
+                    className={`preset-chip ${activePreset === 'last7' ? 'active' : ''}`}
+                    onClick={() => handleDatePreset('last7')}
+                  >
+                    7 Days
+                  </button>
+                  <button
+                    type="button"
+                    className={`preset-chip ${activePreset === 'last30' ? 'active' : ''}`}
+                    onClick={() => handleDatePreset('last30')}
+                  >
+                    30 Days
+                  </button>
+                  <button
+                    type="button"
+                    className={`preset-chip ${activePreset === 'thisMonth' ? 'active' : ''}`}
+                    onClick={() => handleDatePreset('thisMonth')}
+                  >
+                    This Month
+                  </button>
                 </div>
-                <button type="button" onClick={() => setShowDatePicker(false)} className="btn btn-primary" style={{ padding: '4px', fontSize: '0.75rem' }}>Apply</button>
+
+                {/* Custom Date Inputs Container */}
+                <div className="date-inputs-grid">
+                  <div className="date-input-group">
+                    <label>Start Date</label>
+                    <div className="input-with-icon">
+                      <input
+                        type="date"
+                        value={startDate}
+                        onChange={(e) => {
+                          setStartDate(e.target.value);
+                          setActivePreset('');
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div className="date-input-group">
+                    <label>End Date</label>
+                    <div className="input-with-icon">
+                      <input
+                        type="date"
+                        value={endDate}
+                        onChange={(e) => {
+                          setEndDate(e.target.value);
+                          setActivePreset('');
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Popover Footer Actions */}
+                <div className="popover-footer">
+                  <button
+                    type="button"
+                    className="btn-apply-date"
+                    onClick={() => setShowDatePicker(false)}
+                  >
+                    Apply Range
+                  </button>
+                </div>
               </div>
             )}
           </div>
@@ -764,58 +914,119 @@ export default function MapsScans({ leads = [], setLeads, searches = [], setSear
               </table>
             </div>
 
-            {/* Pagination Controls */}
-            {totalPages > 1 && (
-              <div style={{ 
-                display: 'flex', 
-                justifyContent: 'center', 
-                alignItems: 'center', 
-                gap: '12px', 
-                marginTop: '1.5rem',
-                padding: '10px 0',
-                borderTop: '1px solid var(--border-color)'
+            {/* Modern Pagination Bar (Full Card Width Alignment) */}
+            <div className="modern-pagination-bar" style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              paddingTop: '1rem',
+              marginTop: '1.25rem',
+              borderTop: '1px solid var(--border-color)',
+              flexWrap: 'wrap',
+              gap: '1rem',
+              width: '100%'
+            }}>
+              {/* Left: Info Chip */}
+              <div style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '0.45rem 0.95rem',
+                background: 'var(--bg-trans-2)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '20px',
+                fontSize: '0.8rem',
+                color: 'var(--text-secondary)'
+              }}>
+                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--primary)', flexShrink: 0 }}></span>
+                <span>Showing <strong style={{ color: 'var(--text-primary)' }}>{Math.min((currentPage - 1) * pageSize + 1, filteredLeads.length)}</strong>–<strong style={{ color: 'var(--text-primary)' }}>{Math.min(currentPage * pageSize, filteredLeads.length)}</strong> of <strong style={{ color: 'var(--text-primary)' }}>{filteredLeads.length}</strong> Google Maps Scans</span>
+              </div>
+
+              {/* Right: Page Controls Group (Pushed to Far Right Edge) */}
+              <div style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.25rem',
+                background: 'var(--bg-trans-2)',
+                border: '1px solid var(--border-color)',
+                padding: '0.25rem',
+                borderRadius: '8px',
+                marginLeft: 'auto'
               }}>
                 <button
                   type="button"
                   disabled={currentPage === 1}
-                  onClick={() => setCurrentPage(currentPage - 1)}
-                  className="btn btn-secondary"
-                  style={{ 
-                    padding: '6px 14px', 
+                  onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    padding: '0.35rem 0.65rem',
+                    height: '32px',
+                    borderRadius: '6px',
+                    border: 'none',
+                    background: 'transparent',
+                    color: currentPage === 1 ? 'var(--text-muted)' : 'var(--text-primary)',
                     fontSize: '0.78rem',
-                    borderRadius: '20px',
                     fontWeight: 600,
+                    opacity: currentPage === 1 ? 0.4 : 1,
                     cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
-                    opacity: currentPage === 1 ? 0.5 : 1
+                    transition: 'all 0.15s ease'
                   }}
                 >
-                  ← Previous
+                  <ChevronLeft size={14} />
+                  <span>Prev</span>
                 </button>
-                <span style={{ 
-                  fontSize: '0.82rem', 
-                  color: 'var(--text-secondary)',
-                  fontWeight: 500 
-                }}>
-                  Page <strong style={{ color: 'var(--text-primary)' }}>{currentPage}</strong> of <strong>{totalPages}</strong>
-                </span>
+
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                  <button
+                    key={pageNum}
+                    type="button"
+                    onClick={() => setCurrentPage(pageNum)}
+                    style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '6px',
+                      border: 'none',
+                      background: pageNum === currentPage ? 'var(--primary)' : 'transparent',
+                      color: pageNum === currentPage ? '#ffffff' : 'var(--text-secondary)',
+                      fontWeight: 600,
+                      fontSize: '0.8rem',
+                      cursor: 'pointer',
+                      boxShadow: pageNum === currentPage ? '0 3px 10px var(--primary-glow)' : 'none',
+                      transition: 'all 0.15s ease'
+                    }}
+                  >
+                    {pageNum}
+                  </button>
+                ))}
+
                 <button
                   type="button"
                   disabled={currentPage === totalPages}
-                  onClick={() => setCurrentPage(currentPage + 1)}
-                  className="btn btn-secondary"
-                  style={{ 
-                    padding: '6px 14px', 
+                  onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    padding: '0.35rem 0.65rem',
+                    height: '32px',
+                    borderRadius: '6px',
+                    border: 'none',
+                    background: 'transparent',
+                    color: currentPage === totalPages ? 'var(--text-muted)' : 'var(--text-primary)',
                     fontSize: '0.78rem',
-                    borderRadius: '20px',
                     fontWeight: 600,
+                    opacity: currentPage === totalPages ? 0.4 : 1,
                     cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
-                    opacity: currentPage === totalPages ? 0.5 : 1
+                    transition: 'all 0.15s ease'
                   }}
                 >
-                  Next →
+                  <span>Next</span>
+                  <ChevronRight size={14} />
                 </button>
               </div>
-            )}
+            </div>
           </>
         )}
       </div>
@@ -971,7 +1182,7 @@ export default function MapsScans({ leads = [], setLeads, searches = [], setSear
 
             {syncStep === 'syncing' && (
               <div style={{ textAlign: 'center', padding: '20px 0' }}>
-                <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" style={{ width: '36px', height: '36px', border: '3px solid var(--primary)', borderRightColor: 'transparent', borderRadius: '50%', display: 'inline-block', animation: 'spinner-border .75s linear infinite', marginBottom: '16px' }}></span>
+                <Loader2 size={36} className="spin-animation" style={{ color: 'var(--primary)', marginBottom: '16px' }} />
                 <h4 style={{ margin: 0, fontWeight: 700 }}>Syncing Pipeline leads...</h4>
                 <p style={{ margin: '8px 0 0 0', fontSize: '0.82rem', color: 'var(--text-secondary)', fontStyle: 'italic' }}>
                   {syncStatusText}
