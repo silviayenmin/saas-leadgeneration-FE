@@ -6,6 +6,7 @@ import {
   Key,
   Save,
   RefreshCw,
+  Loader2,
   Cpu,
   Link as LinkIcon,
   MapPin,
@@ -155,6 +156,7 @@ export default function OutreachConfig({ onProfileUpdate, initialSubTab = 'campa
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isResettingPassword, setIsResettingPassword] = useState(false);
 
   // Previews test variables
   const [previewTab, setPreviewTab] = useState('email'); // 'email', 'linkedin'
@@ -500,9 +502,9 @@ export default function OutreachConfig({ onProfileUpdate, initialSubTab = 'campa
       showToast('Password must be at least 6 characters.', 'error');
       return;
     }
-    const secretKey = localStorage.getItem('APP_SECRET_KEY') || 'silvia_dev_key';
+    setIsResettingPassword(true);
     try {
-      const response = await fetch('/api/auth/reset-password', {
+      const response = await fetch('/api/auth/change-password', {
         method: 'POST',
         headers: getHeaders(),
         body: JSON.stringify({
@@ -517,10 +519,15 @@ export default function OutreachConfig({ onProfileUpdate, initialSubTab = 'campa
         setConfirmPassword('');
       } else {
         const err = await response.json();
-        showToast(err.detail || 'Failed to change password.', 'error');
+        const errMsg = typeof err.detail === 'string'
+          ? err.detail
+          : (Array.isArray(err.detail) ? err.detail.map(d => d.msg).join(', ') : 'Failed to change password.');
+        showToast(errMsg, 'error');
       }
     } catch (err) {
       showToast('Security change error: ' + err.message, 'error');
+    } finally {
+      setIsResettingPassword(false);
     }
   };
 
@@ -1529,8 +1536,30 @@ export default function OutreachConfig({ onProfileUpdate, initialSubTab = 'campa
                     </div>
 
                     <div className="settings-card-actions">
-                      <button type="button" onClick={handleResetPassword} className="btn btn-primary">
-                        <RefreshCw size={14} /> Change Password
+                      <button
+                        type="button"
+                        onClick={handleResetPassword}
+                        className="btn btn-primary"
+                        disabled={isResettingPassword}
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.5rem',
+                          opacity: isResettingPassword ? 0.75 : 1,
+                          cursor: isResettingPassword ? 'not-allowed' : 'pointer'
+                        }}
+                      >
+                        {isResettingPassword ? (
+                          <>
+                            <Loader2 size={15} style={{ animation: 'spin 0.8s linear infinite' }} />
+                            <span>Updating Password...</span>
+                          </>
+                        ) : (
+                          <>
+                            <RefreshCw size={14} />
+                            <span>Change Password</span>
+                          </>
+                        )}
                       </button>
                     </div>
                   </div>

@@ -63,7 +63,7 @@ function CustomSelect({ value, onChange, options, style, onDeleteItem }) {
         <ChevronDown size={13} className={`caret-icon ${isOpen ? 'rotated' : ''}`} />
       </button>
       {isOpen && (
-        <div className="modern-select-dropdown filter-dropdown" style={{ width: onDeleteItem ? '240px' : '100%' }}>
+        <div className="modern-select-dropdown filter-dropdown" style={{ width: onDeleteItem ? '240px' : 'max-content', minWidth: '100%' }}>
           {options.map((opt) => (
             <div
               key={opt.value}
@@ -74,7 +74,7 @@ function CustomSelect({ value, onChange, options, style, onDeleteItem }) {
                 setIsOpen(false);
               }}
             >
-              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              <span style={{ whiteSpace: 'nowrap' }}>
                 {opt.label}
               </span>
               {onDeleteItem && opt.value !== 'all' ? (
