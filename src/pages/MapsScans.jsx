@@ -64,18 +64,21 @@ function CustomSelect({ value, onChange, options, style, onDeleteItem }) {
         <ChevronDown size={13} className={`caret-icon ${isOpen ? 'rotated' : ''}`} />
       </button>
       {isOpen && (
-        <div className="modern-select-dropdown filter-dropdown" style={{ width: onDeleteItem ? '240px' : 'max-content', minWidth: '100%' }}>
+        <div className="modern-select-dropdown filter-dropdown" style={{ minWidth: onDeleteItem ? '320px' : '100%', width: 'max-content', maxWidth: '450px' }}>
           {options.map((opt) => (
             <div
               key={opt.value}
               className={`modern-select-option ${opt.value === value ? 'selected' : ''}`}
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}
               onClick={() => {
                 onChange(opt.value);
                 setIsOpen(false);
               }}
             >
-              <span style={{ whiteSpace: 'nowrap' }}>
+              <span 
+                style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, marginRight: '8px' }}
+                title={opt.label}
+              >
                 {opt.label}
               </span>
               {onDeleteItem && opt.value !== 'all' ? (
@@ -281,15 +284,15 @@ export default function MapsScans({ leads = [], setLeads, searches = [], setSear
         if (!company.includes(query) && !website.includes(query) && !location.includes(query)) return false;
       }
 
-      // Intent rating filter (>75 -> Qualified, 40-75 -> Potential Lead, <40 -> Warm Lead)
+      const isConverted = !!lead.isConverted;
       if (filterIntent !== 'all') {
         const score = getLeadScoreVal(lead);
         if (filterIntent === 'Qualified') {
-          if (score <= 75) return false;
+          if (isConverted || score < 75) return false;
         } else if (filterIntent === 'Potential Lead') {
-          if (score < 40 || score > 75) return false;
+          if (isConverted || score < 40 || score >= 75) return false;
         } else if (filterIntent === 'Warm Lead') {
-          if (score >= 40) return false;
+          if (!isConverted && score >= 40) return false;
         }
       }
 
@@ -557,10 +560,13 @@ export default function MapsScans({ leads = [], setLeads, searches = [], setSear
 
   const queryOptions = [
     { value: 'all', label: 'All queries' },
-    ...tabSearches.map((s) => ({
-      value: s.id,
-      label: `${s.keyword || 'Search Query'} (${s.leadUrls ? s.leadUrls.length : 0})`
-    }))
+    ...tabSearches.map((s) => {
+      const locationSuffix = s.location ? ` - ${s.location}` : '';
+      return {
+        value: s.id,
+        label: `${s.keyword || 'Search Query'}${locationSuffix} (${s.leadUrls ? s.leadUrls.length : 0})`
+      };
+    })
   ];
 
   const intentOptions = [
