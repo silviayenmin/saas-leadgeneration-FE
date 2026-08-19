@@ -128,3 +128,24 @@ export function parseIsoDate(str) {
   }
   return new Date(str);
 }
+
+export function getLeadScoreVal(lead) {
+  if (!lead) return 55;
+  if (lead.leadScore !== undefined && lead.leadScore !== null) {
+    const val = parseFloat(lead.leadScore);
+    if (!isNaN(val)) return val;
+  }
+  if (lead.matchScore !== undefined && lead.matchScore !== null) {
+    const val = parseFloat(lead.matchScore);
+    if (!isNaN(val)) return val;
+  }
+  if (lead.score !== undefined && lead.score !== null) {
+    const val = parseFloat(lead.score);
+    if (!isNaN(val)) return val;
+  }
+  if (lead.rating !== undefined && lead.rating !== null) {
+    const val = parseFloat(lead.rating) * 20;
+    if (!isNaN(val) && val > 0) return val;
+  }
+  return 55;
+}

@@ -9,7 +9,9 @@ import {
   MessageSquare,
   ExternalLink,
   MapPin,
-  Users
+  Users,
+  Loader2,
+  RefreshCw
 } from 'lucide-react';
 import {
   getLeadPlatform,
@@ -664,8 +666,17 @@ Source: ${lead.sourceUrl}`;
                 disabled={enrichingTeam}
                 style={{ height: '30px', padding: '0 12px', fontSize: '0.72rem', margin: 0 }}
               >
-                <Users size={11} />
-                {enrichingTeam ? 'Fetching...' : 'Find Team'}
+                {enrichingTeam ? (
+                  <>
+                    <Loader2 size={12} className="spin-animation" style={{ color: 'var(--primary)' }} />
+                    <span>Fetching...</span>
+                  </>
+                ) : (
+                  <>
+                    <Users size={11} />
+                    <span>Find Team</span>
+                  </>
+                )}
               </button>
             </div>
 
@@ -678,9 +689,9 @@ Source: ${lead.sourceUrl}`;
             )}
 
             {enrichingTeam && (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '16px', border: '1px dashed var(--border-color)', borderRadius: '10px', background: 'rgba(255, 255, 255, 0.01)' }}>
-                <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" style={{ width: '12px', height: '12px', border: '2px solid var(--primary)', borderRightColor: 'transparent', borderRadius: '50%', display: 'inline-block', animation: 'spinner-border .75s linear infinite' }}></span>
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Searching decision-makers & team details...</span>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', padding: '14px 18px', border: '1px solid rgba(3, 113, 114, 0.25)', borderRadius: '10px', background: 'rgba(3, 113, 114, 0.05)', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)' }}>
+                <Loader2 size={16} className="spin-animation" style={{ color: 'var(--primary)', flexShrink: 0 }} />
+                <span style={{ fontSize: '0.78rem', fontWeight: 500, color: 'var(--text-primary)' }}>Searching decision-makers & team details...</span>
               </div>
             )}
 
@@ -747,7 +758,7 @@ Source: ${lead.sourceUrl}`;
                             No Email Found
                           </span>
                           {enrichingContacts[contact.name] ? (
-                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" style={{ width: '10px', height: '10px', border: '2px solid var(--primary)', borderRightColor: 'transparent', borderRadius: '50%', display: 'inline-block', animation: 'spinner-border .75s linear infinite' }}></span>
+                            <Loader2 size={12} className="spin-animation" style={{ color: 'var(--primary)' }} />
                           ) : (
                             <button
                               type="button"
@@ -774,7 +785,7 @@ Source: ${lead.sourceUrl}`;
                       ) : (
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                           {enrichingContacts[contact.name] ? (
-                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" style={{ width: '10px', height: '10px', border: '2px solid var(--primary)', borderRightColor: 'transparent', borderRadius: '50%', display: 'inline-block', animation: 'spinner-border .75s linear infinite' }}></span>
+                            <Loader2 size={12} className="spin-animation" style={{ color: 'var(--primary)' }} />
                           ) : (
                             <button
                               type="button"
@@ -898,9 +909,9 @@ Source: ${lead.sourceUrl}`;
 
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', marginTop: '12px', minHeight: '200px' }}>
                 {generatingPitch && (
-                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '10px', padding: '20px', border: '1px dashed rgba(3, 113, 114, 0.3)', borderRadius: '10px', background: 'rgba(3, 113, 114, 0.02)' }}>
-                    <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" style={{ width: '16px', height: '16px', border: '2px solid var(--primary)', borderRightColor: 'transparent', borderRadius: '50%', display: 'inline-block', animation: 'spinner-border .75s linear infinite' }}></span>
-                    <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 500 }}>Drafting customized pitch via LLM...</span>
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '10px', padding: '20px', border: '1px solid rgba(3, 113, 114, 0.25)', borderRadius: '10px', background: 'rgba(3, 113, 114, 0.05)' }}>
+                    <Loader2 size={20} className="spin-animation" style={{ color: 'var(--primary)' }} />
+                    <span style={{ fontSize: '0.78rem', color: 'var(--text-primary)', fontWeight: 500 }}>Drafting customized pitch via LLM...</span>
                   </div>
                 )}
 

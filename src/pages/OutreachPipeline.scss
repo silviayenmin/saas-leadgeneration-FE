@@ -324,31 +324,41 @@
             }
           }
 
-          // Quick Presets Row
+          // Quick Presets Row (Equal 4-Column Grid Alignment)
           .quick-presets-row {
-            display: flex;
-            align-items: center;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
             gap: 6px;
-            flex-wrap: wrap;
+            width: 100%;
 
             .preset-chip {
-              flex: 1;
-              min-width: 60px;
-              padding: 6px 10px;
+              display: inline-flex;
+              align-items: center;
+              justify-content: center;
+              height: 32px;
+              padding: 0 4px;
               background: rgba(148, 163, 184, 0.08);
-              border: 1px solid rgba(148, 163, 184, 0.15);
-              border-radius: $radius-md;
+              border: 1px solid rgba(148, 163, 184, 0.18);
+              border-radius: 8px;
               color: $text-secondary;
-              font-size: 0.75rem;
+              font-size: 0.72rem;
               font-weight: 600;
               cursor: pointer;
               text-align: center;
+              white-space: nowrap !important;
               transition: all $transition-fast;
 
               &:hover {
-                background: rgba(14, 165, 164, 0.12);
-                color: $secondary;
-                border-color: rgba(14, 165, 164, 0.3);
+                background: rgba(3, 113, 114, 0.1);
+                color: #037172;
+                border-color: rgba(3, 113, 114, 0.3);
+              }
+
+              &.active {
+                background: linear-gradient(135deg, #037172 0%, #0d9488 100%) !important;
+                color: #ffffff !important;
+                border-color: transparent !important;
+                box-shadow: 0 3px 10px rgba(3, 113, 114, 0.35) !important;
               }
             }
           }
