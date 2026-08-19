@@ -148,12 +148,29 @@ export default function OutreachConfig({ onProfileUpdate, initialSubTab = 'campa
     const secretKey = localStorage.getItem('APP_SECRET_KEY') || 'silvia_dev_key';
     const headers = getHeaders(null);
 
-    // 1. Fetch IMAP
+    const endpoints = [
+      '/api/outreach/config',
+      '/api/model-config',
+      '/api/outreach/places',
+      '/api/outreach/twitter',
+      '/api/outreach/webhook',
+      '/api/config/google-sheets',
+      '/api/user/profile'
+    ];
+
     try {
-      const res = await fetch('/api/outreach/config', { headers });
-      if (res.ok) {
-        const data = await res.json();
-        const config = data.config || {};
+      const responses = await Promise.all(
+        endpoints.map(endpoint => fetch(endpoint, { headers }).then(res => res.ok ? res.json() : null).catch(err => {
+          console.error(`Error fetching ${endpoint}:`, err);
+          return null;
+        }))
+      );
+
+      const [imapData, modelData, placesData, twitterData, webhookData, sheetsData, profileData] = responses;
+
+      // 1. Handle IMAP
+      if (imapData) {
+        const config = imapData.config || {};
         setImapServer(config.imap_server || '');
         setImapPort(config.imap_port || '993');
         setImapEmail(config.imap_email || '');
@@ -162,91 +179,55 @@ export default function OutreachConfig({ onProfileUpdate, initialSubTab = 'campa
           setImapHealth('Active');
         }
       }
-    } catch (err) {
-      console.error(err);
-    }
 
-    // 2. Fetch AI model presets
-    try {
-      const res = await fetch('/api/model-config', { headers });
-      if (res.ok) {
-        const data = await res.json();
-        setModelConfig(data);
-        const preset = data.active_provider || 'groq';
+      // 2. Handle Model Config
+      if (modelData) {
+        setModelConfig(modelData);
+        const preset = modelData.active_provider || 'groq';
         setActivePreset(preset);
-        const activeConf = (data.providers || {})[preset] || {};
+        const activeConf = (modelData.providers || {})[preset] || {};
         setProviderType(activeConf.provider_type || 'groq');
         setModelName(activeConf.model || '');
         setOllamaHost(activeConf.base_url || 'http://localhost:11434');
         setTemperature(activeConf.temperature !== undefined ? activeConf.temperature : 0.7);
       }
-    } catch (err) {
-      console.error(err);
-    }
 
-    // 3. Fetch Places Key
-    try {
-      const res = await fetch('/api/outreach/places', { headers });
-      if (res.ok) {
-        const data = await res.json();
-        setPlacesKey(data.places_api_key || '');
-        if (data.places_api_key) setPlacesHealth('Active');
+      // 3. Handle Places Key
+      if (placesData) {
+        setPlacesKey(placesData.places_api_key || '');
+        if (placesData.places_api_key) setPlacesHealth('Active');
       }
-    } catch (err) {
-      console.error(err);
-    }
 
-    // 4. Fetch Twitter Key
-    try {
-      const res = await fetch('/api/outreach/twitter', { headers });
-      if (res.ok) {
-        const data = await res.json();
-        setTwitterKey(data.twitter_api_key || '');
-        if (data.twitter_api_key) setTwitterHealth('Active');
+      // 4. Handle Twitter Key
+      if (twitterData) {
+        setTwitterKey(twitterData.twitter_api_key || '');
+        if (twitterData.twitter_api_key) setTwitterHealth('Active');
       }
-    } catch (err) {
-      console.error(err);
-    }
 
-    // 5. Fetch Webhook CRM URL
-    try {
-      const res = await fetch('/api/outreach/webhook', { headers });
-      if (res.ok) {
-        const data = await res.json();
-        setWebhookUrl(data.webhook_url || '');
-        if (data.webhook_url) setWebhookHealth('Active');
+      // 5. Handle Webhook CRM URL
+      if (webhookData) {
+        setWebhookUrl(webhookData.webhook_url || '');
+        if (webhookData.webhook_url) setWebhookHealth('Active');
       }
-    } catch (err) {
-      console.error(err);
-    }
 
-    // 5b. Fetch Google Sheets configuration
-    try {
-      const res = await fetch('/api/config/google-sheets', { headers });
-      if (res.ok) {
-        const data = await res.json();
-        setGoogleSheetId(data.sheet_id || '');
-        setGoogleClientEmail(data.client_email || '');
-        setGoogleCredsActive(data.credentials_active || false);
+      // 5b. Handle Google Sheets configuration
+      if (sheetsData) {
+        setGoogleSheetId(sheetsData.sheet_id || '');
+        setGoogleClientEmail(sheetsData.client_email || '');
+        setGoogleCredsActive(sheetsData.credentials_active || false);
         
-        if (!data.credentials_active) {
+        if (!sheetsData.credentials_active) {
           setGoogleSheetsHealth('Inactive (Credentials Missing)');
-        } else if (data.sheet_id) {
+        } else if (sheetsData.sheet_id) {
           setGoogleSheetsHealth('Active');
         } else {
           setGoogleSheetsHealth('Not Configured');
         }
       }
-    } catch (err) {
-      console.error(err);
-    }
 
-    // 6. Fetch User Profile
-    try {
-      const res = await fetch('/api/user/profile', { headers });
-      if (res.ok) {
-        const data = await res.json();
-        const profile = data.profile || {};
+      // 6. Handle User Profile
+      if (profileData) {
+        const profile = profileData.profile || {};
         setDisplayName(profile.displayName || '');
         setBusinessName(profile.businessName || '');
         setAgencyInfo(profile.agencyInfo || '');
@@ -266,7 +247,7 @@ export default function OutreachConfig({ onProfileUpdate, initialSubTab = 'campa
         }
       }
     } catch (err) {
-      console.error(err);
+      console.error("Failed to load configs:", err);
     }
   };
 

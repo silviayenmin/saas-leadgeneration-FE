@@ -41,12 +41,13 @@ const App = () => {
 
   const fetchLeadsAndSearches = async () => {
     try {
-      const resLeads = await api.get('/leads');
+      const [resLeads, resSearches] = await Promise.all([
+        api.get('/leads'),
+        api.get('/searches')
+      ]);
       if (resLeads.data && resLeads.data.leads) {
         setLeads(resLeads.data.leads);
       }
-      
-      const resSearches = await api.get('/searches');
       if (resSearches.data && resSearches.data.searches) {
         setSearches(resSearches.data.searches);
       }
