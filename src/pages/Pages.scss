@@ -243,21 +243,29 @@
 
     .modern-select-trigger.filter-trigger {
         height: 34px !important;
-        padding: 0 0.55rem !important;
+        padding: 0 0.65rem !important;
         background: var(--bg-main) !important;
         border: 1px solid var(--border-color) !important;
         border-radius: 6px !important;
         color: var(--text-primary) !important;
         font-size: 0.82rem !important;
         font-weight: 500 !important;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 0.35rem;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        outline: none;
-        user-select: none;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 0.4rem !important;
+        cursor: pointer !important;
+        transition: all 0.2s ease !important;
+        outline: none !important;
+        user-select: none !important;
+        white-space: nowrap !important;
+        width: auto !important;
+
+        .modern-select-label {
+            white-space: nowrap !important;
+            text-overflow: clip !important;
+            overflow: visible !important;
+        }
 
         .caret-icon {
             color: var(--text-secondary);
@@ -280,55 +288,64 @@
         position: absolute;
         top: calc(100% + 4px);
         left: 0;
-        min-width: 100%;
+        min-width: 100% !important;
+        width: max-content !important;
+        max-width: 320px !important;
         z-index: 1000;
-        background: #0f172a;
-        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: var(--bg-surface);
+        border: 1px solid var(--border-color);
         border-radius: 8px;
         box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
-        padding: 0.3rem;
+        padding: 0.35rem;
         display: flex;
         flex-direction: column;
         gap: 0.15rem;
         animation: dropdownSlideIn 0.15s cubic-bezier(0.4, 0, 0.2, 1);
         max-height: 240px;
         overflow-y: auto;
-        white-space: nowrap;
-    }
+        white-space: nowrap !important;
 
-    .modern-select-option {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 0.75rem;
-        padding: 0.5rem 0.75rem;
-        border-radius: 5px;
-        font-size: 0.8rem;
-        font-weight: 500;
-        color: var(--text-secondary);
-        background: transparent;
-        border: none;
-        cursor: pointer;
-        text-align: left;
-        transition: all 0.15s ease;
+        .modern-select-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            padding: 0.45rem 0.75rem;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            text-align: left;
+            white-space: nowrap !important;
+            transition: all 0.15s ease;
 
-        &:hover {
-            background: rgba(3, 113, 114, 0.15);
-            color: var(--text-primary);
-        }
+            span {
+                white-space: nowrap !important;
+                overflow: visible !important;
+                text-overflow: clip !important;
+            }
 
-        &.selected {
-            background: rgba(3, 113, 114, 0.25);
-            color: #2dd4bf;
-            font-weight: 600;
-        }
+            &:hover {
+                background: rgba(3, 113, 114, 0.15);
+                color: var(--text-primary);
+            }
 
-        .check-dot {
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
-            background: #2dd4bf;
-            flex-shrink: 0;
+            &.selected {
+                background: rgba(3, 113, 114, 0.2);
+                color: #037172;
+                font-weight: 600;
+            }
+
+            .check-dot {
+                width: 5px;
+                height: 5px;
+                border-radius: 50%;
+                background: #037172;
+                flex-shrink: 0;
+            }
         }
     }
 }
