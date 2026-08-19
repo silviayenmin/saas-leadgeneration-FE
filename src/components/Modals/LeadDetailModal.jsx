@@ -237,7 +237,7 @@ export default function LeadDetailModal({ lead, onClose, onUpdateLead, workspace
       });
     } catch (err) {
       const errMsg = err.response?.data?.detail || err.message;
-      alert('AI Pitch generation error: ' + errMsg);
+      console.error('AI Pitch generation error:', errMsg);
     } finally {
       setGeneratingPitch(false);
     }
