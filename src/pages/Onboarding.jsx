@@ -39,8 +39,8 @@ const Onboarding = ({ user, onComplete }) => {
       }
       setStep(2);
     } else if (step === 2) {
-      if (!companyName.trim() || !targetIndustry.trim()) {
-        setError('Please provide your company name and target industry.');
+      if (!companyName.trim()) {
+        setError('Please provide your company name.');
         return;
       }
       setStep(3);
@@ -209,33 +209,7 @@ const Onboarding = ({ user, onComplete }) => {
                 </div>
               </div>
 
-              <div className="form-group">
-                <label>Target Industry / Offering</label>
-                <div className="input-wrapper">
-                  <select
-                    value={targetIndustry}
-                    onChange={(e) => setTargetIndustry(e.target.value)}
-                  >
-                    <option value="Local Services">Local Services (Plumbers, Electricians, HVAC, Roofing)</option>
-                    <option value="Health & Medical">Health & Medical (Dental, Clinics, Hospitals, Chiro)</option>
-                    <option value="Real Estate">Real Estate & Property Management (Agents, Brokers)</option>
-                    <option value="Restaurants & Hospitality">Restaurants, Cafes & Hospitality (Hotels, Catering)</option>
-                    <option value="Professional Services">Legal, Accounting, Tax & Financial Services</option>
-                    <option value="Digital Marketing & Web">Digital Marketing, SEO & Web Design Agencies</option>
-                    <option value="IT Services & Software">IT Services, SaaS & Software Development</option>
-                    <option value="Automotive & Transport">Automotive Repair, Dealerships & Towing</option>
-                    <option value="Beauty & Wellness">Beauty Salons, Spas, Gyms & Fitness</option>
-                    <option value="Construction & Architecture">Construction, Architecture & Interior Design</option>
-                    <option value="E-Commerce & Retail">E-Commerce & Retail Stores</option>
-                    <option value="Education & Training">Education, Tutoring, Schools & Coaching</option>
-                    <option value="Solar & Clean Energy">Solar Services, Energy & Sustainability</option>
-                    <option value="Logistics & Supply Chain">Logistics, Freight, Moving & Warehousing</option>
-                    <option value="Events & Entertainment">Event Planning, Photography & Venues</option>
-                    <option value="Manufacturing & Industrial">Manufacturing, Wholesalers & Equipment</option>
-                    <option value="Consulting & Recruitment">Management Consulting, HR & Staffing Agencies</option>
-                  </select>
-                </div>
-              </div>
+
 
               <div className="form-group">
                 <label>Services Offered</label>

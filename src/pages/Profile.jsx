@@ -684,21 +684,7 @@ export default function Profile({ onProfileUpdate, onSwitchTab }) {
                 </div>
               </div>
 
-              <div className="form-row" style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
-                <label style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-secondary)' }}>Primary Target Industry</label>
-                <div className="input-group-premium">
-                  <div className="input-group-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <CustomSelect
-                      options={industryOptions}
-                      value={targetIndustry}
-                      onChange={setTargetIndustry}
-                    />
-                  </div>
-                </div>
-              </div>
+
 
               <div className="form-row" style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
                 <label style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-secondary)' }}>Services Offered</label>
@@ -719,7 +705,7 @@ export default function Profile({ onProfileUpdate, onSwitchTab }) {
               <div className="form-row" style={{ gridColumn: 'span 2', display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
                 <label style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-secondary)' }}>Value Pitch Profile & Core Offers</label>
                 <div className="input-group-premium" style={{ display: 'flex', alignItems: 'stretch' }}>
-                  <div className="input-group-icon" style={{ height: 'auto' }}>
+                  <div className="input-group-icon" style={{ height: 'auto', alignSelf: 'flex-start', paddingTop: '0.75rem' }}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
                   </div>
                   <textarea
