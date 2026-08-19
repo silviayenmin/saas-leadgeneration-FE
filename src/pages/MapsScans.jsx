@@ -32,6 +32,7 @@ import {
   getLeadScoreVal
 } from '../utils/helpers';
 import api from '../services/api';
+import ModernConfirmModal from '../components/Modals/ModernConfirmModal';
 import './Pages.scss';
 
 function CustomSelect({ value, onChange, options, style, onDeleteItem }) {
@@ -217,6 +218,16 @@ export default function MapsScans({ leads = [], setLeads, searches = [], setSear
   const [syncStatusText, setSyncStatusText] = useState('');
   const [syncResultUrl, setSyncResultUrl] = useState('');
 
+  // Confirm / Alert Modal state
+  const [confirmModal, setConfirmModal] = useState({
+    show: false,
+    title: '',
+    message: '',
+    type: 'danger',
+    isConfirm: true,
+    onConfirm: null
+  });
+
   // Filter searches list to map scans only
   const tabSearches = useMemo(() => {
     return (searches || [])
@@ -338,42 +349,73 @@ export default function MapsScans({ leads = [], setLeads, searches = [], setSear
     }
   };
 
-  const handleBulkDelete = async () => {
+  const handleBulkDelete = () => {
     if (selectedUrls.length === 0) return;
-    if (!window.confirm(`Are you sure you want to delete the ${selectedUrls.length} selected leads?`)) return;
-
-    try {
-      const res = await api.post('/leads/bulk-delete', { urls: selectedUrls });
-      if (res.data.status === 'success') {
-        const resLeads = await api.get('/leads');
-        if (resLeads.data && resLeads.data.leads) {
-          setLeads(resLeads.data.leads);
+    setConfirmModal({
+      show: true,
+      title: 'Delete Selected Leads',
+      message: `Are you sure you want to delete the ${selectedUrls.length} selected lead records? This action cannot be undone.`,
+      type: 'danger',
+      isConfirm: true,
+      onConfirm: async () => {
+        setConfirmModal(prev => ({ ...prev, show: false }));
+        try {
+          const res = await api.post('/leads/bulk-delete', { urls: selectedUrls });
+          if (res.data.status === 'success') {
+            const resLeads = await api.get('/leads');
+            if (resLeads.data && resLeads.data.leads) {
+              setLeads(resLeads.data.leads);
+            }
+            setSelectedUrls([]);
+          }
+        } catch (err) {
+          console.error(err);
+          setConfirmModal({
+            show: true,
+            title: 'Delete Failed',
+            message: 'Failed to delete leads.',
+            type: 'danger',
+            isConfirm: false,
+            onConfirm: null
+          });
         }
-        setSelectedUrls([]);
       }
-    } catch (err) {
-      console.error(err);
-      alert('Failed to delete leads.');
-    }
+    });
   };
 
-  const handleDeleteSearchQuery = async (searchId) => {
-    if (!window.confirm('Delete this search query and its historical markers?')) return;
-    try {
-      const res = await api.delete(`/searches/${searchId}`);
-      if (res.data.status === 'success') {
-        const resSearches = await api.get('/searches');
-        if (resSearches.data && resSearches.data.searches) {
-          setSearches(resSearches.data.searches);
-        }
-        if (selectedSearchId === searchId) {
-          setSelectedSearchId('all');
+  const handleDeleteSearchQuery = (searchId) => {
+    setConfirmModal({
+      show: true,
+      title: 'Delete Search Query',
+      message: 'Are you sure you want to delete this search query and its historical markers?',
+      type: 'danger',
+      isConfirm: true,
+      onConfirm: async () => {
+        setConfirmModal(prev => ({ ...prev, show: false }));
+        try {
+          const res = await api.delete(`/searches/${searchId}`);
+          if (res.data.status === 'success') {
+            const resSearches = await api.get('/searches');
+            if (resSearches.data && resSearches.data.searches) {
+              setSearches(resSearches.data.searches);
+            }
+            if (selectedSearchId === searchId) {
+              setSelectedSearchId('all');
+            }
+          }
+        } catch (err) {
+          console.error(err);
+          setConfirmModal({
+            show: true,
+            title: 'Delete Failed',
+            message: 'Failed to delete search query.',
+            type: 'danger',
+            isConfirm: false,
+            onConfirm: null
+          });
         }
       }
-    } catch (err) {
-      console.error(err);
-      alert('Failed to delete search.');
-    }
+    });
   };
 
   const handleExportCSV = () => {
@@ -381,7 +423,14 @@ export default function MapsScans({ leads = [], setLeads, searches = [], setSear
     const selectedLeads = baseLeads.filter(lead => urlsToExport.includes(lead.sourceUrl));
     
     if (selectedLeads.length === 0) {
-      alert('No leads to export.');
+      setConfirmModal({
+        show: true,
+        title: 'Export Notice',
+        message: 'No leads available to export.',
+        type: 'info',
+        isConfirm: false,
+        onConfirm: null
+      });
       return;
     }
 
@@ -423,7 +472,14 @@ export default function MapsScans({ leads = [], setLeads, searches = [], setSear
   const handleOpenSyncSheetsModal = async () => {
     const urlsToSync = selectedUrls.length > 0 ? selectedUrls : filteredLeads.map(l => l.sourceUrl);
     if (urlsToSync.length === 0) {
-      alert('No leads selected to sync.');
+      setConfirmModal({
+        show: true,
+        title: 'Sync Notice',
+        message: 'No leads selected to sync to Google Sheets.',
+        type: 'info',
+        isConfirm: false,
+        onConfirm: null
+      });
       return;
     }
     setSyncStep('setup');
@@ -472,7 +528,14 @@ export default function MapsScans({ leads = [], setLeads, searches = [], setSear
       }
     } catch (e) {
       console.error(e);
-      alert(e.response?.data?.detail || 'Failed to sync leads to Google Sheets.');
+      setConfirmModal({
+        show: true,
+        title: 'Sync Error',
+        message: e.response?.data?.detail || 'Failed to sync leads to Google Sheets.',
+        type: 'danger',
+        isConfirm: false,
+        onConfirm: null
+      });
       setSyncStep('setup');
       return;
     }
@@ -1218,6 +1281,17 @@ export default function MapsScans({ leads = [], setLeads, searches = [], setSear
           </div>
         </div>
       )}
+
+      {/* Modern Confirm / Alert Popup Modal */}
+      <ModernConfirmModal
+        show={confirmModal.show}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        type={confirmModal.type}
+        isConfirm={confirmModal.isConfirm}
+        onConfirm={confirmModal.onConfirm}
+        onCancel={() => setConfirmModal(prev => ({ ...prev, show: false }))}
+      />
     </div>
   );
 }
