@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutDashboard, MapPin, History, Kanban, User, Settings, Sparkles, LogOut, X } from 'lucide-react';
+import { LayoutDashboard, MapPin, History, Kanban, User, Settings, Sparkles, LogOut, X, CreditCard } from 'lucide-react';
 import './Sidebar.scss';
 
 const Sidebar = ({ activeTab, setActiveTab, user, onLogout, isMobileNavOpen, onCloseMobileNav }) => {
@@ -8,7 +8,7 @@ const Sidebar = ({ activeTab, setActiveTab, user, onLogout, isMobileNavOpen, onC
     { id: 'lead-discovery', label: 'Lead Discovery', icon: MapPin },
     { id: 'maps-scans', label: 'Maps Scans', icon: History },
     { id: 'outreach-pipeline', label: 'Outreach Pipeline', icon: Kanban },
-    { id: 'profile-subscription', label: 'Profile & Subscription', icon: User },
+    { id: 'subscription', label: 'Subscription', icon: CreditCard },
     { id: 'outreach-config', label: 'Outreach Config', icon: Settings },
   ];
 

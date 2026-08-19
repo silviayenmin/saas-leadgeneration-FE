@@ -187,6 +187,33 @@
         }
       }
     }
+
+    .header-user-avatar-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, $primary 0%, $primary-end 100%);
+      color: #FFFFFF;
+      border: none;
+      @include flex-center;
+      font-weight: 600;
+      font-size: 0.875rem;
+      cursor: pointer;
+      flex-shrink: 0;
+      padding: 0;
+      margin-left: 4px;
+      box-shadow: 0 2px 8px rgba(3, 113, 114, 0.25);
+      transition: all $transition-fast;
+
+      &:hover {
+        transform: translateY(-1px) scale(1.05);
+        box-shadow: 0 4px 12px rgba(3, 113, 114, 0.4);
+      }
+
+      &:active {
+        transform: scale(0.95);
+      }
+    }
   }
 }
 
@@ -232,6 +259,12 @@
         width: 32px;
         height: 32px;
       }
+
+      .header-user-avatar-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 0.8rem;
+      }
     }
   }
 }
@@ -268,6 +301,12 @@
       .icon-btn {
         width: 30px;
         height: 30px;
+      }
+
+      .header-user-avatar-btn {
+        width: 30px;
+        height: 30px;
+        font-size: 0.75rem;
       }
     }
   }
