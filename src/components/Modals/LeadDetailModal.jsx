@@ -59,6 +59,7 @@ export default function LeadDetailModal({ lead, onClose, onUpdateLead, workspace
   const [generatingPitch, setGeneratingPitch] = useState(false);
   const [emailBody, setEmailBody] = useState('');
   const [hasGenerated, setHasGenerated] = useState(false);
+  const [enrichingContacts, setEnrichingContacts] = useState({});
 
   // Populate state on mount/change
   useEffect(() => {
@@ -182,6 +183,30 @@ export default function LeadDetailModal({ lead, onClose, onUpdateLead, workspace
       if (addToast) addToast('Lookup Error', errMsg, 'error');
     } finally {
       setEnrichingTeam(false);
+    }
+  };
+
+  const handleEnrichKeyContact = async (contactName) => {
+    setEnrichingContacts(prev => ({ ...prev, [contactName]: true }));
+    try {
+      const response = await api.post('/enrich-contact', {
+        sourceUrl: lead.sourceUrl,
+        authorName: contactName,
+        companyName: companyName
+      });
+      const data = response.data;
+      if (data.keyContacts) {
+        setKeyContacts(data.keyContacts);
+        onUpdateLead(lead.sourceUrl, {
+          keyContacts: data.keyContacts
+        });
+      }
+      if (addToast) addToast('Lookup Success', `Details lookup for ${contactName} completed.`, 'success');
+    } catch (err) {
+      const errMsg = err.response?.data?.detail || err.message;
+      if (addToast) addToast('Lookup Error', errMsg, 'error');
+    } finally {
+      setEnrichingContacts(prev => ({ ...prev, [contactName]: false }));
     }
   };
 
@@ -489,21 +514,40 @@ Source: ${lead.sourceUrl}`;
                   </span>
                 )}
               </div>
-              <div className="field-value" style={{ paddingRight: '4px' }}>
-                <span className="value-text" style={{ 
-                  color: contactInfo ? 'var(--text-primary)' : 'var(--text-muted)', 
-                  fontStyle: contactInfo ? 'normal' : 'italic',
-                  fontWeight: contactInfo ? '600' : '400'
-                }}>
-                  {contactInfo || 'Email not found'}
-                </span>
+              <div className="field-value" style={{ paddingRight: '4px', gap: '8px', display: 'flex', alignItems: 'center', width: '100%' }}>
+                <input
+                  type="text"
+                  className="form-control value-input"
+                  style={{
+                    flex: 1,
+                    background: 'rgba(255, 255, 255, 0.03)',
+                    border: '1px solid var(--border-color)',
+                    borderRadius: '8px',
+                    padding: '6px 12px',
+                    fontSize: '0.8rem',
+                    color: 'var(--text-primary)',
+                    outline: 'none',
+                    height: '32px',
+                    minWidth: 0
+                  }}
+                  value={contactInfo}
+                  placeholder="Email not found"
+                  onChange={(e) => {
+                    const newVal = e.target.value;
+                    setContactInfo(newVal);
+                    onUpdateLead(lead.sourceUrl, { 
+                      contactInfo: newVal,
+                      contactSource: 'manual'
+                    });
+                  }}
+                />
                 <button
                   type="button"
                   id="btn-enrich-contact"
                   className="btn btn-secondary"
                   onClick={handleEnrich}
                   disabled={enriching}
-                  style={{ height: '30px', padding: '0 12px', fontSize: '0.72rem', margin: 0 }}
+                  style={{ height: '32px', padding: '0 12px', fontSize: '0.72rem', margin: 0, borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '4px' }}
                 >
                   <Search size={11} />
                   {enriching ? 'Enriching...' : 'Find Email'}
@@ -655,7 +699,7 @@ Source: ${lead.sourceUrl}`;
                       <div className="member-info">
                         <div className="member-name-row">
                           <span className="member-name">{contact.name}</span>
-                          {contact.linkedin && (
+                          {contact.linkedin && contact.linkedin !== 'No LinkedIn Link' ? (
                             <a
                               href={contact.linkedin.startsWith('http') ? contact.linkedin : `https://${contact.linkedin}`}
                               target="_blank"
@@ -665,6 +709,14 @@ Source: ${lead.sourceUrl}`;
                             >
                               {getPlatformIcon('linkedin', 12)}
                             </a>
+                          ) : (
+                            <span 
+                              className="member-linkedin disabled" 
+                              title="LinkedIn profile not found"
+                              style={{ opacity: 0.3, cursor: 'not-allowed', display: 'inline-flex', alignItems: 'center' }}
+                            >
+                              {getPlatformIcon('linkedin', 12)}
+                            </span>
                           )}
                         </div>
                         <span className="member-title">
@@ -674,7 +726,7 @@ Source: ${lead.sourceUrl}`;
                     </div>
 
                     <div className="member-right">
-                      {contact.email && contact.email !== 'No Email Found' ? (
+                      {contact.email && contact.email !== 'No Email Found' && contact.email !== 'Pending Lookup' ? (
                         <>
                           <span className="member-email">{contact.email}</span>
                           <button
@@ -689,8 +741,65 @@ Source: ${lead.sourceUrl}`;
                             <Copy size={11} />
                           </button>
                         </>
+                      ) : contact.email === 'No Email Found' ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <span className="member-email not-found" style={{ color: 'var(--text-muted)', fontSize: '0.68rem', fontStyle: 'italic', padding: '2px 8px', border: '1px dashed rgba(255,255,255,0.1)', borderRadius: '6px' }}>
+                            No Email Found
+                          </span>
+                          {enrichingContacts[contact.name] ? (
+                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" style={{ width: '10px', height: '10px', border: '2px solid var(--primary)', borderRightColor: 'transparent', borderRadius: '50%', display: 'inline-block', animation: 'spinner-border .75s linear infinite' }}></span>
+                          ) : (
+                            <button
+                              type="button"
+                              className="btn btn-secondary btn-sm pending-enrich-btn"
+                              style={{ 
+                                fontSize: '0.68rem', 
+                                padding: '2px 6px', 
+                                height: '20px', 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                gap: '4px',
+                                cursor: 'pointer',
+                                borderRadius: '4px',
+                                margin: 0
+                              }}
+                              onClick={() => handleEnrichKeyContact(contact.name)}
+                              title="Retry email lookup"
+                            >
+                              <Search size={10} />
+                              Retry
+                            </button>
+                          )}
+                        </div>
                       ) : (
-                        <span className="member-email pending">Pending Lookup</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          {enrichingContacts[contact.name] ? (
+                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" style={{ width: '10px', height: '10px', border: '2px solid var(--primary)', borderRightColor: 'transparent', borderRadius: '50%', display: 'inline-block', animation: 'spinner-border .75s linear infinite' }}></span>
+                          ) : (
+                            <button
+                              type="button"
+                              className="btn btn-secondary btn-sm pending-enrich-btn"
+                              style={{ 
+                                fontSize: '0.68rem', 
+                                padding: '2px 8px', 
+                                height: '24px', 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                gap: '4px',
+                                background: 'rgba(255, 193, 7, 0.1)',
+                                color: '#ffc107',
+                                border: '1px solid rgba(255, 193, 7, 0.2)',
+                                cursor: 'pointer',
+                                borderRadius: '6px',
+                                margin: 0
+                              }}
+                              onClick={() => handleEnrichKeyContact(contact.name)}
+                            >
+                              <Search size={10} />
+                              Find Email
+                            </button>
+                          )}
+                        </div>
                       )}
                     </div>
                   </div>

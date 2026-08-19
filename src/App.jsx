@@ -101,7 +101,24 @@ const App = () => {
         intentType: fields.intentType || updatedLeadObj.intentType,
         serviceRequired: fields.serviceRequired || updatedLeadObj.serviceRequired,
         industry: fields.industry || updatedLeadObj.industry,
-        location: fields.location || updatedLeadObj.location
+        location: fields.location || updatedLeadObj.location,
+        employeeCount: fields.employeeCount || updatedLeadObj.employeeCount,
+        foundedYear: fields.foundedYear || updatedLeadObj.foundedYear,
+        keyContacts: fields.keyContacts || updatedLeadObj.keyContacts,
+        annualRevenue: fields.annualRevenue || updatedLeadObj.annualRevenue,
+        totalFunding: fields.totalFunding || updatedLeadObj.totalFunding,
+        keyContactsSource: fields.keyContactsSource || updatedLeadObj.keyContactsSource,
+        needDescription: fields.needDescription || updatedLeadObj.needDescription,
+        contactInfo: fields.contactInfo || updatedLeadObj.contactInfo,
+        platform: fields.platform || updatedLeadObj.platform,
+        workPreference: fields.workPreference || updatedLeadObj.workPreference,
+        skills: fields.skills || updatedLeadObj.skills,
+        search_type: fields.search_type || updatedLeadObj.search_type,
+        phone: fields.phone || updatedLeadObj.phone,
+        rating: fields.rating || updatedLeadObj.rating,
+        reviews: fields.reviews || updatedLeadObj.reviews,
+        website: fields.website || updatedLeadObj.website,
+        authorName: fields.authorName || updatedLeadObj.authorName
       });
     } catch (err) {
       console.error('Failed to persist lead update to backend:', err);
