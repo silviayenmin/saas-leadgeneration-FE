@@ -22,7 +22,11 @@ import {
   Sun,
   Moon,
   Calendar,
-  ChevronDown
+  ChevronDown,
+  CheckCircle,
+  AlertCircle,
+  Info,
+  X
 } from 'lucide-react';
 import { parseIsoDate, getPlatformIcon } from '../utils/helpers';
 import './OutreachConfig.scss';
@@ -108,6 +112,16 @@ export default function OutreachConfig({ onProfileUpdate, initialSubTab = 'campa
   const [testService, setTestService] = useState('React Development');
   const [showToneDropdown, setShowToneDropdown] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
+
+  // Modern Toast Popup State
+  const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
+
+  const showToast = (message, type = 'success') => {
+    setToast({ show: true, message, type });
+    setTimeout(() => {
+      setToast((prev) => (prev.message === message ? { ...prev, show: false } : prev));
+    }, 3800);
+  };
 
 
   const toneDropdownRef = useRef(null);
@@ -258,7 +272,7 @@ export default function OutreachConfig({ onProfileUpdate, initialSubTab = 'campa
 
   const handleSaveImap = async () => {
     if (!imapServer || !imapPort || !imapEmail || !imapPassword) {
-      alert('Please fill in all IMAP settings fields.');
+      showToast('Please fill in all IMAP settings fields.', 'error');
       return;
     }
     const secretKey = localStorage.getItem('APP_SECRET_KEY') || 'silvia_dev_key';
@@ -274,13 +288,13 @@ export default function OutreachConfig({ onProfileUpdate, initialSubTab = 'campa
         })
       });
       if (response.ok) {
-        alert('IMAP configuration saved successfully!');
+        showToast('IMAP configuration saved successfully!', 'success');
         setImapHealth('Active');
       } else {
-        alert('Failed to save IMAP configuration.');
+        showToast('Failed to save IMAP configuration.', 'error');
       }
     } catch (err) {
-      alert('Network error: ' + err.message);
+      showToast('Network error: ' + err.message, 'error');
     }
   };
 
@@ -295,12 +309,12 @@ export default function OutreachConfig({ onProfileUpdate, initialSubTab = 'campa
       });
       if (response.ok) {
         const data = await response.json();
-        alert(`Inbox replies synchronized successfully! Found ${data.newRepliesCount || 0} new replies.`);
+        showToast(`Inbox replies synchronized successfully! Found ${data.newRepliesCount || 0} new replies.`, 'success');
       } else {
-        alert('Failed to sync replies.');
+        showToast('Failed to sync replies.', 'error');
       }
     } catch (err) {
-      alert('Sync error: ' + err.message);
+      showToast('Sync error: ' + err.message, 'error');
     } finally {
       setIsSyncing(false);
     }
@@ -329,13 +343,13 @@ export default function OutreachConfig({ onProfileUpdate, initialSubTab = 'campa
         body: JSON.stringify(updatedConfig)
       });
       if (response.ok) {
-        alert('AI Model configuration saved successfully!');
+        showToast('AI Model configuration saved successfully!', 'success');
         setModelConfig(updatedConfig);
       } else {
-        alert('Failed to save AI Model configuration.');
+        showToast('Failed to save AI Model configuration.', 'error');
       }
     } catch (err) {
-      alert('Model config save error: ' + err.message);
+      showToast('Model config save error: ' + err.message, 'error');
     }
   };
 
@@ -348,13 +362,13 @@ export default function OutreachConfig({ onProfileUpdate, initialSubTab = 'campa
         body: JSON.stringify({ places_api_key: placesKey.trim() })
       });
       if (response.ok) {
-        alert('Google Places key saved!');
+        showToast('Google Places key saved!', 'success');
         setPlacesHealth(placesKey ? 'Active' : 'Fallback: Playwright');
       } else {
-        alert('Failed to save Google Places settings.');
+        showToast('Failed to save Google Places settings.', 'error');
       }
     } catch (err) {
-      alert('Places key save error: ' + err.message);
+      showToast('Places key save error: ' + err.message, 'error');
     }
   };
 
@@ -367,13 +381,13 @@ export default function OutreachConfig({ onProfileUpdate, initialSubTab = 'campa
         body: JSON.stringify({ twitter_api_key: twitterKey.trim() })
       });
       if (response.ok) {
-        alert('Twitter/X API Key saved!');
+        showToast('Twitter/X API Key saved!', 'success');
         setTwitterHealth(twitterKey ? 'Active' : 'Fallback: Serper');
       } else {
-        alert('Failed to save Twitter settings.');
+        showToast('Failed to save Twitter settings.', 'error');
       }
     } catch (err) {
-      alert('Twitter key save error: ' + err.message);
+      showToast('Twitter key save error: ' + err.message, 'error');
     }
   };
 
@@ -395,13 +409,13 @@ export default function OutreachConfig({ onProfileUpdate, initialSubTab = 'campa
         } else {
           setGoogleSheetsHealth('Not Configured');
         }
-        alert('Google Sheets configuration saved successfully!');
+        showToast('Google Sheets configuration saved successfully!', 'success');
       } else {
         const errorData = await res.json();
-        alert(`Failed to save Google Sheets configuration: ${errorData.detail || 'Unknown error'}`);
+        showToast(`Failed to save Google Sheets configuration: ${errorData.detail || 'Unknown error'}`, 'error');
       }
     } catch (err) {
-      alert(`Error saving Google Sheets configuration: ${err.message}`);
+      showToast(`Error saving Google Sheets configuration: ${err.message}`, 'error');
     }
   };
 
@@ -419,7 +433,7 @@ export default function OutreachConfig({ onProfileUpdate, initialSubTab = 'campa
       });
       if (response.ok) {
         localStorage.setItem('silvia_agency_info', agencyInfo.trim());
-        alert('Profile details saved!');
+        showToast('Profile details saved!', 'success');
         if (onProfileUpdate) {
           onProfileUpdate({
             email: userEmail,
@@ -427,24 +441,24 @@ export default function OutreachConfig({ onProfileUpdate, initialSubTab = 'campa
           });
         }
       } else {
-        alert('Failed to save profile changes.');
+        showToast('Failed to save profile changes.', 'error');
       }
     } catch (err) {
-      alert('Profile save error: ' + err.message);
+      showToast('Profile save error: ' + err.message, 'error');
     }
   };
 
   const handleResetPassword = async () => {
     if (!currentPassword || !newPassword || !confirmPassword) {
-      alert('Please fill out all password fields.');
+      showToast('Please fill out all password fields.', 'error');
       return;
     }
     if (newPassword !== confirmPassword) {
-      alert('New password and confirm password do not match.');
+      showToast('New password and confirm password do not match.', 'error');
       return;
     }
     if (newPassword.length < 6) {
-      alert('Password must be at least 6 characters.');
+      showToast('Password must be at least 6 characters.', 'error');
       return;
     }
     const secretKey = localStorage.getItem('APP_SECRET_KEY') || 'silvia_dev_key';
@@ -458,16 +472,16 @@ export default function OutreachConfig({ onProfileUpdate, initialSubTab = 'campa
         })
       });
       if (response.ok) {
-        alert('Password updated successfully!');
+        showToast('Password updated successfully!', 'success');
         setCurrentPassword('');
         setNewPassword('');
         setConfirmPassword('');
       } else {
         const err = await response.json();
-        alert(err.detail || 'Failed to change password.');
+        showToast(err.detail || 'Failed to change password.', 'error');
       }
     } catch (err) {
-      alert('Security change error: ' + err.message);
+      showToast('Security change error: ' + err.message, 'error');
     }
   };
 
@@ -480,13 +494,13 @@ export default function OutreachConfig({ onProfileUpdate, initialSubTab = 'campa
         body: JSON.stringify({ webhook_url: webhookUrl.trim() })
       });
       if (response.ok) {
-        alert('Zapier/Webhook CRM Integration URL saved!');
+        showToast('Zapier/Webhook CRM Integration URL saved!', 'success');
         setWebhookHealth(webhookUrl ? 'Active' : 'Inactive');
       } else {
-        alert('Failed to save webhook integration.');
+        showToast('Failed to save webhook integration.', 'error');
       }
     } catch (err) {
-      alert('Webhook integration error: ' + err.message);
+      showToast('Webhook integration error: ' + err.message, 'error');
     }
   };
 
@@ -505,7 +519,7 @@ export default function OutreachConfig({ onProfileUpdate, initialSubTab = 'campa
   // Copy developer token
   const copyDevToken = () => {
     navigator.clipboard.writeText(developerToken);
-    alert('Developer token copied to clipboard!');
+    showToast('Developer token copied to clipboard!', 'info');
   };
 
   // Generate copywriting pitch previews
@@ -665,7 +679,7 @@ The ${agName} Team`;
                             id="settings-imap-server"
                             className="form-control"
                             placeholder="e.g. imap.gmail.com"
-                            style={{ paddingLeft: '2.25rem' }}
+                            autoComplete="off"
                             value={imapServer}
                             onChange={(e) => setImapServer(e.target.value)}
                           />
@@ -681,7 +695,7 @@ The ${agName} Team`;
                             id="settings-imap-port"
                             className="form-control"
                             placeholder="e.g. 993"
-                            style={{ paddingLeft: '2.25rem' }}
+                            autoComplete="off"
                             value={imapPort}
                             onChange={(e) => setImapPort(e.target.value)}
                           />
@@ -697,7 +711,7 @@ The ${agName} Team`;
                             id="settings-imap-email"
                             className="form-control"
                             placeholder="e.g. name@gmail.com"
-                            style={{ paddingLeft: '2.25rem' }}
+                            autoComplete="off"
                             value={imapEmail}
                             onChange={(e) => setImapEmail(e.target.value)}
                           />
@@ -707,20 +721,20 @@ The ${agName} Team`;
                       <div className="form-group" style={{ marginBottom: 0 }}>
                         <label htmlFor="settings-imap-password">App Password</label>
                         <div className="input-wrapper">
-                          <Key className="input-icon" size={14} style={{ color: 'var(--text-muted)' }} />
+                          <Key className="input-icon" size={14} />
                           <input
                             type="password"
                             id="settings-imap-password"
                             className="form-control"
                             placeholder="App password..."
-                            style={{ paddingLeft: '2.25rem' }}
+                            autoComplete="new-password"
                             value={imapPassword}
                             onChange={(e) => setImapPassword(e.target.value)}
                           />
                         </div>
                       </div>
 
-                      <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+                      <div className="settings-card-actions">
                         <button type="button" onClick={handleSaveImap} className="btn btn-primary flex-1">
                           <Save size={14} style={{ marginRight: '6px' }} /> Save Settings
                         </button>
@@ -792,7 +806,7 @@ The ${agName} Team`;
                             style={{ width: 'auto', padding: '0 0.85rem', height: '36px' }}
                             onClick={() => {
                               navigator.clipboard.writeText(googleClientEmail);
-                              alert('Service Account email copied to clipboard!');
+                              showToast('Service Account email copied to clipboard!', 'info');
                             }}
                             title="Copy email to clipboard"
                           >
@@ -812,9 +826,11 @@ The ${agName} Team`;
                       </div>
                     )}
                     
-                    <button type="button" onClick={handleSaveGoogleSheets} className="btn btn-primary" style={{ width: '100%', padding: '0.75rem 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-                      <Save size={16} /> Save Sheets Settings
-                    </button>
+                    <div className="settings-card-actions">
+                      <button type="button" onClick={handleSaveGoogleSheets} className="btn btn-primary">
+                        <Save size={16} /> Save Sheets Settings
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}
@@ -933,14 +949,15 @@ The ${agName} Team`;
                       </div>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={handleSaveModel}
-                      className="btn btn-primary"
-                      style={{ width: '100%', padding: '0.75rem 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', marginTop: '1.25rem' }}
-                    >
-                      <Save size={16} /> Save Model Configuration
-                    </button>
+                    <div className="settings-card-actions">
+                      <button
+                        type="button"
+                        onClick={handleSaveModel}
+                        className="btn btn-primary"
+                      >
+                        <Save size={16} /> Save Model Configuration
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}
@@ -988,9 +1005,11 @@ The ${agName} Team`;
                           If empty, Google Maps scanner falls back to local browser Playwright scraping.
                         </p>
                       </div>
-                      <button type="button" onClick={handleSavePlaces} className="btn btn-primary" style={{ width: '100%', padding: '0.75rem 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-                        <Save size={16} /> Save Places Settings
-                      </button>
+                      <div className="settings-card-actions">
+                        <button type="button" onClick={handleSavePlaces} className="btn btn-primary">
+                          <Save size={16} /> Save Places Settings
+                        </button>
+                      </div>
                     </div>
                   </div>
 
@@ -1035,9 +1054,11 @@ The ${agName} Team`;
                           If empty, scraping falls back to Serper API search engine crawling.
                         </p>
                       </div>
-                      <button type="button" onClick={handleSaveTwitter} className="btn btn-primary" style={{ width: '100%', padding: '0.75rem 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-                        <Save size={16} /> Save Twitter Settings
-                      </button>
+                      <div className="settings-card-actions">
+                        <button type="button" onClick={handleSaveTwitter} className="btn btn-primary">
+                          <Save size={16} /> Save Twitter Settings
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1289,9 +1310,11 @@ The ${agName} Team`;
                       </div>
                     </div>
 
-                    <button type="button" onClick={handleSaveProfile} className="btn btn-primary" style={{ width: 'fit-content', padding: '0.65rem 1.25rem' }}>
-                      <Save size={14} style={{ marginRight: '6px' }} /> Save Changes
-                    </button>
+                    <div className="settings-card-actions">
+                      <button type="button" onClick={handleSaveProfile} className="btn btn-primary">
+                        <Save size={14} /> Save Changes
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}
@@ -1479,9 +1502,11 @@ The ${agName} Team`;
                       </div>
                     </div>
 
-                    <button type="button" onClick={handleResetPassword} className="btn btn-primary" style={{ width: '100%', padding: '0.75rem 1.25rem', display: 'flex', alignItems: 'center', justify: 'center', gap: '0.5rem', fontWeight: '600', borderRadius: '8px', marginTop: '0.5rem' }}>
-                      <RefreshCw size={14} /> Change Password
-                    </button>
+                    <div className="settings-card-actions">
+                      <button type="button" onClick={handleResetPassword} className="btn btn-primary">
+                        <RefreshCw size={14} /> Change Password
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}
@@ -1563,9 +1588,11 @@ The ${agName} Team`;
                           />
                         </div>
                       </div>
-                      <button type="button" onClick={handleSaveWebhook} className="btn btn-primary" style={{ width: 'fit-content', padding: '0.65rem 1.25rem' }}>
-                        <Save size={14} style={{ marginRight: '6px' }} /> Save Webhook URL
-                      </button>
+                      <div className="settings-card-actions">
+                        <button type="button" onClick={handleSaveWebhook} className="btn btn-primary">
+                          <Save size={14} /> Save Webhook URL
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1632,6 +1659,26 @@ The ${agName} Team`;
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Modern Toast Notification Popup */}
+      {toast.show && (
+        <div className={`modern-toast-popup ${toast.type}`}>
+          <div className="toast-icon-box">
+            {toast.type === 'success' && <CheckCircle size={18} />}
+            {toast.type === 'error' && <AlertCircle size={18} />}
+            {toast.type === 'info' && <Info size={18} />}
+          </div>
+          <div className="toast-message-content">{toast.message}</div>
+          <button
+            type="button"
+            className="toast-close-btn"
+            onClick={() => setToast((prev) => ({ ...prev, show: false }))}
+            title="Dismiss notification"
+          >
+            <X size={14} />
+          </button>
         </div>
       )}
     </div>
