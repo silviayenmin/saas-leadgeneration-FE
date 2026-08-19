@@ -2,7 +2,7 @@ import React from 'react';
 import { Bell, Coins, ArrowUpRight, Sun, Moon, Menu } from 'lucide-react';
 import './Header.scss';
 
-const Header = ({ title, credits, onUpgradeClick, theme, onToggleTheme, isMobileNavOpen, onToggleMobileNav }) => {
+const Header = ({ title, credits, onUpgradeClick, theme, onToggleTheme, isMobileNavOpen, onToggleMobileNav, user, onProfileClick }) => {
   return (
     <header className="app-header">
       <div className="header-left">
@@ -40,6 +40,14 @@ const Header = ({ title, credits, onUpgradeClick, theme, onToggleTheme, isMobile
 
         <button className="icon-btn" title="Notifications">
           <Bell size={18} />
+        </button>
+
+        <button 
+          className="header-user-avatar-btn" 
+          onClick={onProfileClick} 
+          title="Profile Settings"
+        >
+          {user?.fullName?.charAt(0)?.toUpperCase() || 'U'}
         </button>
       </div>
     </header>

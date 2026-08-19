@@ -5,7 +5,8 @@ import Dashboard from './pages/Dashboard';
 import LeadDiscovery from './pages/LeadDiscovery';
 import MapsScans from './pages/MapsScans';
 import OutreachPipeline from './pages/OutreachPipeline';
-import ProfileSubscription from './pages/ProfileSubscription';
+import Profile from './pages/Profile';
+import Subscription from './pages/Subscription';
 import OutreachConfig from './pages/OutreachConfig';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
@@ -353,7 +354,8 @@ const App = () => {
             onRefresh={fetchLeadsAndSearches}
           />
         );
-      case 'profile-subscription': return <ProfileSubscription onUpgradeSuccess={fetchCredits} onProfileUpdate={(u) => setUser(u)} />;
+      case 'profile': return <Profile onProfileUpdate={(u) => setUser(u)} onSwitchTab={handleTabChange} />;
+      case 'subscription': return <Subscription onUpgradeSuccess={fetchCredits} />;
       case 'outreach-config': return <OutreachConfig />;
       default: 
         return (
@@ -362,7 +364,7 @@ const App = () => {
             searches={searches} 
             onOpenLead={setActiveLead} 
             onSwitchTab={handleTabChange} 
-            onUpgradeClick={() => handleTabChange('profile-subscription')} 
+            onUpgradeClick={() => handleTabChange('subscription')} 
           />
         );
     }
@@ -374,7 +376,8 @@ const App = () => {
       case 'lead-discovery': return 'Google Maps Lead Discovery';
       case 'maps-scans': return 'Maps Scans & History';
       case 'outreach-pipeline': return 'Outreach CRM Pipeline';
-      case 'profile-subscription': return 'Profile & Subscription';
+      case 'profile': return 'Profile Settings';
+      case 'subscription': return 'Subscription & Billing';
       case 'outreach-config': return 'Outreach & API Config';
       default: return 'Dashboard';
     }
@@ -398,11 +401,13 @@ const App = () => {
         <Header
           title={getPageTitle()}
           credits={credits}
-          onUpgradeClick={() => handleTabChange('profile-subscription')}
+          onUpgradeClick={() => handleTabChange('subscription')}
           theme={theme}
           onToggleTheme={toggleTheme}
           isMobileNavOpen={isMobileNavOpen}
           onToggleMobileNav={() => setIsMobileNavOpen(!isMobileNavOpen)}
+          user={user}
+          onProfileClick={() => handleTabChange('profile')}
         />
         <main style={activeLead ? { flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: 'var(--bg-main)' } : { flex: 1, overflowY: 'auto', background: 'var(--bg-main)' }}>
           {activeLead ? (
