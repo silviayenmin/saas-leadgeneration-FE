@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { getPlatformIcon } from '../utils/helpers';
 import api from '../services/api';
+import { MapContainer, TileLayer, Circle } from 'react-leaflet';
 
 export default function LeadDiscovery({ leads, setLeads, searches, setSearches, onSwitchTab, onOpenLead }) {
   const [goalMode, setGoalMode] = useState('social'); // Google Maps only (defaulted to social scan wrapper)
@@ -147,6 +148,39 @@ export default function LeadDiscovery({ leads, setLeads, searches, setSearches, 
   const [keyword, setKeyword] = useState('');
   const [industry, setIndustry] = useState('');
   const [location, setLocation] = useState('');
+  const [mapCenter, setMapCenter] = useState([13.0827, 80.2707]); // Default: Chennai
+  const [mapZoom, setMapZoom] = useState(11);
+  const [mapKey, setMapKey] = useState(0);
+
+  // Debounced Nominatim OSM Geocoding
+  useEffect(() => {
+    if (!location.trim()) {
+      setMapCenter([13.0827, 80.2707]);
+      setMapZoom(11);
+      setMapKey(prev => prev + 1);
+      return;
+    }
+
+    const delayDebounce = setTimeout(async () => {
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location.trim())}&limit=1`);
+        const data = await res.json();
+        if (data && data.length > 0) {
+          const lat = parseFloat(data[0].lat);
+          const lon = parseFloat(data[0].lon);
+          setMapCenter([lat, lon]);
+          setMapZoom(12);
+          setMapKey(prev => prev + 1);
+        }
+      } catch (err) {
+        console.warn("Geocoding query failed:", err);
+      }
+    }, 650);
+
+    return () => clearTimeout(delayDebounce);
+  }, [location]);
+
+
   const [timeframe, setTimeframe] = useState('qdr:m3');
   const [limit, setLimit] = useState(10);
   const [isOpenLimitDropdown, setIsOpenLimitDropdown] = useState(false);
@@ -551,66 +585,110 @@ export default function LeadDiscovery({ leads, setLeads, searches, setSearches, 
               <form onSubmit={step === 3 ? handleLaunch : handleNext} id="search-form" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                 {/* Step 1: Define Audience */}
                 {step === 1 && (
-                  <div className="wizard-step-panel active" data-step="1" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                    <div className="step-heading">
-                      <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <Users size={18} color="var(--primary)" />
-                        Define Target Audience
-                      </h3>
-                      <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>Specify the search keywords and industry context for our Llama-3.3 AI scanner.</p>
-                    </div>
-                    <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                      <label htmlFor="keyword" style={{ fontSize: '0.85rem', fontWeight: 600 }}>Search Intent Query / Keyword</label>
-                      <div className="input-wrapper" style={{ position: 'relative' }}>
-                        <Map className="input-icon" size={14} style={{ position: 'absolute', left: '10px', top: '11px', color: 'var(--text-secondary)' }} />
-                        <input
-                          type="text"
-                          id="keyword"
-                          className="form-control"
-                          placeholder="e.g. logo designers, software companies, restaurants"
-                          value={keyword}
-                          onChange={(e) => setKeyword(e.target.value)}
-                          style={{ width: '100%', padding: '8px 12px 8px 30px', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '6px', color: 'var(--text-primary)', fontSize: '0.85rem' }}
-                          required
-                        />
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem', width: '100%', alignItems: 'stretch' }}>
+                    
+                    {/* Left Column: Form Inputs */}
+                    <div className="wizard-step-panel active" data-step="1" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                      <div className="step-heading">
+                        <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <Users size={18} color="var(--primary)" />
+                          Define Target Audience
+                        </h3>
+                        <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>Specify the search keywords and industry context for our Llama-3.3 AI scanner.</p>
                       </div>
-                      <span className="wizard-help-text" style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>Llama-3.3 will auto-expand this query to match varied social phrasing.</span>
-                    </div>
+                      <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <label htmlFor="keyword" style={{ fontSize: '0.85rem', fontWeight: 600 }}>Search Intent Query / Keyword</label>
+                        <div className="input-wrapper" style={{ position: 'relative' }}>
+                          <Map className="input-icon" size={14} style={{ position: 'absolute', left: '10px', top: '11px', color: 'var(--text-secondary)' }} />
+                          <input
+                            type="text"
+                            id="keyword"
+                            className="form-control"
+                            placeholder="e.g. logo designers, software companies, restaurants"
+                            value={keyword}
+                            onChange={(e) => setKeyword(e.target.value)}
+                            style={{ width: '100%', padding: '8px 12px 8px 30px', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '6px', color: 'var(--text-primary)', fontSize: '0.85rem' }}
+                            required
+                          />
+                        </div>
+                        <span className="wizard-help-text" style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>Llama-3.3 will auto-expand this query to match varied social phrasing.</span>
+                      </div>
 
-                    <div className="wizard-grid-2" style={{ display: 'grid', gridTemplateColumns: platform === 'google_maps' ? '1fr' : '1fr 1fr', gap: '1rem' }}>
-                      {platform !== 'google_maps' && (
+                      <div className="wizard-grid-2" style={{ display: 'grid', gridTemplateColumns: platform === 'google_maps' ? '1fr' : '1fr 1fr', gap: '1rem' }}>
+                        {platform !== 'google_maps' && (
+                          <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                            <label htmlFor="wizard-industry" style={{ fontSize: '0.85rem', fontWeight: 600 }}>Target Industry (Optional)</label>
+                            <div className="input-wrapper" style={{ position: 'relative' }}>
+                              <Building className="input-icon" size={14} style={{ position: 'absolute', left: '10px', top: '11px', color: 'var(--text-secondary)' }} />
+                              <input
+                                type="text"
+                                id="wizard-industry"
+                                className="form-control"
+                                placeholder="e.g. E-commerce, FinTech"
+                                value={industry}
+                                onChange={(e) => setIndustry(e.target.value)}
+                                style={{ width: '100%', padding: '8px 12px 8px 30px', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '6px', color: 'var(--text-primary)', fontSize: '0.85rem' }}
+                              />
+                            </div>
+                          </div>
+                        )}
                         <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                          <label htmlFor="wizard-industry" style={{ fontSize: '0.85rem', fontWeight: 600 }}>Target Industry (Optional)</label>
+                          <label htmlFor="wizard-location" style={{ fontSize: '0.85rem', fontWeight: 600 }}>Target Location (Optional)</label>
                           <div className="input-wrapper" style={{ position: 'relative' }}>
-                            <Building className="input-icon" size={14} style={{ position: 'absolute', left: '10px', top: '11px', color: 'var(--text-secondary)' }} />
+                            <MapPin className="input-icon" size={14} style={{ position: 'absolute', left: '10px', top: '11px', color: 'var(--text-secondary)' }} />
                             <input
                               type="text"
-                              id="wizard-industry"
+                              id="wizard-location"
                               className="form-control"
-                              placeholder="e.g. E-commerce, FinTech"
-                              value={industry}
-                              onChange={(e) => setIndustry(e.target.value)}
+                              placeholder="e.g. United States, London"
+                              value={location}
+                              onChange={(e) => setLocation(e.target.value)}
                               style={{ width: '100%', padding: '8px 12px 8px 30px', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '6px', color: 'var(--text-primary)', fontSize: '0.85rem' }}
                             />
                           </div>
                         </div>
-                      )}
-                      <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                        <label htmlFor="wizard-location" style={{ fontSize: '0.85rem', fontWeight: 600 }}>Target Location (Optional)</label>
-                        <div className="input-wrapper" style={{ position: 'relative' }}>
-                          <MapPin className="input-icon" size={14} style={{ position: 'absolute', left: '10px', top: '11px', color: 'var(--text-secondary)' }} />
-                          <input
-                            type="text"
-                            id="wizard-location"
-                            className="form-control"
-                            placeholder="e.g. United States, London"
-                            value={location}
-                            onChange={(e) => setLocation(e.target.value)}
-                            style={{ width: '100%', padding: '8px 12px 8px 30px', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '6px', color: 'var(--text-primary)', fontSize: '0.85rem' }}
-                          />
-                        </div>
                       </div>
                     </div>
+
+                    {/* Right Column: Live Target Location Map */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem', flex: 1, minHeight: '260px' }}>
+                      <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Target Scan Location Preview</label>
+                      <div style={{ 
+                        flex: 1,
+                        border: location.trim() ? '2px solid var(--primary)' : '1px solid var(--border-color)', 
+                        borderRadius: '8px', 
+                        overflow: 'hidden', 
+                        background: 'var(--bg-card)', 
+                        position: 'relative',
+                        boxShadow: location.trim() ? '0 0 14px rgba(3, 180, 216, 0.25)' : 'var(--shadow-sm)',
+                        transition: 'all 0.25s ease'
+                      }}>
+                        <MapContainer
+                          key={mapKey}
+                          center={mapCenter}
+                          zoom={mapZoom}
+                          style={{ height: '100%', width: '100%', minHeight: '250px' }}
+                          zoomControl={false}
+                          attributionControl={false}
+                        >
+                          <TileLayer
+                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                          />
+                          <Circle
+                            center={mapCenter}
+                            radius={4000}
+                            pathOptions={{
+                              color: '#03b4d8',
+                              fillColor: '#03b4d8',
+                              fillOpacity: 0.12,
+                              weight: 2.5,
+                              dashArray: '6, 6'
+                            }}
+                          />
+                        </MapContainer>
+                      </div>
+                    </div>
+
                   </div>
                 )}
 
