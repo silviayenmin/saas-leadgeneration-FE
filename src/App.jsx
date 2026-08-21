@@ -332,6 +332,8 @@ const App = () => {
             setSearches={setSearches}
             onSwitchTab={handleTabChange}
             onOpenLead={setActiveLead}
+            refreshCredits={fetchCredits}
+            credits={credits}
           />
         );
       case 'maps-scans': 
