@@ -240,23 +240,32 @@ export default function Subscription({ onUpgradeSuccess }) {
               </div>
             </div>
 
-            {/* Pricing Plans Cards */}
+             {/* Pricing Plans Cards */}
             <div className="plans-grid">
               {/* Free Plan */}
-              <div className={`plan-card ${currentPlanKey === 'FREE' ? 'current' : ''}`}>
+              <div className={`plan-card ${plans.FREE?.isPopular ? 'popular' : ''} ${currentPlanKey === 'FREE' ? 'current' : ''}`}>
+                {plans.FREE?.badge && <div className="popular-badge">{plans.FREE.badge}</div>}
                 <div className="plan-header">
                   <h4>Free Explorer</h4>
                   <div className="price-tag">
-                    <span className="amount">$0</span>
+                    <span className="amount">${plans.FREE?.price !== undefined ? plans.FREE.price : 0}</span>
                     <span className="period">/ month</span>
                   </div>
-                  <div className="credits-pill">25 Lead Discovery Credits</div>
+                  <div className="credits-pill">{plans.FREE?.credits?.toLocaleString() || 25} Lead Discovery Credits</div>
                 </div>
 
                 <div className="plan-features">
-                  <div className="feature-item"><Check size={16} className="check-icon" /> Basic Google Maps Lead Search</div>
-                  <div className="feature-item"><Check size={16} className="check-icon" /> Standard Email & Phone Extraction</div>
-                  <div className="feature-item"><Check size={16} className="check-icon" /> CSV Lead Export</div>
+                  {plans.FREE?.features && plans.FREE.features.length > 0 ? (
+                    plans.FREE.features.map((feat, idx) => (
+                      <div key={idx} className="feature-item"><Check size={16} className="check-icon" /> {feat}</div>
+                    ))
+                  ) : (
+                    <>
+                      <div className="feature-item"><Check size={16} className="check-icon" /> Basic Google Maps Lead Search</div>
+                      <div className="feature-item"><Check size={16} className="check-icon" /> Standard Email & Phone Extraction</div>
+                      <div className="feature-item"><Check size={16} className="check-icon" /> CSV Lead Export</div>
+                    </>
+                  )}
                 </div>
 
                 <button
@@ -273,22 +282,30 @@ export default function Subscription({ onUpgradeSuccess }) {
               </div>
 
               {/* Starter Plan */}
-              <div className={`plan-card popular ${currentPlanKey === 'STARTER' ? 'current' : ''}`}>
-                <div className="popular-badge">Most Popular</div>
+              <div className={`plan-card ${plans.STARTER?.isPopular ? 'popular' : ''} ${currentPlanKey === 'STARTER' ? 'current' : ''}`}>
+                {plans.STARTER?.badge && <div className="popular-badge">{plans.STARTER.badge}</div>}
                 <div className="plan-header">
                   <h4>Starter Pro</h4>
                   <div className="price-tag">
-                    <span className="amount">$29</span>
+                    <span className="amount">${plans.STARTER?.price !== undefined ? plans.STARTER.price : 29}</span>
                     <span className="period">/ month</span>
                   </div>
-                  <div className="credits-pill">500 Lead Discovery Credits</div>
+                  <div className="credits-pill">{plans.STARTER?.credits?.toLocaleString() || 500} Lead Discovery Credits</div>
                 </div>
 
                 <div className="plan-features">
-                  <div className="feature-item"><Check size={16} className="check-icon" /> Advanced Local Maps Lead Discovery</div>
-                  <div className="feature-item"><Check size={16} className="check-icon" /> Deep Email & Social Profile Enrichment</div>
-                  <div className="feature-item"><Check size={16} className="check-icon" /> AI Cold Outreach Pitch Generator</div>
-                  <div className="feature-item"><Check size={16} className="check-icon" /> CRM Outreach Pipeline Tracking</div>
+                  {plans.STARTER?.features && plans.STARTER.features.length > 0 ? (
+                    plans.STARTER.features.map((feat, idx) => (
+                      <div key={idx} className="feature-item"><Check size={16} className="check-icon" /> {feat}</div>
+                    ))
+                  ) : (
+                    <>
+                      <div className="feature-item"><Check size={16} className="check-icon" /> Advanced Local Maps Lead Discovery</div>
+                      <div className="feature-item"><Check size={16} className="check-icon" /> Deep Email & Social Profile Enrichment</div>
+                      <div className="feature-item"><Check size={16} className="check-icon" /> AI Cold Outreach Pitch Generator</div>
+                      <div className="feature-item"><Check size={16} className="check-icon" /> CRM Outreach Pipeline Tracking</div>
+                    </>
+                  )}
                 </div>
 
                 <button
@@ -300,26 +317,35 @@ export default function Subscription({ onUpgradeSuccess }) {
                     ? 'Current Plan'
                     : upgradingPlanKey === 'STARTER'
                     ? 'Upgrading...'
-                    : 'Upgrade to Starter ($29/mo)'}
+                    : `Upgrade to Starter ($${plans.STARTER?.price || 29}/mo)`}
                 </button>
               </div>
 
               {/* Agency Pro Plan */}
-              <div className={`plan-card ${currentPlanKey === 'AGENCY_PRO' ? 'current' : ''}`}>
+              <div className={`plan-card ${plans.AGENCY_PRO?.isPopular ? 'popular' : ''} ${currentPlanKey === 'AGENCY_PRO' ? 'current' : ''}`}>
+                {plans.AGENCY_PRO?.badge && <div className="popular-badge">{plans.AGENCY_PRO.badge}</div>}
                 <div className="plan-header">
                   <h4>Agency Pro</h4>
                   <div className="price-tag">
-                    <span className="amount">$79</span>
+                    <span className="amount">${plans.AGENCY_PRO?.price !== undefined ? plans.AGENCY_PRO.price : 79}</span>
                     <span className="period">/ month</span>
                   </div>
-                  <div className="credits-pill">2,500 Lead Discovery Credits</div>
+                  <div className="credits-pill">{plans.AGENCY_PRO?.credits?.toLocaleString() || 2500} Lead Discovery Credits</div>
                 </div>
 
                 <div className="plan-features">
-                  <div className="feature-item"><Check size={16} className="check-icon" /> Unlimited Map Scans & Lead Scraping</div>
-                  <div className="feature-item"><Check size={16} className="check-icon" /> Full AI Website Intelligence & Audit</div>
-                  <div className="feature-item"><Check size={16} className="check-icon" /> Automated Multi-Channel Cold Pitches</div>
-                  <div className="feature-item"><Check size={16} className="check-icon" /> Priority API & Integration Connectors</div>
+                  {plans.AGENCY_PRO?.features && plans.AGENCY_PRO.features.length > 0 ? (
+                    plans.AGENCY_PRO.features.map((feat, idx) => (
+                      <div key={idx} className="feature-item"><Check size={16} className="check-icon" /> {feat}</div>
+                    ))
+                  ) : (
+                    <>
+                      <div className="feature-item"><Check size={16} className="check-icon" /> Unlimited Map Scans & Lead Scraping</div>
+                      <div className="feature-item"><Check size={16} className="check-icon" /> Full AI Website Intelligence & Audit</div>
+                      <div className="feature-item"><Check size={16} className="check-icon" /> Automated Multi-Channel Cold Pitches</div>
+                      <div className="feature-item"><Check size={16} className="check-icon" /> Priority API & Integration Connectors</div>
+                    </>
+                  )}
                 </div>
 
                 <button
@@ -331,7 +357,7 @@ export default function Subscription({ onUpgradeSuccess }) {
                     ? 'Current Plan'
                     : upgradingPlanKey === 'AGENCY_PRO'
                     ? 'Upgrading...'
-                    : 'Upgrade to Agency Pro ($79/mo)'}
+                    : `Upgrade to Agency Pro ($${plans.AGENCY_PRO?.price || 79}/mo)`}
                 </button>
               </div>
             </div>

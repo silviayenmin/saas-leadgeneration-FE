@@ -411,17 +411,36 @@ export default function Profile({ onProfileUpdate, onSwitchTab }) {
     }
   };
 
+  const renderHealthBadge = (label, status, icon, onClick, title) => {
+    const isAct = status === 'Active';
+    const isFall = status.toLowerCase().includes('fallback') || status === 'Fallback';
+    const statusClass = isAct ? 'health-active' : (isFall ? 'health-fallback' : 'health-inactive');
+    const dotClass = isAct ? 'green' : (isFall ? 'warning' : 'red');
+
+    return (
+      <div 
+        onClick={onClick}
+        className={`interactive-health-badge ${statusClass}`}
+        title={title}
+      >
+        {icon}
+        <span>{label}: <strong>{status}</strong></span>
+        <span className={`pulse-indicator ${dotClass}`}></span>
+      </div>
+    );
+  };
+
   return (
-    <div className="page-container profile-sub-container animate-fade-in" style={{ padding: '1rem', gap: '1rem' }}>
+    <div className="page-container profile-sub-container animate-fade-in">
       {/* Hero Header Banner */}
-      <div className="profile-hero-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1.5rem' }}>
+      <div className="profile-hero-card">
         <div className="hero-left">
           <div className="hero-avatar">
             {fullName.charAt(0)?.toUpperCase() || user?.fullName?.charAt(0)?.toUpperCase() || 'U'}
           </div>
           <div className="hero-meta">
             <h2>{fullName || user?.fullName || 'MapFlow User'}</h2>
-            <div className="hero-subtext" style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'center' }}>
+            <div className="hero-subtext">
               <span><Mail size={14} /> {email || user?.email}</span>
               {companyName && <span><span className="hero-bullet">•</span> <Building2 size={14} /> {companyName}</span>}
               <span><span className="hero-bullet">•</span> Member since: <strong>{joinedDate}</strong></span>
@@ -430,101 +449,22 @@ export default function Profile({ onProfileUpdate, onSwitchTab }) {
         </div>
 
         {/* Horizontal Integration Health Badges */}
-        <div className="hero-right" style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem', alignItems: 'flex-start', position: 'relative' }}>
-          <h4 style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', margin: 0 }}>
-            Integration Health
-          </h4>
-          <div style={{ display: 'flex', gap: '0.65rem', flexWrap: 'wrap', position: 'relative' }}>
-            
-            {/* 1. Inbox Sync Badge */}
-            {(() => {
-              const cfg = getBadgeConfig(imapHealth);
-              return (
-                <div 
-                  onClick={() => onSwitchTab && onSwitchTab('outreach-config')}
-                  className="interactive-health-badge"
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: '0.45rem', padding: '0.4rem 0.85rem', borderRadius: '20px',
-                    background: cfg.bg, border: cfg.border, fontSize: '0.78rem', color: 'var(--text-primary)', cursor: 'pointer'
-                  }}
-                  title="Click to configure Inbox connection"
-                >
-                  <Mail size={12} style={{ color: cfg.text }} />
-                  <span>Inbox: <strong style={{ color: cfg.text }}>{imapHealth}</strong></span>
-                  <span className={`pulse-indicator ${cfg.dotClass}`}></span>
-                </div>
-              );
-            })()}
-
-            {/* 2. Google Sheets Badge */}
-            {(() => {
-              const cfg = getBadgeConfig(googleSheetsHealth === 'Active' ? 'Active' : 'Inactive');
-              return (
-                <div 
-                  onClick={() => onSwitchTab && onSwitchTab('outreach-config')}
-                  className="interactive-health-badge"
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: '0.45rem', padding: '0.4rem 0.85rem', borderRadius: '20px',
-                    background: cfg.bg, border: cfg.border, fontSize: '0.78rem', color: 'var(--text-primary)', cursor: 'pointer'
-                  }}
-                  title="Click to configure Google Sheets sync"
-                >
-                  <Building2 size={12} style={{ color: cfg.text }} />
-                  <span>Sheets: <strong style={{ color: cfg.text }}>{googleSheetsHealth === 'Active' ? 'Active' : 'Inactive'}</strong></span>
-                  <span className={`pulse-indicator ${cfg.dotClass}`}></span>
-                </div>
-              );
-            })()}
-
-            {/* 3. CRM Webhook Badge */}
-            {(() => {
-              const cfg = getBadgeConfig(webhookHealth);
-              return (
-                <div 
-                  onClick={() => {
-                    setActiveTab('integrations');
-                    setTimeout(() => {
-                      const element = document.getElementById('settings-webhook-url');
-                      if (element) {
-                        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        element.focus();
-                      }
-                    }, 120);
-                  }}
-                  className="interactive-health-badge"
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: '0.45rem', padding: '0.4rem 0.85rem', borderRadius: '20px',
-                    background: cfg.bg, border: cfg.border, fontSize: '0.78rem', color: 'var(--text-primary)', cursor: 'pointer'
-                  }}
-                  title="Click to configure CRM Webhook URL"
-                >
-                  <Webhook size={12} style={{ color: cfg.text }} />
-                  <span>Webhook: <strong style={{ color: cfg.text }}>{webhookHealth}</strong></span>
-                  <span className={`pulse-indicator ${cfg.dotClass}`}></span>
-                </div>
-              );
-            })()}
-
-            {/* 4. Google Places API Badge */}
-            {(() => {
-              const cfg = getBadgeConfig(placesHealth === 'Active' ? 'Active' : 'Fallback');
-              return (
-                <div 
-                  onClick={() => onSwitchTab && onSwitchTab('outreach-config')}
-                  className="interactive-health-badge"
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: '0.45rem', padding: '0.4rem 0.85rem', borderRadius: '20px',
-                    background: cfg.bg, border: cfg.border, fontSize: '0.78rem', color: 'var(--text-primary)', cursor: 'pointer'
-                  }}
-                  title="Click to configure Google Places API keys"
-                >
-                  <Key size={12} style={{ color: cfg.text }} />
-                  <span>Places API: <strong style={{ color: cfg.text }}>{placesHealth === 'Active' ? 'Active' : 'Fallback'}</strong></span>
-                  <span className={`pulse-indicator ${cfg.dotClass}`}></span>
-                </div>
-              );
-            })()}
-
+        <div className="hero-right">
+          <h4>Integration Health</h4>
+          <div className="health-badges-grid">
+            {renderHealthBadge("Inbox", imapHealth, <Mail size={12} />, () => onSwitchTab && onSwitchTab('outreach-config'), "Click to configure Inbox connection")}
+            {renderHealthBadge("Sheets", googleSheetsHealth === 'Active' ? 'Active' : 'Inactive', <Building2 size={12} />, () => onSwitchTab && onSwitchTab('outreach-config'), "Click to configure Google Sheets sync")}
+            {renderHealthBadge("Webhook", webhookHealth, <Webhook size={12} />, () => {
+              setActiveTab('integrations');
+              setTimeout(() => {
+                const element = document.getElementById('settings-webhook-url');
+                if (element) {
+                  element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  element.focus();
+                }
+              }, 120);
+            }, "Click to configure CRM Webhook URL")}
+            {renderHealthBadge("Places API", placesHealth === 'Active' ? 'Active' : 'Fallback', <Key size={12} />, () => onSwitchTab && onSwitchTab('outreach-config'), "Click to configure Google Places API keys")}
           </div>
         </div>
       </div>
@@ -577,19 +517,19 @@ export default function Profile({ onProfileUpdate, onSwitchTab }) {
       </div>
 
       {/* Forms Column (Full-Width) */}
-      <div className="settings-forms-column" style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '1.5rem', marginTop: '0.5rem' }}>
+      <div className="settings-forms-column">
         
         {activeTab === 'profile' && (
-          <form onSubmit={handleSaveProfile} className="profile-form-grid" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          <form onSubmit={handleSaveProfile} className="profile-form-grid">
             <div className="form-card">
-              <div className="card-title" style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem', marginBottom: '1.5rem' }}>
+              <div className="card-title">
                 <User size={18} className="title-icon" />
                 <h3>Personal & Professional Profile</h3>
               </div>
               
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1.25rem' }}>
+              <div className="profile-form-fields-grid">
 
-              <div className="form-row" style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
+              <div className="form-row">
                 <label style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-secondary)' }}>Full Name / Display Name</label>
                 <div className="input-group-premium">
                   <div className="input-group-icon">
@@ -601,15 +541,14 @@ export default function Profile({ onProfileUpdate, onSwitchTab }) {
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder="e.g. Alex Johnson"
                     required
-                    style={{ border: 'none', background: 'transparent', flex: 1, padding: '0 0.75rem', height: '38px', color: 'var(--text-primary)', outline: 'none' }}
                   />
                 </div>
               </div>
 
-              <div className="form-row" style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
-                <div className="label-with-badge" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div className="form-row">
+                <div className="label-with-badge">
                   <label style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-secondary)' }}>Email Address</label>
-                  <span className="verified-pill" style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', color: 'var(--success)', background: 'var(--success-bg)', border: '1px solid var(--success-border)', padding: '2px 8px', borderRadius: '12px' }}>
+                  <span className="verified-badge">
                     <ShieldCheck size={12} /> Verified
                   </span>
                 </div>
@@ -621,12 +560,11 @@ export default function Profile({ onProfileUpdate, onSwitchTab }) {
                     type="email"
                     value={email}
                     readOnly
-                    style={{ border: 'none', background: 'transparent', flex: 1, padding: '0 0.75rem', height: '38px', color: 'var(--text-muted)', cursor: 'not-allowed', outline: 'none' }}
                   />
                 </div>
               </div>
 
-              <div className="form-row" style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
+              <div className="form-row">
                 <label style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-secondary)' }}>Phone Number</label>
                 <div className="input-group-premium">
                   <div className="input-group-icon">
@@ -652,7 +590,7 @@ export default function Profile({ onProfileUpdate, onSwitchTab }) {
                 </div>
               </div>
 
-              <div className="form-row" style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
+              <div className="form-row">
                 <label style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-secondary)' }}>Business / Company Name</label>
                 <div className="input-group-premium">
                   <div className="input-group-icon">
@@ -663,12 +601,11 @@ export default function Profile({ onProfileUpdate, onSwitchTab }) {
                     value={companyName}
                     onChange={(e) => setCompanyName(e.target.value)}
                     placeholder="e.g. Apex Digital Media"
-                    style={{ border: 'none', background: 'transparent', flex: 1, padding: '0 0.75rem', height: '38px', color: 'var(--text-primary)', outline: 'none' }}
                   />
                 </div>
               </div>
 
-              <div className="form-row" style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
+              <div className="form-row">
                 <label style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-secondary)' }}>Company Website</label>
                 <div className="input-group-premium">
                   <div className="input-group-icon">
@@ -679,14 +616,11 @@ export default function Profile({ onProfileUpdate, onSwitchTab }) {
                     value={companyWebsite}
                     onChange={(e) => setCompanyWebsite(e.target.value)}
                     placeholder="https://company.com"
-                    style={{ border: 'none', background: 'transparent', flex: 1, padding: '0 0.75rem', height: '38px', color: 'var(--text-primary)', outline: 'none' }}
                   />
                 </div>
               </div>
 
-
-
-              <div className="form-row" style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
+              <div className="form-row">
                 <label style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-secondary)' }}>Services Offered</label>
                 <div className="input-group-premium">
                   <div className="input-group-icon">
@@ -697,15 +631,14 @@ export default function Profile({ onProfileUpdate, onSwitchTab }) {
                     value={servicesOffered}
                     onChange={(e) => setServicesOffered(e.target.value)}
                     placeholder="e.g. Web Design, Local SEO, Lead Gen, PPC"
-                    style={{ border: 'none', background: 'transparent', flex: 1, padding: '0 0.75rem', height: '38px', color: 'var(--text-primary)', outline: 'none' }}
                   />
                 </div>
               </div>
 
-              <div className="form-row" style={{ gridColumn: 'span 2', display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
+              <div className="form-row" style={{ gridColumn: 'span 2' }}>
                 <label style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-secondary)' }}>Value Pitch Profile & Core Offers</label>
-                <div className="input-group-premium" style={{ display: 'flex', alignItems: 'stretch' }}>
-                  <div className="input-group-icon" style={{ height: 'auto', alignSelf: 'flex-start', paddingTop: '0.75rem' }}>
+                <div className="input-group-premium">
+                  <div className="input-group-icon" style={{ alignSelf: 'flex-start', paddingTop: '0.75rem' }}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
                   </div>
                   <textarea
@@ -714,7 +647,6 @@ export default function Profile({ onProfileUpdate, onSwitchTab }) {
                     maxLength={500}
                     onChange={(e) => setBio(e.target.value)}
                     placeholder="e.g. premier design & development services"
-                    style={{ border: 'none', background: 'transparent', flex: 1, padding: '0.75rem', color: 'var(--text-primary)', outline: 'none', resize: 'vertical', minHeight: '80px' }}
                   />
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'flex-end', fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '2px' }}>
@@ -724,7 +656,7 @@ export default function Profile({ onProfileUpdate, onSwitchTab }) {
               
               </div> {/* End of grid layout container */}
 
-              <button type="submit" className={`btn-save-profile ${savingProfile ? 'loading' : ''}`} disabled={savingProfile} style={{ marginTop: '1.5rem', alignSelf: 'flex-start' }}>
+              <button type="submit" className={`btn-save-profile ${savingProfile ? 'loading' : ''}`} disabled={savingProfile}>
                 {savingProfile ? (
                   <>
                     <Loader2 size={18} className="spin-icon" />
@@ -742,8 +674,8 @@ export default function Profile({ onProfileUpdate, onSwitchTab }) {
         )}
 
         {activeTab === 'security' && (
-          <div className="card settings-card animate-fade-in" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-color)', borderRadius: '12px', padding: '1.5rem', marginBottom: 0 }}>
-            <div className="card-title" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.35rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem', marginBottom: '1.25rem' }}>
+          <div className="form-card settings-card animate-fade-in">
+            <div className="card-title" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.35rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <Lock size={18} style={{ color: 'var(--primary)' }} />
                 <span style={{ fontWeight: '700', fontSize: '1.15rem' }}>Security / Update Password</span>
@@ -765,7 +697,6 @@ export default function Profile({ onProfileUpdate, onSwitchTab }) {
                   <input
                     type={showCurrentPassword ? 'text' : 'password'}
                     id="profile-current-password"
-                    style={{ border: 'none', background: 'transparent', flex: 1, padding: '0 2.5rem 0 0.75rem', height: '38px', color: 'var(--text-primary)', outline: 'none' }}
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
                     placeholder="Enter current password"
@@ -780,7 +711,7 @@ export default function Profile({ onProfileUpdate, onSwitchTab }) {
                 </div>
               </div>
 
-              <div className="form-group" style={{ marginBottom: 0, width: '100%', display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
+              <div className="form-group">
                 <label htmlFor="profile-new-password" style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-secondary)' }}>
                   New Password
                 </label>
@@ -791,7 +722,6 @@ export default function Profile({ onProfileUpdate, onSwitchTab }) {
                   <input
                     type={showNewPassword ? 'text' : 'password'}
                     id="profile-new-password"
-                    style={{ border: 'none', background: 'transparent', flex: 1, padding: '0 2.5rem 0 0.75rem', height: '38px', color: 'var(--text-primary)', outline: 'none' }}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="Enter new password"
@@ -799,14 +729,13 @@ export default function Profile({ onProfileUpdate, onSwitchTab }) {
                   <button
                     type="button"
                     onClick={() => setShowNewPassword(!showNewPassword)}
-                    style={{ position: 'absolute', right: '0.75rem', background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
                   >
                     {showNewPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                   </button>
                 </div>
               </div>
 
-              <div className="form-group" style={{ marginBottom: 0, width: '100%', display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
+              <div className="form-group">
                 <label htmlFor="profile-confirm-password" style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-secondary)' }}>
                   Confirm New Password
                 </label>
@@ -817,7 +746,6 @@ export default function Profile({ onProfileUpdate, onSwitchTab }) {
                   <input
                     type={showConfirmPassword ? 'text' : 'password'}
                     id="profile-confirm-password"
-                    style={{ border: 'none', background: 'transparent', flex: 1, padding: '0 2.5rem 0 0.75rem', height: '38px', color: 'var(--text-primary)', outline: 'none' }}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Confirm new password"
@@ -825,14 +753,13 @@ export default function Profile({ onProfileUpdate, onSwitchTab }) {
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    style={{ position: 'absolute', right: '0.75rem', background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
                   >
                     {showConfirmPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                   </button>
                 </div>
               </div>
 
-              <div style={{ padding: '0.75rem 1rem', borderRadius: '8px', background: 'var(--bg-trans-2)', border: '1px solid var(--border-color)', fontSize: '0.8rem', display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
+              <div className="password-strength-box" style={{ padding: '0.75rem 1rem', borderRadius: '8px', background: 'var(--bg-trans-2)', border: '1px solid var(--border-color)', fontSize: '0.8rem', display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
                 <span style={{ fontWeight: '700', color: 'var(--text-secondary)', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Password strength check</span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: newPassword.length >= 6 ? 'var(--success)' : 'var(--text-muted)' }}>
                   <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: newPassword.length >= 6 ? 'var(--success)' : 'var(--text-muted)' }}></div>
@@ -850,9 +777,8 @@ export default function Profile({ onProfileUpdate, onSwitchTab }) {
 
               <button
                 type="submit"
-                className="btn btn-primary"
+                className="btn-change-password"
                 disabled={isResettingPassword}
-                style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', height: '38px', borderRadius: '6px', cursor: 'pointer', background: 'var(--primary)', color: 'white', border: 'none', fontWeight: 'bold' }}
               >
                 {isResettingPassword ? (
                   <>
@@ -871,42 +797,40 @@ export default function Profile({ onProfileUpdate, onSwitchTab }) {
         )}
 
         {activeTab === 'integrations' && (
-          <div className="settings-stacked-cards animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            <div className="card settings-card" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-color)', borderRadius: '12px', padding: '1.5rem', marginBottom: 0 }}>
-              <div className="settings-card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem', marginBottom: '1.25rem' }}>
-                <div className="settings-card-title-row" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <Key size={18} style={{ color: 'var(--primary)' }} />
-                  <span className="settings-card-title-text" style={{ fontWeight: '700', fontSize: '1.15rem' }}>API Developer Credentials</span>
+          <div className="settings-stacked-cards animate-fade-in">
+            <div className="form-card settings-card">
+              <div className="settings-card-header">
+                <div className="settings-card-title-row">
+                  <Key size={18} />
+                  <span className="settings-card-title-text">API Developer Credentials</span>
                 </div>
-                <div className="status-pulse-pill status-active" style={{ fontSize: '0.75rem', padding: '0.15rem 0.55rem', display: 'flex', alignItems: 'center', gap: '4px', background: 'var(--success-bg)', border: '1px solid var(--success-border)', borderRadius: '12px', color: 'var(--success)' }}>
-                  <span className="pulse-dot" style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--success)' }}></span>
+                <div className="verified-badge">
+                  <span className="pulse-dot"></span>
                   <span>Active</span>
                 </div>
               </div>
               
-              <div className="settings-body" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                <div className="form-group" style={{ marginBottom: 0, display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
+              <div className="settings-body">
+                <div className="form-group">
                   <label style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-secondary)' }}>API DEVELOPER SECRET KEY</label>
-                  <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <div className="input-group-premium readonly" style={{ flexGrow: 1 }}>
+                  <div className="developer-key-row">
+                    <div className="input-group-premium readonly">
                       <div className="input-group-icon">
                         <Key size={16} />
                       </div>
                       <input
                         type={showDevToken ? 'text' : 'password'}
                         readOnly
-                        style={{ border: 'none', background: 'transparent', flex: 1, padding: '0 2.5rem 0 0.75rem', height: '38px', color: 'var(--text-primary)', fontFamily: 'monospace', outline: 'none', cursor: 'not-allowed' }}
                         value={developerToken}
                       />
                       <button
                         type="button"
                         onClick={() => setShowDevToken(!showDevToken)}
-                        style={{ position: 'absolute', right: '0.75rem', background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
                       >
                         {showDevToken ? <EyeOff size={15} /> : <Eye size={15} />}
                       </button>
                     </div>
-                    <button type="button" onClick={copyDevToken} className="btn btn-glow-outline" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--border-color)', height: '38px', padding: '0 0.85rem', cursor: 'pointer', borderRadius: '6px', background: 'transparent', color: 'var(--text-primary)' }}>
+                    <button type="button" onClick={copyDevToken} className="btn-copy-token">
                       <Copy size={15} />
                     </button>
                   </div>
@@ -914,20 +838,20 @@ export default function Profile({ onProfileUpdate, onSwitchTab }) {
               </div>
             </div>
 
-            <div className="card settings-card" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-color)', borderRadius: '12px', padding: '1.5rem', marginBottom: 0 }}>
-              <div className="settings-card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem', marginBottom: '1.25rem' }}>
-                <div className="settings-card-title-row" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <Webhook size={18} style={{ color: 'var(--primary)' }} />
-                  <span className="settings-card-title-text" style={{ fontWeight: '700', fontSize: '1.15rem' }}>CRM Webhook Integration</span>
+            <div className="form-card settings-card">
+              <div className="settings-card-header">
+                <div className="settings-card-title-row">
+                  <Webhook size={18} />
+                  <span className="settings-card-title-text">CRM Webhook Integration</span>
                 </div>
-                <div className={`status-pulse-pill ${webhookHealth === 'Active' ? 'status-active' : 'status-inactive'}`} style={{ fontSize: '0.75rem', padding: '0.15rem 0.55rem', display: 'flex', alignItems: 'center', gap: '4px', background: webhookHealth === 'Active' ? 'var(--success-bg)' : 'var(--bg-trans-3)', border: webhookHealth === 'Active' ? '1px solid var(--success-border)' : '1px solid var(--border-color)', borderRadius: '12px', color: webhookHealth === 'Active' ? 'var(--success)' : 'var(--text-muted)' }}>
-                  <span className="pulse-dot" style={{ width: '6px', height: '6px', borderRadius: '50%', background: webhookHealth === 'Active' ? 'var(--success)' : 'var(--text-muted)' }}></span>
+                <div className={`verified-badge ${webhookHealth === 'Active' ? 'active' : 'inactive'}`}>
+                  <span className="pulse-dot"></span>
                   <span>{webhookHealth}</span>
                 </div>
               </div>
               
-              <div className="settings-body" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                <div className="form-group" style={{ marginBottom: 0, display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
+              <div className="settings-body">
+                <div className="form-group">
                   <label style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-secondary)' }}>WEBHOOK TARGET URL</label>
                   <div className="input-group-premium">
                     <div className="input-group-icon">
@@ -937,14 +861,13 @@ export default function Profile({ onProfileUpdate, onSwitchTab }) {
                       type="text"
                       id="settings-webhook-url"
                       placeholder="e.g. https://hooks.zapier.com/..."
-                      style={{ border: 'none', background: 'transparent', flex: 1, padding: '0 0.75rem', height: '38px', color: 'var(--text-primary)', outline: 'none' }}
                       value={webhookUrl}
                       onChange={(e) => setWebhookUrl(e.target.value)}
                     />
                   </div>
                 </div>
-                <div className="settings-card-actions" style={{ display: 'flex', justifyContent: 'flex-start', marginTop: '0.5rem' }}>
-                  <button type="button" onClick={handleSaveWebhook} className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', height: '38px', padding: '0 1rem', background: 'var(--primary)', color: 'white', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>
+                <div className="settings-card-actions">
+                  <button type="button" onClick={handleSaveWebhook} className="btn-change-password">
                     <Save size={14} /> Save Webhook URL
                   </button>
                 </div>
