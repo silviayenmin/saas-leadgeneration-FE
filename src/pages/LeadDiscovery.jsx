@@ -24,7 +24,7 @@ import { getPlatformIcon } from '../utils/helpers';
 import api from '../services/api';
 import { MapContainer, TileLayer, Circle } from 'react-leaflet';
 
-export default function LeadDiscovery({ leads, setLeads, searches, setSearches, onSwitchTab, onOpenLead }) {
+export default function LeadDiscovery({ leads, setLeads, searches, setSearches, onSwitchTab, onOpenLead, refreshCredits, credits }) {
   const [goalMode, setGoalMode] = useState('social'); // Google Maps only (defaulted to social scan wrapper)
   const [step, setStep] = useState(1);
 
@@ -36,6 +36,12 @@ export default function LeadDiscovery({ leads, setLeads, searches, setSearches, 
     type: 'error',
     isCreditError: false
   });
+
+  useEffect(() => {
+    if (credits && credits.creditsRemaining <= 0) {
+      showAlert('You have consumed all your Lead Discovery credits. Please upgrade your subscription to continue scraping.', 'Credits Exhausted', 'error');
+    }
+  }, [credits]);
 
   const showAlert = (message, title = 'Notice', type = 'error') => {
     const isCredit = (message || '').toLowerCase().includes('credit') || (message || '').toLowerCase().includes('upgrade');
@@ -69,6 +75,10 @@ export default function LeadDiscovery({ leads, setLeads, searches, setSearches, 
   };
 
   const handleStartTenderSync = async () => {
+    if (credits && credits.creditsRemaining <= 0) {
+      showAlert('You have consumed all your Lead Discovery credits. Please upgrade your subscription to continue scraping.', 'Credits Exhausted', 'error');
+      return;
+    }
     const activePortals = Object.keys(selectedPortals).filter((k) => selectedPortals[k]);
     if (activePortals.length === 0) {
       showAlert('Please select at least one portal to sync.', 'Portal Required', 'warning');
@@ -126,11 +136,16 @@ export default function LeadDiscovery({ leads, setLeads, searches, setSearches, 
       const resSearches = await api.get('/searches');
       if (resSearches.data && resSearches.data.searches) setSearches(resSearches.data.searches);
 
+      // Refresh credits balance in the header
+      if (typeof refreshCredits === 'function') {
+        refreshCredits();
+      }
+
       setTimeout(() => {
         setIsScanning(false);
         setScanProgress(0);
         if (onSwitchTab) {
-          onSwitchTab('dashboard');
+          onSwitchTab('maps-scans');
         }
       }, 500);
     } catch (err) {
@@ -219,6 +234,10 @@ export default function LeadDiscovery({ leads, setLeads, searches, setSearches, 
 
   const handleNext = (e) => {
     if (e) e.preventDefault();
+    if (credits && credits.creditsRemaining <= 0) {
+      showAlert('You have consumed all your Lead Discovery credits. Please upgrade your subscription to continue scraping.', 'Credits Exhausted', 'error');
+      return;
+    }
     if (step === 2 && !keyword.trim()) {
       showAlert('Please enter a search intent keyword.', 'Missing Keyword', 'warning');
       return;
@@ -235,6 +254,10 @@ export default function LeadDiscovery({ leads, setLeads, searches, setSearches, 
   // Launch AI Scraper
   const handleLaunch = async (e) => {
     e.preventDefault();
+    if (credits && credits.creditsRemaining <= 0) {
+      showAlert('You have consumed all your Lead Discovery credits. Please upgrade your subscription to continue scraping.', 'Credits Exhausted', 'error');
+      return;
+    }
     setIsScanning(true);
     setScanProgress(5);
     setScanStatusText(`Connecting to ${platform.toUpperCase()} api gateways...`);
@@ -300,9 +323,14 @@ export default function LeadDiscovery({ leads, setLeads, searches, setSearches, 
       const resSearches = await api.get('/searches');
       if (resSearches.data && resSearches.data.searches) setSearches(resSearches.data.searches);
 
+      // Refresh credits balance in the header
+      if (typeof refreshCredits === 'function') {
+        refreshCredits();
+      }
+
       setTimeout(() => {
         resetWizard();
-        onSwitchTab('dashboard');
+        onSwitchTab('maps-scans');
       }, 800);
     } catch (err) {
       clearInterval(progressInterval);
@@ -970,7 +998,7 @@ export default function LeadDiscovery({ leads, setLeads, searches, setSearches, 
                     className="btn-modal-primary"
                     onClick={() => {
                       closeAlert();
-                      if (onSwitchTab) onSwitchTab('profile-subscription');
+                      if (onSwitchTab) onSwitchTab('subscription');
                     }}
                   >
                     <CreditCard size={14} />
