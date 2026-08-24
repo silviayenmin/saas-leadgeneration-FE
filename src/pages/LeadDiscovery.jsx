@@ -28,6 +28,11 @@ export default function LeadDiscovery({ leads, setLeads, searches, setSearches, 
   const [goalMode, setGoalMode] = useState('social'); // Google Maps only (defaulted to social scan wrapper)
   const [step, setStep] = useState(1);
 
+  // Scanner status state
+  const [isScanning, setIsScanning] = useState(false);
+  const [scanProgress, setScanProgress] = useState(0);
+  const [scanStatusText, setScanStatusText] = useState('Starting search...');
+
   // Modern Alert Modal State
   const [alertModal, setAlertModal] = useState({
     show: false,
@@ -38,10 +43,10 @@ export default function LeadDiscovery({ leads, setLeads, searches, setSearches, 
   });
 
   useEffect(() => {
-    if (credits && credits.creditsRemaining <= 0) {
+    if (!isScanning && credits && credits.creditsRemaining <= 0) {
       showAlert('You have consumed all your Lead Discovery credits. Please upgrade your subscription to continue scraping.', 'Credits Exhausted', 'error');
     }
-  }, [credits]);
+  }, [credits, isScanning]);
 
   const showAlert = (message, title = 'Notice', type = 'error') => {
     const isCredit = (message || '').toLowerCase().includes('credit') || (message || '').toLowerCase().includes('upgrade');
@@ -203,10 +208,7 @@ export default function LeadDiscovery({ leads, setLeads, searches, setSearches, 
   const [minIntentScore, setMinIntentScore] = useState(40);
   const [searchType, setSearchType] = useState('sales');
 
-  // Scanner status state
-  const [isScanning, setIsScanning] = useState(false);
-  const [scanProgress, setScanProgress] = useState(0);
-  const [scanStatusText, setScanStatusText] = useState('Starting search...');
+
 
   // Reset wizard
   const resetWizard = () => {
@@ -238,6 +240,10 @@ export default function LeadDiscovery({ leads, setLeads, searches, setSearches, 
       showAlert('You have consumed all your Lead Discovery credits. Please upgrade your subscription to continue scraping.', 'Credits Exhausted', 'error');
       return;
     }
+    if (step === 2 && credits && credits.creditsRemaining < limit) {
+      showAlert(`You only have ${credits.creditsRemaining} credits remaining, but you requested a limit of ${limit} leads. Please upgrade your plan or lower your limit to continue.`, 'Insufficient Credits', 'error');
+      return;
+    }
     if (step === 2 && !keyword.trim()) {
       showAlert('Please enter a search intent keyword.', 'Missing Keyword', 'warning');
       return;
@@ -256,6 +262,10 @@ export default function LeadDiscovery({ leads, setLeads, searches, setSearches, 
     e.preventDefault();
     if (credits && credits.creditsRemaining <= 0) {
       showAlert('You have consumed all your Lead Discovery credits. Please upgrade your subscription to continue scraping.', 'Credits Exhausted', 'error');
+      return;
+    }
+    if (credits && credits.creditsRemaining < limit) {
+      showAlert(`You only have ${credits.creditsRemaining} credits remaining, but you requested a limit of ${limit} leads. Please upgrade your plan or lower your limit to continue.`, 'Insufficient Credits', 'error');
       return;
     }
     setIsScanning(true);
