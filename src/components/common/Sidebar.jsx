@@ -5,7 +5,7 @@ import './Sidebar.scss';
 const Sidebar = ({ activeTab, setActiveTab, user, onLogout, isMobileNavOpen, onCloseMobileNav }) => {
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'lead-discovery', label: 'Lead Discovery', icon: MapPin },
+    { id: 'lead-discovery', label: 'Prospect Discovery', icon: MapPin },
     { id: 'maps-scans', label: 'Maps Scans', icon: History },
     { id: 'outreach-pipeline', label: 'Outreach Pipeline', icon: Kanban },
     { id: 'subscription', label: 'Subscription', icon: CreditCard },

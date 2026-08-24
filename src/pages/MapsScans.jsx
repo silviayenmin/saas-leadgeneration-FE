@@ -356,8 +356,8 @@ export default function MapsScans({ leads = [], setLeads, searches = [], setSear
     if (selectedUrls.length === 0) return;
     setConfirmModal({
       show: true,
-      title: 'Delete Selected Leads',
-      message: `Are you sure you want to delete the ${selectedUrls.length} selected lead records? This action cannot be undone.`,
+      title: 'Delete Selected Prospects',
+      message: `Are you sure you want to delete the ${selectedUrls.length} selected prospect records? This action cannot be undone.`,
       type: 'danger',
       isConfirm: true,
       onConfirm: async () => {
@@ -376,7 +376,7 @@ export default function MapsScans({ leads = [], setLeads, searches = [], setSear
           setConfirmModal({
             show: true,
             title: 'Delete Failed',
-            message: 'Failed to delete leads.',
+            message: 'Failed to delete prospects.',
             type: 'danger',
             isConfirm: false,
             onConfirm: null
@@ -572,8 +572,8 @@ export default function MapsScans({ leads = [], setLeads, searches = [], setSear
   const intentOptions = [
     { value: 'all', label: 'All Intent Scores' },
     { value: 'Qualified', label: 'Qualified' },
-    { value: 'Potential Lead', label: 'Potential Lead' },
-    { value: 'Warm Lead', label: 'Warm Lead' }
+    { value: 'Potential Lead', label: 'Potential Prospect' },
+    { value: 'Warm Lead', label: 'Warm Prospect' }
   ];
 
   const crmOptions = [
@@ -582,7 +582,9 @@ export default function MapsScans({ leads = [], setLeads, searches = [], setSear
     { value: 'Drafted', label: 'Drafted' },
     { value: 'Emailed', label: 'Emailed' },
     { value: 'Replied', label: 'Replied' },
-    { value: 'Disqualified', label: 'Disqualified' }
+    { value: 'Hot', label: 'Hot' },
+    { value: 'Warm', label: 'Warm' },
+    { value: 'Cold', label: 'Cold' }
   ];
 
   return (
@@ -617,7 +619,7 @@ export default function MapsScans({ leads = [], setLeads, searches = [], setSear
           <div className="kpi-icon"><Database size={18} /></div>
           <div className="kpi-details">
             <div className="kpi-value">{stats.total}</div>
-            <div className="kpi-label">Maps Leads</div>
+            <div className="kpi-label">Maps Prospects</div>
           </div>
         </div>
 
@@ -825,7 +827,7 @@ export default function MapsScans({ leads = [], setLeads, searches = [], setSear
         {/* Spreadsheet Data Grid */}
         {filteredLeads.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '4rem 1rem', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-            No matching Google Maps scans found. Clear filters or run a scan in Lead Discovery.
+            No matching Google Maps scans found. Clear filters or run a scan in Prospect Discovery.
           </div>
         ) : (
           <>
@@ -846,7 +848,7 @@ export default function MapsScans({ leads = [], setLeads, searches = [], setSear
                     <th style={{ width: '10%' }}>AI Match</th>
                     <th style={{ width: '13%' }}>Phone</th>
                     <th style={{ width: '20%' }}>Email Contact</th>
-                    <th style={{ width: '16%' }}>CRM Lead</th>
+                    <th style={{ width: '16%' }}>CRM Prospect</th>
                     <th style={{ width: '4%' }}>Maps</th>
                   </tr>
                 </thead>

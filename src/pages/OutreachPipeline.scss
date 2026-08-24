@@ -468,9 +468,9 @@
 
     .kanban-board-grid {
       display: grid;
-      grid-template-columns: repeat(5, minmax(260px, 1fr));
+      grid-template-columns: repeat(7, minmax(260px, 1fr));
       gap: 14px;
-      min-width: 1300px;
+      min-width: 1820px;
     }
   }
 

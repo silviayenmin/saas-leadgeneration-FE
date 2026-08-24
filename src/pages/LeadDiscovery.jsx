@@ -44,7 +44,7 @@ export default function LeadDiscovery({ leads, setLeads, searches, setSearches, 
 
   useEffect(() => {
     if (!isScanning && credits && credits.creditsRemaining <= 0) {
-      showAlert('You have consumed all your Lead Discovery credits. Please upgrade your subscription to continue scraping.', 'Credits Exhausted', 'error');
+      showAlert('You have consumed all your Prospect Discovery credits. Please upgrade your subscription to continue scraping.', 'Credits Exhausted', 'error');
     }
   }, [credits, isScanning]);
 
@@ -81,7 +81,7 @@ export default function LeadDiscovery({ leads, setLeads, searches, setSearches, 
 
   const handleStartTenderSync = async () => {
     if (credits && credits.creditsRemaining <= 0) {
-      showAlert('You have consumed all your Lead Discovery credits. Please upgrade your subscription to continue scraping.', 'Credits Exhausted', 'error');
+      showAlert('You have consumed all your Prospect Discovery credits. Please upgrade your subscription to continue scraping.', 'Credits Exhausted', 'error');
       return;
     }
     const activePortals = Object.keys(selectedPortals).filter((k) => selectedPortals[k]);
@@ -236,11 +236,11 @@ export default function LeadDiscovery({ leads, setLeads, searches, setSearches, 
   const handleNext = (e) => {
     if (e) e.preventDefault();
     if (credits && credits.creditsRemaining <= 0) {
-      showAlert('You have consumed all your Lead Discovery credits. Please upgrade your subscription to continue scraping.', 'Credits Exhausted', 'error');
+      showAlert('You have consumed all your Prospect Discovery credits. Please upgrade your subscription to continue scraping.', 'Credits Exhausted', 'error');
       return;
     }
     if (step === 2 && credits && credits.creditsRemaining < limit) {
-      showAlert(`You only have ${credits.creditsRemaining} credits remaining, but you requested a limit of ${limit} leads. Please upgrade your plan or lower your limit to continue.`, 'Insufficient Credits', 'error');
+      showAlert(`You only have ${credits.creditsRemaining} credits remaining, but you requested a limit of ${limit} prospects. Please upgrade your plan or lower your limit to continue.`, 'Insufficient Credits', 'error');
       return;
     }
     if (step === 2 && !keyword.trim()) {
@@ -260,11 +260,11 @@ export default function LeadDiscovery({ leads, setLeads, searches, setSearches, 
   const handleLaunch = async (e) => {
     e.preventDefault();
     if (credits && credits.creditsRemaining <= 0) {
-      showAlert('You have consumed all your Lead Discovery credits. Please upgrade your subscription to continue scraping.', 'Credits Exhausted', 'error');
+      showAlert('You have consumed all your Prospect Discovery credits. Please upgrade your subscription to continue scraping.', 'Credits Exhausted', 'error');
       return;
     }
     if (credits && credits.creditsRemaining < limit) {
-      showAlert(`You only have ${credits.creditsRemaining} credits remaining, but you requested a limit of ${limit} leads. Please upgrade your plan or lower your limit to continue.`, 'Insufficient Credits', 'error');
+      showAlert(`You only have ${credits.creditsRemaining} credits remaining, but you requested a limit of ${limit} prospects. Please upgrade your plan or lower your limit to continue.`, 'Insufficient Credits', 'error');
       return;
     }
     setIsScanning(true);
@@ -532,7 +532,7 @@ export default function LeadDiscovery({ leads, setLeads, searches, setSearches, 
                     </div>
                     <div style={{ display: 'flex', gap: '0.6rem' }}>
                       <span style={{ color: 'var(--primary)', fontWeight: 'bold' }}>✓</span>
-                      <span><strong>Lead Score Ranking:</strong> Ranks high-intent leads (0 to 100).</span>
+                      <span><strong>Prospect Score Ranking:</strong> Ranks high-intent prospects (0 to 100).</span>
                     </div>
                   </div>
 
@@ -913,7 +913,7 @@ export default function LeadDiscovery({ leads, setLeads, searches, setSearches, 
                           <Calendar size={14} /> Recency / Limits
                         </span>
                         <strong className="summary-value" style={{ color: 'var(--text-primary)' }}>
-                          {platform === 'google_maps' ? `${limit} leads max` : `${timeframe === 'qdr:d' ? 'Past Day' : timeframe === 'qdr:w' ? 'Past Week' : 'Past 1-3 Months'} (${limit} leads max)`}
+                          {platform === 'google_maps' ? `${limit} prospects max` : `${timeframe === 'qdr:d' ? 'Past Day' : timeframe === 'qdr:w' ? 'Past Week' : 'Past 1-3 Months'} (${limit} prospects max)`}
                         </strong>
                       </div>
                     </div>
@@ -922,7 +922,7 @@ export default function LeadDiscovery({ leads, setLeads, searches, setSearches, 
                       <div className="estimate-count" style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--primary)' }}>
                         {estimateMin} - {estimateMax}
                       </div>
-                      <div className="estimate-label" style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)', marginTop: '4px' }}>Estimated qualified lead targets</div>
+                      <div className="estimate-label" style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)', marginTop: '4px' }}>Estimated qualified prospect targets</div>
                       <span className="estimate-help-text" style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', display: 'block', marginTop: '2px' }}>Based on your filter metrics, matching history, and domain indexes.</span>
                     </div>
                   </div>
