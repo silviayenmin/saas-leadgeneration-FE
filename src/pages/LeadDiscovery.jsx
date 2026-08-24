@@ -700,29 +700,15 @@ export default function LeadDiscovery({ leads, setLeads, searches, setSearches, 
                         boxShadow: location.trim() ? '0 0 14px rgba(3, 180, 216, 0.25)' : 'var(--shadow-sm)',
                         transition: 'all 0.25s ease'
                       }}>
-                        <MapContainer
+                        <iframe
                           key={mapKey}
-                          center={mapCenter}
-                          zoom={mapZoom}
-                          style={{ height: '100%', width: '100%', minHeight: '250px' }}
-                          zoomControl={false}
-                          attributionControl={false}
-                        >
-                          <TileLayer
-                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                          />
-                          <Circle
-                            center={mapCenter}
-                            radius={4000}
-                            pathOptions={{
-                              color: '#03b4d8',
-                              fillColor: '#03b4d8',
-                              fillOpacity: 0.12,
-                              weight: 2.5,
-                              dashArray: '6, 6'
-                            }}
-                          />
-                        </MapContainer>
+                          title="Location Preview"
+                          width="100%"
+                          height="100%"
+                          style={{ border: 0, minHeight: '250px' }}
+                          loading="lazy"
+                          src={`https://maps.google.com/maps?q=${encodeURIComponent(location.trim() || 'Singapore')}&t=&ie=UTF8&output=embed`}
+                        ></iframe>
                       </div>
                     </div>
 
