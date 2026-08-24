@@ -375,7 +375,7 @@ const App = () => {
   const getPageTitle = () => {
     switch (activeTab) {
       case 'dashboard': return 'Dashboard';
-      case 'lead-discovery': return 'Google Maps Lead Discovery';
+      case 'lead-discovery': return 'Google Maps Prospect Discovery';
       case 'maps-scans': return 'Maps Scans & History';
       case 'outreach-pipeline': return 'Outreach CRM Pipeline';
       case 'profile': return 'Profile Settings';

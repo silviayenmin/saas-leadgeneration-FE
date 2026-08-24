@@ -386,7 +386,7 @@ export default function Dashboard({ leads = [], searches = [], onOpenLead, onSwi
             <div className="data-card" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div style={{ fontWeight: 'bold', fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Sparkles size={16} color="var(--primary)" />
-                <span>AI Recommended Lead Matches</span>
+                <span>AI Recommended Prospect Matches</span>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.50rem' }}>
                 {recommendedLeads.length === 0 ? (
@@ -417,7 +417,7 @@ export default function Dashboard({ leads = [], searches = [], onOpenLead, onSwi
                             {lead.platform === 'google_maps' ? lead.companyName : lead.authorName}
                           </span>
                           <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
-                            {lead.companyName && lead.companyName !== 'Not Specified' ? lead.companyName : (lead.industry || 'Lead Match')}
+                            {lead.companyName && lead.companyName !== 'Not Specified' ? lead.companyName : (lead.industry || 'Prospect Match')}
                           </span>
                         </div>
                         <span style={{ fontSize: '0.7rem', padding: '3px 8px', borderRadius: '12px', background: isHigh ? 'rgba(16,185,129,0.1)' : 'rgba(245,158,11,0.1)', color: isHigh ? '#10B981' : '#F59E0B', fontWeight: 600 }}>
@@ -516,7 +516,7 @@ export default function Dashboard({ leads = [], searches = [], onOpenLead, onSwi
                 minWidth="105px"
                 options={[
                   { value: 'all', label: 'All Modes' },
-                  { value: 'sales', label: 'Sales Leads Only' },
+                  { value: 'sales', label: 'Sales Prospects Only' },
                   { value: 'recruiter', label: 'Candidates Only' }
                 ]}
               />
@@ -527,8 +527,8 @@ export default function Dashboard({ leads = [], searches = [], onOpenLead, onSwi
                 options={[
                   { value: 'all', label: 'All Intent Scores' },
                   { value: 'Qualified', label: 'Qualified' },
-                  { value: 'Potential Lead', label: 'Potential Lead' },
-                  { value: 'Warm Lead', label: 'Warm Lead' }
+                  { value: 'Potential Lead', label: 'Potential Prospect' },
+                  { value: 'Warm Lead', label: 'Warm Prospect' }
                 ]}
               />
 
@@ -542,7 +542,9 @@ export default function Dashboard({ leads = [], searches = [], onOpenLead, onSwi
                   { value: 'Drafted', label: 'Drafted' },
                   { value: 'Emailed', label: 'Emailed' },
                   { value: 'Replied', label: 'Replied' },
-                  { value: 'Disqualified', label: 'Disqualified' }
+                  { value: 'Hot', label: 'Hot' },
+                  { value: 'Warm', label: 'Warm' },
+                  { value: 'Cold', label: 'Cold' }
                 ]}
               />
 
@@ -660,7 +662,7 @@ export default function Dashboard({ leads = [], searches = [], onOpenLead, onSwi
             {/* Leads Table */}
             {filteredLeads.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '3rem 1rem', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-                No leads matching filters. Try adjusting your filter parameters or search queries.
+                No prospects matching filters. Try adjusting your filter parameters or search queries.
               </div>
             ) : (
               <>
@@ -669,7 +671,7 @@ export default function Dashboard({ leads = [], searches = [], onOpenLead, onSwi
                   <thead>
                     <tr>
                       <th style={{ width: '20%' }}>Platform</th>
-                      <th style={{ width: '35%' }}>Lead / Company</th>
+                      <th style={{ width: '35%' }}>Prospect / Company</th>
                       <th style={{ width: '20%' }}>Match Score</th>
                       <th style={{ width: '20%' }}>Contact Info</th>
                       <th style={{ width: '5%' }}>Source</th>

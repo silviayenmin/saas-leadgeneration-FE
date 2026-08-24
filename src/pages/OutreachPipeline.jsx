@@ -208,8 +208,8 @@ const PLATFORM_OPTIONS = [
 const INTENT_OPTIONS = [
   { value: 'ALL', label: 'All Intent Scores' },
   { value: 'Qualified', label: 'Qualified' },
-  { value: 'Potential Lead', label: 'Potential Lead' },
-  { value: 'Warm Lead', label: 'Warm Lead' }
+  { value: 'Potential Lead', label: 'Potential Prospect' },
+  { value: 'Warm Lead', label: 'Warm Prospect' }
 ];
 
 const OutreachPipeline = ({
@@ -294,18 +294,22 @@ const OutreachPipeline = ({
   // Columns & Stages Configuration depending on Workflow Mode
   const STAGE_CONFIGS = {
     sales: [
-      { id: 'New', label: 'New Leads', statusKey: 'New', color: '#3B82F6' },
+      { id: 'New', label: 'New Prospects', statusKey: 'New', color: '#3B82F6' },
       { id: 'Drafted', label: 'Drafted Pitch', statusKey: 'Drafted', color: '#8B5CF6' },
       { id: 'Emailed', label: 'Emailed Out', statusKey: 'Emailed', color: '#F59E0B' },
       { id: 'Replied', label: 'Replied', statusKey: 'Replied', color: '#10B981' },
-      { id: 'Disqualified', label: 'Disqualified', statusKey: 'Disqualified', color: '#EF4444' },
+      { id: 'Hot', label: 'Hot', statusKey: 'Hot', color: '#EF4444' },
+      { id: 'Warm', label: 'Warm', statusKey: 'Warm', color: '#EAB308' },
+      { id: 'Cold', label: 'Cold', statusKey: 'Cold', color: '#64748B' },
     ],
     recruiter: [
       { id: 'New', label: 'Discovered', statusKey: 'Discovered', color: '#3B82F6' },
       { id: 'Drafted', label: 'Contacted', statusKey: 'Contacted', color: '#8B5CF6' },
       { id: 'Emailed', label: 'Screening', statusKey: 'Screening', color: '#F59E0B' },
       { id: 'Replied', label: 'Interviewing', statusKey: 'Interviewing', color: '#10B981' },
-      { id: 'Disqualified', label: 'Rejected', statusKey: 'Rejected', color: '#EF4444' },
+      { id: 'Hot', label: 'Hot', statusKey: 'Hot', color: '#EF4444' },
+      { id: 'Warm', label: 'Warm', statusKey: 'Warm', color: '#EAB308' },
+      { id: 'Cold', label: 'Cold', statusKey: 'Cold', color: '#64748B' },
     ],
   };
 
@@ -432,7 +436,7 @@ const OutreachPipeline = ({
             </div>
             <div>
               <h2>Outreach CRM Pipeline</h2>
-              <p>Drag and drop leads to track engagement across sales & recruitment workflows</p>
+              <p>Drag and drop prospects to track engagement across sales & recruitment workflows</p>
             </div>
           </div>
 
@@ -440,7 +444,7 @@ const OutreachPipeline = ({
             <button
               className={`btn-refresh ${isRefreshing ? 'spinning' : ''}`}
               onClick={handleRefreshClick}
-              title="Refresh pipeline leads"
+              title="Refresh pipeline prospects"
             >
               <RefreshCw size={15} />
               <span>Refresh</span>
@@ -630,7 +634,7 @@ const OutreachPipeline = ({
                   {stageLeads.length === 0 ? (
                     <div className="empty-column-state">
                       <Sparkles size={20} style={{ opacity: 0.4 }} />
-                      <p>No leads in {stage.label}</p>
+                      <p>No prospects in {stage.label}</p>
                     </div>
                   ) : (
                      stageLeads.map((lead, idx) => {
@@ -676,7 +680,7 @@ const OutreachPipeline = ({
                             {/* Hover Delete Action Button */}
                             <button
                               className="btn-delete-card-hover"
-                              title="Delete Lead"
+                              title="Delete Prospect"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleDeleteCard(lead, e);
@@ -841,9 +845,9 @@ const OutreachPipeline = ({
               <div className="modal-title-group">
                 <img
                   src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
-                    selectedLeadModal.authorName || selectedLeadModal.companyName || 'Lead'
+                    selectedLeadModal.authorName || selectedLeadModal.companyName || 'Prospect'
                   )}&background=0EA5A4&color=fff&bold=true`}
-                  alt="Lead Avatar"
+                  alt="Prospect Avatar"
                   className="modal-avatar"
                 />
                 <div>

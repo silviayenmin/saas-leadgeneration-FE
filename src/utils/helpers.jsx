@@ -118,6 +118,9 @@ export function getCrmBadgeClass(crmStatus) {
   if (s === "emailed") return "badge-warning";
   if (s === "replied") return "badge-success";
   if (s === "disqualified") return "badge-danger";
+  if (s === "hot") return "badge-danger";
+  if (s === "warm") return "badge-warning";
+  if (s === "cold") return "badge-neutral";
   return "badge-neutral";
 }
 
