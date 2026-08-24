@@ -395,7 +395,7 @@ export default function Subscription({ onUpgradeSuccess }) {
                         <tr key={idx}>
                           <td>{new Date(tx.timestamp || Date.now()).toLocaleString()}</td>
                           <td><strong>{tx.action || 'Lead Discovery Search'}</strong></td>
-                          <td style={{ color: 'var(--error)', fontWeight: 'bold' }}>-{tx.amount || 1}</td>
+                          <td style={{ color: 'var(--error)', fontWeight: 'bold' }}>-{tx.creditsUsed ?? tx.amount ?? 1}</td>
                           <td>{tx.balanceAfter ?? creditsRemaining}</td>
                         </tr>
                       ))
