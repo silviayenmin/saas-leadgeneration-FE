@@ -183,11 +183,10 @@ export default function LeadDiscovery({ leads, setLeads, searches, setSearches, 
 
     const delayDebounce = setTimeout(async () => {
       try {
-        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location.trim())}&limit=1`);
-        const data = await res.json();
-        if (data && data.length > 0) {
-          const lat = parseFloat(data[0].lat);
-          const lon = parseFloat(data[0].lon);
+        const res = await api.get(`/maps/geocode?q=${encodeURIComponent(location.trim())}`);
+        if (res.data && res.data.success && res.data.data && res.data.data.length > 0) {
+          const lat = parseFloat(res.data.data[0].lat);
+          const lon = parseFloat(res.data.data[0].lon);
           setMapCenter([lat, lon]);
           setMapZoom(12);
           setMapKey(prev => prev + 1);
