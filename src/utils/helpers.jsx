@@ -9,7 +9,7 @@ export function getLeadPlatform(lead) {
   if (url.includes("weworkremotely.com")) return "weworkremotely";
   if (url.includes("freelancer.com")) return "freelancer";
   if (url.includes("upwork.com")) return "upwork";
-  if (url.includes("google.com/maps") || url.includes("google.co.in/maps")) return "google_maps";
+  if (url.includes("google.com/maps") || url.includes("google.co.in/maps") || url.includes("maps.google.com")) return "google_maps";
   return "linkedin";
 }
 
