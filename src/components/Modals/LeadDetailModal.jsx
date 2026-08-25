@@ -609,7 +609,7 @@ Source: ${lead.sourceUrl}`;
             </div>
           </div>
 
-          {/* CARD 4: Company metrics (for Maps scans) */}
+          {/* CARD 4: Company metrics (for Maps scans) - Commented out for now
           {isMaps && (
             <div className="detail-card">
               <div className="card-header-row">
@@ -650,6 +650,7 @@ Source: ${lead.sourceUrl}`;
               </div>
             </div>
           )}
+          */}
 
           {/* CARD 5: B2B Key Team & Contacts */}
           <div className="detail-card">
@@ -820,7 +821,7 @@ Source: ${lead.sourceUrl}`;
           </div>
 
           {/* CARD 6: Inbox Sync Replies Thread */}
-          <div className="detail-card replies-card" style={{ marginTop: '20px' }}>
+          <div className="detail-card replies-card">
             <div className="card-header-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <h4 className="card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px', margin: 0 }}>
                 <MessageSquare size={14} className="header-icon" />
