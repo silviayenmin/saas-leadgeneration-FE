@@ -51,7 +51,7 @@ const Login = ({ onNavigate, onLoginSuccess, onRequireOtp, successMessage }) => 
           <div className="brand-icon">
             <Sparkles size={26} />
           </div>
-          <h2>MapFlow AI</h2>
+          <h2>LeadGen AI</h2>
           <p>Discover Local Businesses. Find Better Leads. Close More Deals.</p>
         </div>
 
@@ -119,7 +119,7 @@ const Login = ({ onNavigate, onLoginSuccess, onRequireOtp, successMessage }) => 
           </div>
 
           <button type="submit" className="btn-submit" disabled={loading}>
-            {loading ? 'Signing In...' : 'Sign In to MapFlow'} <ArrowRight size={16} />
+            {loading ? 'Signing In...' : 'Sign In to LeadGen'} <ArrowRight size={16} />
           </button>
         </form>
 

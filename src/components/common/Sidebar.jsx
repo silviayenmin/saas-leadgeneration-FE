@@ -26,7 +26,7 @@ const Sidebar = ({ activeTab, setActiveTab, user, onLogout, isMobileNavOpen, onC
           <div className="brand-icon">
             <Sparkles size={20} />
           </div>
-          <span className="brand-text">MAPFLOW AI</span>
+          <span className="brand-text">LEADGEN AI</span>
         </div>
         <button className="mobile-close-btn" onClick={onCloseMobileNav} title="Close Navigation">
           <X size={18} />
@@ -54,8 +54,8 @@ const Sidebar = ({ activeTab, setActiveTab, user, onLogout, isMobileNavOpen, onC
         <div className="user-info">
           <div className="user-avatar">{user?.fullName?.charAt(0) || 'U'}</div>
           <div className="user-details">
-            <div className="user-name">{user?.fullName || 'MapFlow User'}</div>
-            <div className="user-email">{user?.email || 'user@mapflow.ai'}</div>
+            <div className="user-name">{user?.fullName || 'LeadGen User'}</div>
+            <div className="user-email">{user?.email || 'user@leadgen.ai'}</div>
           </div>
         </div>
         <button className="logout-btn" onClick={onLogout} title="Sign Out">

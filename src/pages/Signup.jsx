@@ -48,7 +48,7 @@ const Signup = ({ onNavigate, onSignupSuccess }) => {
             <Sparkles size={26} />
           </div>
           <h2>Create Account</h2>
-          <p>Join MapFlow AI to discover local businesses & find better leads.</p>
+          <p>Join LeadGen AI to discover local businesses & find better leads.</p>
         </div>
 
         {error && (
