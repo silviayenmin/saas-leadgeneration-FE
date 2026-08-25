@@ -366,7 +366,7 @@ export default function LeadDiscovery({ leads, setLeads, searches, setSearches, 
             <div className="card loading-state-card" style={{ width: '100%', maxWidth: '500px', background: 'var(--bg-surface)', border: '1px solid var(--border-color)', borderRadius: '12px', padding: '2rem' }}>
               <div className="pulsing-ai-indicator loading-ai-indicator" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
                 <div className="pulsing-dot" style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--primary)', animation: 'pulse 1.5s infinite' }}></div>
-                <span style={{ fontWeight: 'bold' }}>MapFlow AI scraper engaged...</span>
+                <span style={{ fontWeight: 'bold' }}>LeadGen AI scraper engaged...</span>
               </div>
               <div id="loading-status-text" className="loading-text loading-status-text" style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '1.25rem' }}>
                 {scanStatusText}

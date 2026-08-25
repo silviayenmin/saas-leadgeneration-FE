@@ -328,7 +328,7 @@ export default function Dashboard({ leads = [], searches = [], onOpenLead, onSwi
       <div className="data-card" style={{ padding: '1rem', marginBottom: '1.5rem', background: 'var(--bg-trans-5)', border: '1px solid rgba(14,165,164,0.2)', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '10px' }}>
         <Sparkles size={16} color="var(--primary)" />
         <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-          <strong>MapFlow AI Insight:</strong> Intent analysis identified key local matches and project requirements. Average qualification match score is {stats.avgScore}% today.
+          <strong>LeadGen AI Insight:</strong> Intent analysis identified key local matches and project requirements. Average qualification match score is {stats.avgScore}% today.
         </div>
       </div>
 

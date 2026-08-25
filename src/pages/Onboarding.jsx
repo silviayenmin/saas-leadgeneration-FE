@@ -76,7 +76,7 @@ const Onboarding = ({ user, onComplete }) => {
           <div className="brand-icon">
             <Rocket size={26} />
           </div>
-          <h2>Welcome to MapFlow AI</h2>
+          <h2>Welcome to LeadGen AI</h2>
           <p>Let's customize your business discovery engine in 3 simple steps.</p>
         </div>
 
@@ -175,7 +175,7 @@ const Onboarding = ({ user, onComplete }) => {
                     rows="2"
                     value={bio}
                     onChange={(e) => setBio(e.target.value)}
-                    placeholder="e.g. Helping local businesses acquire high-intent leads using MapFlow AI."
+                    placeholder="e.g. Helping local businesses acquire high-intent leads using LeadGen AI."
                   />
                 </div>
               </div>

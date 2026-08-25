@@ -255,7 +255,7 @@ const App = () => {
   if (loading) {
     return (
       <div style={{ display: 'flex', height: '100vh', background: '#0A0F1C', color: '#F8FAFC', alignItems: 'center', justifyContent: 'center' }}>
-        <p style={{ fontFamily: 'Inter', fontSize: '1rem', color: '#94A3B8' }}>Loading MapFlow AI...</p>
+        <p style={{ fontFamily: 'Inter', fontSize: '1rem', color: '#94A3B8' }}>Loading LeadGen AI...</p>
       </div>
     );
   }

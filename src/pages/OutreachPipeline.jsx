@@ -192,24 +192,15 @@ const WORKFLOW_MODE_OPTIONS = [
   { value: 'recruiter', label: 'Recruiter Workflow Mode' },
 ];
 
-const PLATFORM_OPTIONS = [
-  { value: 'ALL', label: 'All Platforms' },
-  { value: 'Google Maps', label: 'Google Maps' },
-  { value: 'Govt Tenders', label: 'Govt Tenders' },
-  { value: 'LinkedIn', label: 'LinkedIn' },
-  { value: 'Facebook', label: 'Facebook' },
-  { value: 'Twitter', label: 'Twitter / X' },
-  { value: 'Reddit', label: 'Reddit' },
-  { value: 'WeWorkRemotely', label: 'WeWorkRemotely' },
-  { value: 'Freelancer', label: 'Freelancer' },
-  { value: 'Upwork', label: 'Upwork' },
-];
-
-const INTENT_OPTIONS = [
-  { value: 'ALL', label: 'All Intent Scores' },
-  { value: 'Qualified', label: 'Qualified' },
-  { value: 'Potential Lead', label: 'Potential Prospect' },
-  { value: 'Warm Lead', label: 'Warm Prospect' }
+const STAGE_FILTER_OPTIONS = [
+  { value: 'ALL', label: 'All Stages' },
+  { value: 'New', label: 'New Prospects' },
+  { value: 'Drafted', label: 'Drafted' },
+  { value: 'Emailed', label: 'Emailed' },
+  { value: 'Replied', label: 'Replied' },
+  { value: 'Hot', label: 'Hot' },
+  { value: 'Warm', label: 'Warm' },
+  { value: 'Cold', label: 'Cold' }
 ];
 
 const OutreachPipeline = ({
@@ -225,8 +216,7 @@ const OutreachPipeline = ({
 
   // Filter Toolbar State
   const [searchQuery, setSearchQuery] = useState('');
-  const [platformFilter, setPlatformFilter] = useState('ALL');
-  const [intentFilter, setIntentFilter] = useState('ALL');
+  const [stageFilter, setStageFilter] = useState('ALL');
   const [modeFilter, setModeFilter] = useState('ALL'); // 'ALL' | 'sales' | 'recruiter'
   const [filterMode, setFilterMode] = useState('sales'); // 'sales' | 'recruiter'
   const [startDate, setStartDate] = useState('');
@@ -325,19 +315,13 @@ const OutreachPipeline = ({
       if (!nameMatch && !compMatch) return false;
     }
 
-    // Platform Filter
-    if (platformFilter !== 'ALL') {
-      const p = (lead.platform || '').toLowerCase();
-      if (!p.includes(platformFilter.toLowerCase())) return false;
+    // Stage Filter
+    if (stageFilter !== 'ALL') {
+      const status = lead.crmStatus || 'New';
+      if (status !== stageFilter && !(stageFilter === 'New' && status === 'Discovered')) return false;
     }
 
-    // Intent Filter (>75 -> Qualified, 40-75 -> Potential Lead, <40 -> Warm Lead)
-    if (intentFilter !== 'ALL') {
-      const score = getLeadScoreVal(lead);
-      if (intentFilter === 'Qualified' && score <= 75) return false;
-      if (intentFilter === 'Potential Lead' && (score < 40 || score > 75)) return false;
-      if (intentFilter === 'Warm Lead' && score >= 40) return false;
-    }
+
 
     // Mode Select (Sales vs Recruiter)
     if (modeFilter !== 'ALL' && lead.search_type && lead.search_type !== modeFilter) {
@@ -475,19 +459,14 @@ const OutreachPipeline = ({
             }}
           /> */}
 
-          {/* Platform Filter */}
+          {/* Stage Filter */}
           <CustomPipelineSelect
-            options={PLATFORM_OPTIONS}
-            value={platformFilter}
-            onChange={(val) => setPlatformFilter(val)}
+            options={STAGE_FILTER_OPTIONS}
+            value={stageFilter}
+            onChange={(val) => setStageFilter(val)}
           />
 
-          {/* Intent Filter */}
-          <CustomPipelineSelect
-            options={INTENT_OPTIONS}
-            value={intentFilter}
-            onChange={(val) => setIntentFilter(val)}
-          />
+
 
           {/* Date Picker Trigger */}
           <div className={`date-picker-wrapper ${showDatePicker ? 'is-open' : ''}`} ref={datePickerRef}>
